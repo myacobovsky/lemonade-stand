@@ -28,14 +28,7 @@ export default function ShopPage() {
     { id: 'bpc', label: 'Battery Park City', icon: '🌳' },
   ];
 
-  const demoStores = [
-    { id: 1, name: "Emma's Crafts", owner: 'Emma', neighborhood: 'tribeca', image: '🎨', productCount: 3, rating: 5, description: 'Handmade bracelets, painted rocks, and more!' },
-    { id: 2, name: "Jake's Bake Shop", owner: 'Jake', neighborhood: 'tribeca', image: '🧁', productCount: 5, rating: 5, description: 'Cookies and brownies. Weekend pickup only!' },
-    { id: 3, name: "Lily's Art Studio", owner: 'Lily', neighborhood: 'bpc', image: '🌻', productCount: 4, rating: 5, description: 'Watercolor paintings and greeting cards!' },
-    { id: 4, name: "Max's Card Shop", owner: 'Max', neighborhood: 'fidi', image: '🃏', productCount: 8, rating: 4, description: 'Custom trading cards and sports cards!' },
-    { id: 5, name: "Mia's Plant Corner", owner: 'Mia', neighborhood: 'bpc', image: '🌱', productCount: 6, rating: 5, description: 'Little potted plants and painted planters!' },
-    { id: 6, name: "Noah's Tech Fix", owner: 'Noah', neighborhood: 'fidi', image: '🔧', productCount: 3, rating: 4, description: 'Phone cases, cable organizers, and tech tips!' },
-  ];
+  const demoStores = [];
 
   // Build store list from real DB stores + demo stores
   const dbStores = realStores.map((s) => ({
@@ -52,7 +45,7 @@ export default function ShopPage() {
   }));
 
   // Only show demo stores if there are fewer than 3 real stores
-  const allStores = dbStores.length >= 3 ? dbStores : [...dbStores, ...demoStores];
+  const allStores = dbStores;
 
   const filteredStores = allStores.filter((store) => {
     const matchesSearch = store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
