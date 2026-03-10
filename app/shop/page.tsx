@@ -100,7 +100,7 @@ export default function ShopPage() {
           {filteredStores.map((store) => (
             <button
               key={store.id}
-              onClick={() => router.push('/store')}
+              onClick={() => router.push('/store/' + store.owner.toLowerCase())}
               className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all text-left w-full"
             >
               <div className="flex gap-4">
