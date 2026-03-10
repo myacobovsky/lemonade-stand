@@ -208,37 +208,100 @@ export default function DashboardPage() {
               <button onClick={() => router.push('/store')} className="mt-4 text-amber-600 font-medium hover:underline">View & share your store →</button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {orders.map((order) => (
-                <div key={order.id} className="border border-gray-100 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <div className="font-medium text-gray-800">{order.buyerName}</div>
-                      <div className="text-sm text-gray-500">{order.items ? order.items.map((i) => `${i.name} x${i.quantity}`).join(', ') : order.productName}</div>
+                <div key={order.id} className={`rounded-xl border-2 overflow-hidden ${
+                  order.status === 'pending' ? 'border-amber-300 bg-amber-50/30' :
+                  order.status === 'accepted' ? 'border-blue-200' :
+                  order.status === 'completed' ? 'border-emerald-200' :
+                  'border-gray-200'
+                }`}>
+                  {/* Status banner for pending orders */}
+                  {order.status === 'pending' && (
+                    <div className="bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-800 flex items-center gap-2">
+                      <span>🔔</span> New order! Reach out to the customer to arrange pickup or delivery.
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold">${order.items ? order.items.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2) : order.price?.toFixed(2)}</div>
-                      <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${
-                        order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                        order.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                        order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                        'bg-gray-100 text-gray-500'
-                      }`}>
-                        {order.status}
+                  )}
+                  {order.status === 'accepted' && (
+                    <div className="bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-700 flex items-center gap-2">
+                      <span>📦</span> Accepted. Contact the customer to complete this order.
+                    </div>
+                  )}
+
+                  <div className="p-4">
+                    {/* Customer info */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="font-bold text-gray-800 text-base">{order.buyer_name || 'Customer'}</div>
+                        {order.buyer_contact && (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <span className="text-sm text-blue-600 font-medium">{order.buyer_contact}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-800">${order.total_amount?.toFixed(2) || (order.items ? order.items.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2) : '0.00')}</div>
+                        <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block mt-1 ${
+                          order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                          order.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                          order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                          order.status === 'declined' ? 'bg-red-100 text-red-500' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>
+                          {order.status}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {order.note && <div className="text-sm text-gray-500 italic mb-2">&quot;{order.note}&quot;</div>}
-                  <div className="flex gap-2">
-                    {order.status === 'pending' && (
-                      <>
-                        <button onClick={() => updateOrderStatus(order.id, 'accepted')} className="flex-1 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600">Accept</button>
-                        <button onClick={() => updateOrderStatus(order.id, 'declined')} className="py-2 px-4 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50">Decline</button>
-                      </>
+
+                    {/* Items ordered */}
+                    <div className="bg-white rounded-lg p-3 mb-3 border border-gray-100">
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Items ordered</div>
+                      {order.items ? order.items.map((item, i) => (
+                        <div key={i} className="flex justify-between text-sm py-1">
+                          <span className="text-gray-700">{item.name} <span className="text-gray-400">x{item.quantity}</span></span>
+                          <span className="text-gray-600 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      )) : <div className="text-sm text-gray-500">Order details unavailable</div>}
+                    </div>
+
+                    {/* Customer note */}
+                    {order.buyer_note && (
+                      <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                        <div className="text-xs font-semibold text-gray-500 mb-1">Note from customer</div>
+                        <p className="text-sm text-gray-700 italic">&quot;{order.buyer_note}&quot;</p>
+                      </div>
                     )}
-                    {order.status === 'accepted' && (
-                      <button onClick={() => handleStartComplete(order)} className="flex-1 py-2 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600">Mark Complete & Confirm Payment</button>
-                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex gap-2">
+                      {order.status === 'pending' && (
+                        <>
+                          <button onClick={() => updateOrderStatus(order.id, 'accepted')} className="flex-1 py-2.5 rounded-lg bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors">
+                            ✓ Accept Order
+                          </button>
+                          <button onClick={() => updateOrderStatus(order.id, 'declined')} className="py-2.5 px-4 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 transition-colors">
+                            Decline
+                          </button>
+                        </>
+                      )}
+                      {order.status === 'accepted' && (
+                        <div className="w-full space-y-2">
+                          <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
+                            <strong>Next step:</strong> Contact {order.buyer_name || 'the customer'} at <strong>{order.buyer_contact || 'their contact info'}</strong> to arrange pickup or delivery. When done, mark complete below.
+                          </div>
+                          <button onClick={() => handleStartComplete(order)} className="w-full py-2.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors">
+                            Mark Complete & Confirm Payment
+                          </button>
+                        </div>
+                      )}
+                      {order.status === 'completed' && (
+                        <div className="text-xs text-emerald-600 font-medium">✓ Completed{order.confirmed_amount ? ` — $${order.confirmed_amount.toFixed(2)} received` : ''}</div>
+                      )}
+                      {order.status === 'declined' && (
+                        <div className="text-xs text-gray-400">Order declined</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
