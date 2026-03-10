@@ -7,7 +7,7 @@ import { useApp } from '../../lib/context';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, user } = useApp();
+  const { signIn, signUp, user, store, loading: appLoading } = useApp();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
 
-  if (user) { router.push('/dashboard'); return null; }
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,10 +33,16 @@ export default function LoginPage() {
     } else {
       const { error } = await signIn(email, password);
       if (error) setError(error.message);
-      else router.push('/dashboard');
+      else router.push('/biz');
     }
     setLoading(false);
   };
+
+  // Redirect logged-in users
+  if (user && !appLoading) {
+    if (store) { router.push('/biz'); return null; }
+    else { router.push('/setup'); return null; }
+  }
 
   if (confirmSent) {
     return (
