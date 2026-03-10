@@ -28,6 +28,11 @@ export default function BizPage() {
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  if (!loading && !storeData) {
+    router.push('/setup');
+    return null;
+  }
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
