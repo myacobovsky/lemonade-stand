@@ -319,6 +319,49 @@ const learnArticles = [
       { type: 'vocab', term: 'Expand', definition: 'Adding new products to your store' },
     ],
   },
+  {
+    id: '50-business-ideas',
+    title: '50 Products You Can Make and Sell',
+    emoji: '💡',
+    category: '1. Brainstorm',
+    difficulty: 'Beginner',
+    readTime: '8 min',
+    summary: 'Not sure what to make? Here are 50 real products kids can create and sell for under $50 to start!',
+    content: [
+      { type: 'intro', text: "You don't need a lot of money to start a real business. Every idea on this list is something you can MAKE and SELL for under $50 to get started. Pick one that sounds fun and give it a try!" },
+
+      { type: 'heading', text: '🎨 Arts & Crafts' },
+      { type: 'text', text: "If you love making things with your hands, these are for you." },
+      { type: 'example', text: "1. Friendship bracelets — Beads and string cost about $10. Sell for $3-5 each.\n2. Painted rocks — Collect rocks for free, buy paint for $8. Sell as decor or gifts for $2-4.\n3. Custom bookmarks — Cardstock and markers. Sell for $1-2 each.\n4. Handmade greeting cards — Way more special than store-bought. Sell for $2-4.\n5. Sticker designs — Draw them, print on sticker paper ($12). Sell packs for $3-5.\n6. Keychains — Beads, charms, and keychain rings cost about $10. Tons of styles! Sell for $3-6.\n7. Painted flower pots — Buy plain pots for $1 each, paint them fun. Sell for $5-8.\n8. Custom name signs — Cardboard or wood scraps, paint, and glitter. Sell for $5-10.\n9. Origami art — Paper is basically free. Sell cranes, flowers, and animals for $1-3.\n10. Pressed flower frames — Collect flowers, press them in a book, frame them. Sell for $5-8.\n11. Paperweights — Smooth rocks, paint, glitter, or decoupage. Super easy to make. Sell for $3-6.\n12. Beaded suncatchers — Wire, beads, and fishing line. Hang in a window and they sparkle! Sell for $4-7.\n13. Woven potholders — Potholder looms cost about $8. Sell potholders for $3-5 each.\n14. Clay magnets — Air-dry clay ($8) and paint. Make fun shapes, glue magnets on the back. Sell for $2-4." },
+
+      { type: 'heading', text: '🍪 Food & Treats' },
+      { type: 'text', text: "People love homemade food. Always have a parent help in the kitchen and check about food rules in your area." },
+      { type: 'example', text: "15. Lemonade — The classic! Lemons, sugar, and cups cost about $10-15.\n16. Cookies — A batch costs about $5 to make, sell for $1-2 each.\n17. Rice crispy treats — Super cheap to make, kids love them. Sell for $1-2.\n18. Trail mix bags — Buy ingredients in bulk, mix your own combos. Sell bags for $2-3.\n19. Hot cocoa kits — Fill jars with cocoa mix, marshmallows, and a candy cane. Sell for $4-6.\n20. Flavored popcorn — Popcorn is cheap! Add cinnamon sugar, cheese, or caramel. Sell bags for $2-3.\n21. Dog treats — Peanut butter, oats, and banana. Dogs go crazy for them. Sell bags for $3-5.\n22. Fruit popsicles — Blend fruit, pour into molds ($8). Sell for $1-2 each in summer.\n23. Decorated sugar cookies — Plain cookies plus frosting and sprinkles. Sell for $2-3.\n24. Homemade granola — Oats, honey, and mix-ins. Sell jars for $5-7.\n25. Cake pops — Crumbled cake, frosting, and sticks. Decorate with sprinkles. Sell for $2-3 each.\n26. Banana bread loaves — One batch costs about $4. Sell mini loaves for $5-6." },
+
+      { type: 'heading', text: '🌱 Nature & Garden' },
+      { type: 'text', text: "Love being outside? These businesses start in your backyard." },
+      { type: 'example', text: "27. Potted plant babies — Split off baby plants from ones you already have. Sell in small pots for $3-5.\n28. Seed starter kits — Small pots, soil, seeds, and handwritten instructions. Sell kits for $4-6.\n29. Flower bouquets — Grow flowers from $2 seed packets, sell fresh bouquets for $5-8.\n30. Painted garden markers — Flat rocks or popsicle sticks labeled with plant names. Sell sets for $3-5.\n31. Bug hotel kits — Sticks, pinecones, and a small box. Fun and educational! Sell for $5-8.\n32. Herb growing kits — Small pots with basil, mint, or cilantro seeds. People love fresh herbs! Sell for $4-6.\n33. Fairy garden supplies — Tiny painted doors, mini mushrooms, pebble paths. Sell kits for $6-10.\n34. Dried flower bouquets — Hang flowers upside down to dry, arrange in bundles. Last forever! Sell for $5-8.\n35. Terrarium kits — Small jars, pebbles, soil, moss, and tiny plants. Sell assembled or as DIY kits for $8-12.\n36. Nature journals — Collect and press leaves, draw insects, label everything. Photocopy and sell for $3-5." },
+
+      { type: 'heading', text: '🎁 Seasonal & Holiday' },
+      { type: 'text', text: "These products sell best at certain times of year. Plan ahead!" },
+      { type: 'example', text: "37. Holiday ornaments — Handmade ornaments in November and December. Huge demand! Sell for $3-6.\n38. Valentine's Day cards — Handmade valentines in February. Sell packs of 5 for $3-5.\n39. Back-to-school pencil cases — Decorate plain pouches with fabric paint. Sell for $4-6.\n40. Summer activity kits — Outdoor games, chalk, bubbles in a bag. Sell boxes for $8-12.\n41. Custom party favors — Themed favor bags for birthday parties. Sell packs for $10-15.\n42. Halloween treat bags — Decorated bags filled with candy or toys. Sell for $3-5.\n43. Mother's Day gift boxes — A candle, card, and small craft in a box. Sell for $8-12." },
+
+      { type: 'heading', text: '🧶 Wearable & Useful' },
+      { type: 'text', text: "Make things people can actually use every day." },
+      { type: 'example', text: "44. Tie-dye shirts — Buy plain white shirts ($3 each), tie-dye kits cost about $15. Sell for $10-15.\n45. Scrunchies — Fabric scraps and elastic. Cost almost nothing! Sell for $2-4.\n46. Tote bags — Buy plain canvas totes ($3 each), paint or stamp designs on them. Sell for $8-12.\n47. Lip balm — Beeswax, coconut oil, and small tins. Sell for $2-4 each.\n48. Bath bombs — Baking soda, citric acid, and essential oils. Sell for $3-5 each.\n49. Beeswax wraps — Fabric and beeswax pellets. Reusable food wraps! Sell for $5-8.\n50. Coasters — Tiles from the hardware store ($0.50 each), paint or decoupage. Sell sets of 4 for $8-10." },
+
+      { type: 'tip', text: "Don't try to do all 50! Pick ONE idea that sounds fun, start small, and see how it goes. You can always try a different one later." },
+
+      { type: 'heading', text: 'How to Pick YOUR Idea' },
+      { type: 'text', text: "Ask yourself these questions:\n1. Which idea sounds the most FUN to me?\n2. Which one can I start THIS WEEK?\n3. Who would buy this in my neighborhood?\nThe best business is one you are excited about. Pick the one that makes you say 'I want to try THAT!' and go for it." },
+
+      { type: 'heading', text: 'Key Words You Learned' },
+      { type: 'vocab', term: 'Startup Cost', definition: 'The money you need to spend before you can start selling' },
+      { type: 'vocab', term: 'Handmade', definition: 'Made by hand, not by a machine. This is your superpower!' },
+      { type: 'vocab', term: 'Seasonal', definition: 'Something that sells best at a certain time of year' },
+      { type: 'vocab', term: 'Batch', definition: 'A group of products you make all at once' },
+    ],
+  },
 ];
 
 const LearnHub = () => {
