@@ -126,6 +126,11 @@ export default function EditorPage() {
     });
   };
 
+  if (!loading && !storeData) {
+    router.push('/setup');
+    return null;
+  }
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
