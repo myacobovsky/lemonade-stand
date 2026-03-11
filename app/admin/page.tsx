@@ -21,6 +21,9 @@ export default function AdminDashboard() {
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeOrders, setStoreOrders] = useState([]);
   const [timeframe, setTimeframe] = useState('all');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [allThemes, setAllThemes] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
@@ -39,7 +42,8 @@ export default function AdminDashboard() {
 
       const { data: allProducts } = await supabase
         .from('products')
-        .select('id, store_id');
+        .select('*')
+        .order('created_at', { ascending: false });
 
       const { data: allOrders } = await supabase
         .from('orders')
@@ -79,6 +83,12 @@ export default function AdminDashboard() {
         pendingOrders: (allOrders || []).filter(o => o.status === 'pending').length,
       });
 
+      // Fetch themes for moderation
+      const { data: themes } = await supabase
+        .from('store_themes')
+        .select('*');
+      setAllThemes(themes || []);
+      setAllProducts(allProducts || []);
       setStores(enrichedStores);
       setOrders(allOrders || []);
     } catch (err) {
@@ -235,8 +245,27 @@ export default function AdminDashboard() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Platform Overview</h1>
-        <p className="text-gray-500 text-sm mb-6">Lemonade Stand admin panel</p>
+        <p className="text-gray-500 text-sm mb-4">Lemonade Stand admin panel</p>
 
+        {/* Tabs */}
+        <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+          {[
+            { id: 'overview', label: 'Overview' },
+            { id: 'moderation', label: 'Content Review' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === tab.id ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'overview' && (<>
         {/* Top metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -378,6 +407,136 @@ export default function AdminDashboard() {
             <div className="p-8 text-center text-gray-400 text-sm">No orders yet</div>
           )}
         </div>
+        </>)}
+
+        {activeTab === 'moderation' && (
+          <div className="space-y-6">
+            {/* Store Content Review */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-800">Store Content</h2>
+                <p className="text-xs text-gray-400 mt-1">Review store names, bios, and announcements for inappropriate content</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-xs text-gray-500 border-b border-gray-100">
+                      <th className="text-left px-4 py-3 font-medium">Store</th>
+                      <th className="text-left px-4 py-3 font-medium">Bio</th>
+                      <th className="text-left px-4 py-3 font-medium">Announcement</th>
+                      <th className="text-right px-4 py-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stores.map(store => {
+                      const theme = allThemes.find(t => t.store_id === store.id);
+                      return (
+                        <tr key={store.id} className="border-b border-gray-50 hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <div className="text-sm font-medium text-gray-800">{store.store_name}</div>
+                            <div className="text-xs text-gray-400">by {store.kid_name}</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            {store.bio ? (
+                              <div className="text-sm text-gray-600 max-w-xs truncate">{store.bio}</div>
+                            ) : (
+                              <span className="text-xs text-gray-300">No bio</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {theme?.announcement_on && theme?.announcement ? (
+                              <div className="text-sm text-gray-600 max-w-xs truncate">{theme.announcement}</div>
+                            ) : (
+                              <span className="text-xs text-gray-300">Off</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <a href={'/store/' + store.kid_name.toLowerCase()} target="_blank" className="px-2 py-1 bg-amber-50 hover:bg-amber-100 rounded text-xs text-amber-700">View</a>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Product Content Review */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-800">Product Content</h2>
+                <p className="text-xs text-gray-400 mt-1">Review product names and descriptions</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-xs text-gray-500 border-b border-gray-100">
+                      <th className="text-left px-4 py-3 font-medium">Product</th>
+                      <th className="text-left px-4 py-3 font-medium">Description</th>
+                      <th className="text-left px-4 py-3 font-medium">Store</th>
+                      <th className="text-right px-4 py-3 font-medium">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allProducts.slice(0, 50).map(p => {
+                      const store = stores.find(s => s.id === p.store_id);
+                      return (
+                        <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span>{p.emoji || '🎁'}</span>
+                              <span className="text-sm font-medium text-gray-800">{p.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="text-sm text-gray-600 max-w-xs truncate">{p.description || <span className="text-gray-300">No description</span>}</div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{store?.store_name || 'Unknown'}</td>
+                          <td className="px-4 py-3 text-right text-sm font-medium">${p.price}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Order Notes Review */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="font-bold text-gray-800">Order Messages & Notes</h2>
+                <p className="text-xs text-gray-400 mt-1">Review notes left by buyers on orders</p>
+              </div>
+              {orders.filter(o => o.buyer_note).length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-sm">No order notes to review</div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {orders.filter(o => o.buyer_note).map(order => {
+                    const store = stores.find(s => s.id === order.store_id);
+                    return (
+                      <div key={order.id} className="px-4 py-3 hover:bg-gray-50">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-800">{order.buyer_name}</span>
+                              <span className="text-xs text-gray-400">→</span>
+                              <span className="text-sm text-gray-600">{store?.store_name || 'Unknown store'}</span>
+                            </div>
+                            <div className="bg-gray-100 rounded-lg px-3 py-2 mt-1.5 max-w-lg">
+                              <p className="text-sm text-gray-700">{order.buyer_note}</p>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-400 shrink-0 ml-4">{new Date(order.created_at).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   );
