@@ -9,24 +9,28 @@ const AppContext = createContext(null);
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [store, setStore] = useState(null);
+  const [stores, setStores] = useState([]);
+  const [activeStoreId, setActiveStoreId] = useState(null);
   const [theme, setTheme] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+
+  // Derived: current active store
+  const store = stores.find(s => s.id === activeStoreId) || null;
 
   // Listen for auth changes
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
-      if (session?.user) loadStoreData(session.user.id);
+      if (session?.user) loadUserStores(session.user.id);
       else setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
-      if (session?.user) loadStoreData(session.user.id);
+      if (session?.user) loadUserStores(session.user.id);
       else {
-        setStore(null); setTheme(null); setProducts([]); setOrders([]);
+        setStores([]); setActiveStoreId(null); setTheme(null); setProducts([]); setOrders([]);
         setLoading(false);
       }
     });
@@ -34,47 +38,71 @@ export function AppProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Load all store data for a user
-  async function loadStoreData(userId) {
+  // When active store changes, load its data
+  useEffect(() => {
+    if (activeStoreId) loadStoreData(activeStoreId);
+  }, [activeStoreId]);
+
+  // Load all stores for a user
+  async function loadUserStores(userId) {
     try {
-      // Get store
-      const { data: storeData } = await supabase
+      const { data: userStores } = await supabase
         .from('stores')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .order('created_at', { ascending: true });
 
-      if (storeData) {
-        setStore(storeData);
-
-        // Get theme
-        const { data: themeData } = await supabase
-          .from('store_themes')
-          .select('*')
-          .eq('store_id', storeData.id)
-          .single();
-        if (themeData) setTheme(themeData);
-
-        // Get products
-        const { data: productsData } = await supabase
-          .from('products')
-          .select('*')
-          .eq('store_id', storeData.id)
-          .order('sort_order', { ascending: true });
-        if (productsData) setProducts(productsData);
-
-        // Get orders
-        const { data: ordersData } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('store_id', storeData.id)
-          .order('created_at', { ascending: false });
-        if (ordersData) setOrders(ordersData);
+      if (userStores && userStores.length > 0) {
+        setStores(userStores);
+        // Auto-select: use saved preference or first store
+        const savedId = typeof window !== 'undefined' ? localStorage.getItem('activeStoreId') : null;
+        const validSaved = savedId && userStores.some(s => s.id === savedId);
+        setActiveStoreId(validSaved ? savedId : userStores[0].id);
+      } else {
+        setStores([]);
+        setActiveStoreId(null);
       }
+    } catch (err) {
+      console.error('Error loading stores:', err);
+    }
+    setLoading(false);
+  }
+
+  // Load data for a specific store
+  async function loadStoreData(storeId) {
+    try {
+      // Save preference
+      if (typeof window !== 'undefined') localStorage.setItem('activeStoreId', storeId);
+
+      const { data: themeData } = await supabase
+        .from('store_themes')
+        .select('*')
+        .eq('store_id', storeId)
+        .single();
+      if (themeData) setTheme(themeData);
+      else setTheme(null);
+
+      const { data: productsData } = await supabase
+        .from('products')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('sort_order', { ascending: true });
+      setProducts(productsData || []);
+
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+      setOrders(ordersData || []);
     } catch (err) {
       console.error('Error loading store data:', err);
     }
-    setLoading(false);
+  }
+
+  // Switch active store
+  function switchStore(storeId) {
+    setActiveStoreId(storeId);
   }
 
   // Auth functions
@@ -89,6 +117,7 @@ export function AppProvider({ children }) {
   }
 
   async function signOut() {
+    if (typeof window !== 'undefined') localStorage.removeItem('activeStoreId');
     await supabase.auth.signOut();
   }
 
@@ -100,7 +129,6 @@ export function AppProvider({ children }) {
       .select()
       .single();
     if (data) {
-      setStore(data);
       // Create default theme
       const { data: themeData } = await supabase
         .from('store_themes')
@@ -108,6 +136,9 @@ export function AppProvider({ children }) {
         .select()
         .single();
       if (themeData) setTheme(themeData);
+
+      setStores(prev => [...prev, data]);
+      setActiveStoreId(data.id);
     }
     return { data, error };
   }
@@ -120,7 +151,7 @@ export function AppProvider({ children }) {
       .eq('id', store.id)
       .select()
       .single();
-    if (data) setStore(data);
+    if (data) setStores(prev => prev.map(s => s.id === data.id ? data : s));
     return { data, error };
   }
 
@@ -167,7 +198,6 @@ export function AppProvider({ children }) {
 
   async function reorderProducts(newProducts) {
     setProducts(newProducts);
-    // Update sort_order in DB
     for (let i = 0; i < newProducts.length; i++) {
       await supabase.from('products').update({ sort_order: i }).eq('id', newProducts[i].id);
     }
@@ -198,7 +228,6 @@ export function AppProvider({ children }) {
 
   async function confirmPayment(orderId, amount, savings) {
     await updateOrderStatus(orderId, 'completed', { confirmed_amount: amount, confirmed_savings: savings });
-    // Update store earnings
     if (store) {
       const newEarnings = (store.total_earnings || 0) + amount;
       const newSavings = (store.confirmed_savings || 0) + savings;
@@ -222,7 +251,9 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       // Auth
       user, loading, signUp, signIn, signOut,
-      // Store
+      // Stores (multi)
+      stores, activeStoreId, switchStore,
+      // Active store
       store, createStore, updateStore,
       // Theme
       theme, updateTheme,
@@ -233,7 +264,7 @@ export function AppProvider({ children }) {
       // Images
       uploadImage,
       // Reload
-      reload: () => user && loadStoreData(user.id),
+      reload: () => user && loadUserStores(user.id),
     }}>
       {children}
     </AppContext.Provider>
