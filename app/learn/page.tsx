@@ -1,6 +1,5 @@
 // @ts-nocheck
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NavBar } from '../components';
 import learnArticles from './articles';
@@ -63,7 +62,6 @@ const colorMap = {
 
 export default function LearnHub() {
   const router = useRouter();
-  const [expandedStage, setExpandedStage] = useState(null);
 
   return (
     <div className="min-h-screen bg-white">
@@ -77,20 +75,16 @@ export default function LearnHub() {
           <p className="text-lg text-gray-500 max-w-lg mx-auto leading-relaxed">Learn how to start and run a real business, step by step.</p>
         </div>
 
-        {/* Stage progression */}
-        <div className="space-y-5">
-          {stages.map((stage, stageIndex) => {
+        {/* All stages, always open */}
+        <div className="space-y-8">
+          {stages.map((stage) => {
             const colors = colorMap[stage.color];
             const articles = learnArticles.filter(a => a.category === stage.id);
-            const isExpanded = expandedStage === stage.id || expandedStage === null;
 
             return (
               <div key={stage.id}>
                 {/* Stage header */}
-                <button
-                  onClick={() => setExpandedStage(expandedStage === stage.id ? null : stage.id)}
-                  className={`w-full rounded-2xl p-5 sm:p-6 text-left transition-all ${colors.bg} ${colors.border} border hover:shadow-sm`}
-                >
+                <div className={`w-full rounded-2xl p-5 sm:p-6 text-left ${colors.bg} ${colors.border} border`}>
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-full ${colors.numBg} text-white flex items-center justify-center font-bold text-xl shrink-0`}>
                       {stage.num}
@@ -103,49 +97,35 @@ export default function LearnHub() {
                       <p className="text-base sm:text-lg text-gray-600 font-medium">{stage.tagline}</p>
                       <p className="text-sm sm:text-base text-gray-500 mt-1 leading-relaxed">{stage.description}</p>
                     </div>
-                    <div className="text-gray-400 shrink-0 mt-2">
-                      <svg className={`w-6 h-6 transition-transform ${isExpanded && expandedStage !== null ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                    </div>
                   </div>
-                </button>
+                </div>
 
-                {/* Articles within this stage */}
-                {isExpanded && (
-                  <div className="ml-10 sm:ml-12 pl-6 mt-3 mb-8 space-y-3 relative">
-                    {/* Connecting line */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${colors.line} rounded-full`} />
+                {/* Articles */}
+                <div className="ml-10 sm:ml-12 pl-6 mt-3 mb-2 space-y-3 relative">
+                  <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${colors.line} rounded-full`} />
 
-                    {articles.map((article) => (
-                      <button
-                        key={article.id}
-                        onClick={() => router.push(`/learn/${article.id}`)}
-                        className="w-full bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all text-left flex items-start gap-4 relative"
-                      >
-                        {/* Dot on the line */}
-                        <div className={`absolute -left-[26px] top-6 w-3 h-3 rounded-full ${colors.numBg} border-2 border-white`} />
+                  {articles.map((article) => (
+                    <button
+                      key={article.id}
+                      onClick={() => router.push(`/learn/${article.id}`)}
+                      className="w-full bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all text-left flex items-start gap-4 relative"
+                    >
+                      <div className={`absolute -left-[26px] top-6 w-3 h-3 rounded-full ${colors.numBg} border-2 border-white`} />
 
-                        <span className="text-3xl sm:text-4xl shrink-0">{article.emoji}</span>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-1">{article.title}</h3>
-                          <p className="text-sm sm:text-base text-gray-500 leading-relaxed line-clamp-2">{article.summary}</p>
-                          <div className="flex items-center gap-3 mt-2">
-                            <span className="text-xs sm:text-sm text-gray-400">{article.readTime} read</span>
-                            <span className="text-gray-300">·</span>
-                            <span className={`text-xs sm:text-sm font-medium px-2 py-0.5 rounded-full ${article.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{article.difficulty}</span>
-                          </div>
+                      <span className="text-3xl sm:text-4xl shrink-0">{article.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-1">{article.title}</h3>
+                        <p className="text-sm sm:text-base text-gray-500 leading-relaxed line-clamp-2">{article.summary}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-xs sm:text-sm text-gray-400">{article.readTime} read</span>
+                          <span className="text-gray-300">·</span>
+                          <span className={`text-xs sm:text-sm font-medium px-2 py-0.5 rounded-full ${article.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{article.difficulty}</span>
                         </div>
-                        <span className="text-gray-300 text-lg shrink-0 mt-2">→</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Connector between stages */}
-                {stageIndex < stages.length - 1 && !isExpanded && (
-                  <div className="flex justify-center py-2">
-                    <div className="w-0.5 h-5 bg-gray-200 rounded-full" />
-                  </div>
-                )}
+                      </div>
+                      <span className="text-gray-300 text-lg shrink-0 mt-2">→</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             );
           })}
