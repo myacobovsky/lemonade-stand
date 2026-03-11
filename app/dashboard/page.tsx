@@ -7,7 +7,7 @@ import { useApp } from '../../lib/context';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading, store: storeData, orders, updateOrderStatus, confirmPayment } = useApp();
+  const { loading, store: storeData, stores, orders, updateOrderStatus, confirmPayment } = useApp();
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
   const storeName = storeData?.store_name || "Emma's Crafts";
@@ -163,6 +163,17 @@ export default function DashboardPage() {
               <div className="text-[10px] font-medium text-gray-600">Share</div>
             </button>
           </div>
+        </div>
+
+        {/* Add Another Store */}
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6 flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium text-gray-800">Managing {stores.length} store{stores.length !== 1 ? 's' : ''}</div>
+            <div className="text-xs text-gray-400">Switch stores using the dropdown in the nav bar</div>
+          </div>
+          <button onClick={() => router.push('/setup')} className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-medium rounded-lg transition-colors">
+            + Add Store
+          </button>
         </div>
 
         {/* Pending orders alert */}
