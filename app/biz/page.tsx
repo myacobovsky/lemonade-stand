@@ -22,7 +22,10 @@ export default function BizPage() {
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFlyer, setShowFlyer] = useState(false);
-  const [productCosts, setProductCosts] = useState({}); // { productId: { materials: '', minutes: '', hourlyRate: '' } }
+  const [productCosts, setProductCosts] = useState({});
+  const [whatIfProduct, setWhatIfProduct] = useState(null);
+  const [whatIfPrice, setWhatIfPrice] = useState('');
+  const [whatIfGoal, setWhatIfGoal] = useState('');; // { productId: { materials: '', minutes: '', hourlyRate: '' } }
   
 
   const handleCopyLink = () => {
@@ -162,10 +165,10 @@ export default function BizPage() {
               <div className="flex items-center gap-2 mb-3">
                 <div className="text-sm font-bold text-gray-700">🧮 Profit Calculator</div>
                 <LearnTip title="Cost = Materials + Time" color="amber">
-                  <p>Your real cost is not just supplies. Your TIME has value too.</p>
-                  <p>Think about it: if you babysit for $10/hour, your time is worth $10/hour. If a bracelet takes 30 minutes to make, that is $5 of your time.</p>
-                  <p><strong>Total cost = materials + time</strong></p>
-                  <p>Try filling in both below to see your true profit.</p>
+                  <p>Making things costs money AND time.</p>
+                  <p>The beads and string you buy? That is your <strong>materials</strong> cost.</p>
+                  <p>The time you spend making it? That has value too. If you could earn $10/hour babysitting, then 30 minutes of your time is worth $5.</p>
+                  <p>Type in what you spend on each product below and see how much you really earn.</p>
                 </LearnTip>
               </div>
               <div className="space-y-3">
@@ -275,6 +278,143 @@ export default function BizPage() {
           )}
         </div>
 
+        {/* What If Simulator */}
+        {products.length > 0 && (
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-bold text-gray-800">🔮 What If?</h2>
+            <LearnTip title="Planning Ahead" color="purple">
+              <p>What if you want to earn $50? How many things do you need to sell?</p>
+              <p>This tool helps you figure that out. Pick a product, choose a price, and set a goal.</p>
+              <p>Try sliding the price up and down. See how the number changes? A higher price means you sell fewer to reach your goal.</p>
+            </LearnTip>
+          </div>
+
+          {/* Product picker */}
+          <div className="space-y-3">
+            <div>
+              <div className="text-xs font-medium text-gray-500 mb-1.5">Pick a product</div>
+              <div className="flex gap-2 flex-wrap">
+                {products.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => { setWhatIfProduct(p.id); setWhatIfPrice(String(p.price)); }}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm transition-all ${
+                      whatIfProduct === p.id ? 'border-purple-400 bg-purple-50' : 'border-gray-100 hover:border-gray-300'
+                    }`}
+                  >
+                    <span>{p.emoji || '🎁'}</span>
+                    <span className="font-medium text-gray-700">{p.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {whatIfProduct && (() => {
+              const p = products.find(pr => pr.id === whatIfProduct);
+              if (!p) return null;
+              const costs = productCosts[p.id] || {};
+              const materials = parseFloat(costs.materials) || 0;
+              const minutes = parseFloat(costs.minutes) || 0;
+              const hourlyRate = parseFloat(costs.hourlyRate) || 0;
+              const timeCost = (minutes / 60) * hourlyRate;
+              const totalCost = materials + timeCost;
+              const price = parseFloat(whatIfPrice) || 0;
+              const profitPerUnit = price - totalCost;
+              const goal = parseFloat(whatIfGoal) || 0;
+              const unitsNeeded = profitPerUnit > 0 && goal > 0 ? Math.ceil(goal / profitPerUnit) : 0;
+              const totalRevenue = unitsNeeded * price;
+              const totalCosts = unitsNeeded * totalCost;
+
+              return (
+                <div className="mt-3 space-y-3">
+                  {/* Price slider */}
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 mb-1.5">Selling price</div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={Math.max(totalCost + 0.5, 0.5)}
+                        max={Math.max(price * 3, 20)}
+                        step="0.5"
+                        value={whatIfPrice || p.price}
+                        onChange={(e) => setWhatIfPrice(e.target.value)}
+                        className="flex-1 h-2 bg-gray-200 rounded-full appearance-none accent-purple-500"
+                      />
+                      <div className="relative shrink-0">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                        <input
+                          type="number" min="0" step="0.50"
+                          value={whatIfPrice}
+                          onChange={(e) => setWhatIfPrice(e.target.value)}
+                          className="w-20 pl-6 pr-2 py-2 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm font-semibold"
+                        />
+                      </div>
+                    </div>
+                    {totalCost > 0 && <div className="text-xs text-gray-400 mt-1">Your cost: ${totalCost.toFixed(2)} · Profit per sale: <span className={profitPerUnit > 0 ? 'text-emerald-600 font-semibold' : 'text-red-500 font-semibold'}>${profitPerUnit.toFixed(2)}</span></div>}
+                    {totalCost === 0 && <div className="text-xs text-gray-400 mt-1">Fill in your costs in the calculator above to get accurate results</div>}
+                  </div>
+
+                  {/* Goal input */}
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 mb-1.5">Profit goal</div>
+                    <div className="flex gap-2">
+                      {[25, 50, 100, 250].map((g) => (
+                        <button
+                          key={g}
+                          onClick={() => setWhatIfGoal(String(g))}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            whatIfGoal === String(g) ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >${g}</button>
+                      ))}
+                      <div className="relative">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                        <input
+                          type="number" min="0" step="10" placeholder="Custom"
+                          value={![25,50,100,250].map(String).includes(whatIfGoal) ? whatIfGoal : ''}
+                          onChange={(e) => setWhatIfGoal(e.target.value)}
+                          className="w-24 pl-6 pr-2 py-2 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Results */}
+                  {profitPerUnit > 0 && goal > 0 && (
+                    <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 mt-2">
+                      <div className="text-center mb-3">
+                        <div className="text-3xl font-bold text-purple-700">{unitsNeeded}</div>
+                        <div className="text-sm text-purple-600 font-medium">{p.name}{unitsNeeded !== 1 ? 's' : ''} to sell</div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div className="bg-white rounded-lg p-2">
+                          <div className="font-bold text-gray-800">${totalRevenue.toFixed(0)}</div>
+                          <div className="text-gray-500">total sales</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-2">
+                          <div className="font-bold text-gray-800">${totalCosts.toFixed(0)}</div>
+                          <div className="text-gray-500">total costs</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-2">
+                          <div className="font-bold text-emerald-600">${goal}</div>
+                          <div className="text-gray-500">your profit</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {profitPerUnit <= 0 && price > 0 && totalCost > 0 && (
+                    <div className="bg-red-50 rounded-xl p-4 border border-red-200 text-sm text-red-700">
+                      Your price (${price.toFixed(2)}) is less than your cost (${totalCost.toFixed(2)}). Raise your price to make a profit.
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+        )}
 
         {/* Marketing & Promotion */}
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
