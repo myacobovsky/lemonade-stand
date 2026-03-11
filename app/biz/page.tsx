@@ -22,8 +22,8 @@ export default function BizPage() {
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFlyer, setShowFlyer] = useState(false);
-  const [productCosts, setProductCosts] = useState({});
-  const [showCalculator, setShowCalculator] = useState(true);
+  const [productCosts, setProductCosts] = useState({}); // { productId: { materials: '', minutes: '', hourlyRate: '' } }
+  
 
   const handleCopyLink = () => {
     setCopiedLink(true);
@@ -120,47 +120,37 @@ export default function BizPage() {
         </div>
 
 
+
         {/* Money Math */}
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="font-bold text-gray-800">💰 Money Math</h2>
             <LearnTip title="Understanding Your Money" color="green">
-              <p>Every business owner needs to understand three numbers:</p>
-              <p><strong>Cost</strong> is what you spend to make your product. Beads, string, flour, paint — all of that is your cost.</p>
-              <p><strong>Price</strong> is what you charge your customers.</p>
-              <p><strong>Profit</strong> is what you KEEP. It is your price minus your cost. This is the money you actually earn.</p>
-              <p>The bigger the gap between your cost and your price, the more money you make on each sale.</p>
+              <p>Every business owner tracks three numbers:</p>
+              <p><strong>Cost</strong> = what you spend (supplies + your time)</p>
+              <p><strong>Price</strong> = what you charge customers</p>
+              <p><strong>Profit</strong> = what you keep (price minus cost)</p>
             </LearnTip>
           </div>
 
-          {/* Quick stats from real data */}
+          {/* Quick stats */}
           <div className="grid grid-cols-2 gap-3 mb-5">
             <div className="bg-amber-50 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-amber-600">${totalEarnings.toFixed(2)}</div>
-              <div className="text-xs text-amber-700 mt-1 font-medium">Total money earned</div>
-              <LearnTip title="Revenue" color="amber">
-                <p>This is your <strong>revenue</strong>. It means all the money that came in from your sales.</p>
-                <p>But remember: not all of this is yours to keep. You had to spend money on supplies to make your products.</p>
-              </LearnTip>
+              <div className="text-xs text-amber-700 mt-1 font-medium">Total Sales</div>
             </div>
             <div className="bg-emerald-50 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-emerald-600">${confirmedSavings.toFixed(2)}</div>
-              <div className="text-xs text-emerald-700 mt-1 font-medium">In your savings jar</div>
-              <LearnTip title="Savings" color="green">
-                <p>This is money you set aside for your goal. Saving part of what you earn is one of the smartest things a business owner can do.</p>
-                <p>You are saving <strong>{savingsPercentConfig}%</strong> of each sale. That means for every dollar you earn, {savingsPercentConfig} cents goes into your jar.</p>
-              </LearnTip>
+              <div className="text-xs text-emerald-700 mt-1 font-medium">In Savings</div>
             </div>
           </div>
 
           {completedOrders.length > 0 && (
             <div className="bg-blue-50 rounded-xl p-4 mb-5">
-              <div className="text-sm font-semibold text-blue-800 mb-1">📊 Your numbers</div>
               <div className="text-sm text-blue-700 space-y-1">
-                <p>You have made <strong>{completedOrders.length}</strong> sale{completedOrders.length !== 1 ? 's' : ''} so far.</p>
-                {completedOrders.length > 0 && <p>That is about <strong>${(totalEarnings / completedOrders.length).toFixed(2)}</strong> per sale on average.</p>}
+                <p><strong>{completedOrders.length}</strong> sale{completedOrders.length !== 1 ? 's' : ''} so far · <strong>${(totalEarnings / completedOrders.length).toFixed(2)}</strong> avg per sale</p>
                 {savingsGoalAmount > confirmedSavings && (
-                  <p>You need <strong>{Math.ceil((savingsGoalAmount - confirmedSavings) / (totalEarnings / Math.max(completedOrders.length, 1)))}</strong> more sale{Math.ceil((savingsGoalAmount - confirmedSavings) / (totalEarnings / Math.max(completedOrders.length, 1))) !== 1 ? 's' : ''} to reach your savings goal. You got this!</p>
+                  <p><strong>{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1))}</strong> more sale{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1)) !== 1 ? 's' : ''} to reach your savings goal</p>
                 )}
               </div>
             </div>
@@ -171,76 +161,105 @@ export default function BizPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="text-sm font-bold text-gray-700">🧮 Profit Calculator</div>
-                <LearnTip title="What is Profit?" color="amber">
-                  <p><strong>Profit</strong> is the money you keep after paying for your supplies.</p>
-                  <p>If you sell a bracelet for $5 and the beads cost you $2, your profit is $3.</p>
-                  <p>Try typing in how much it costs to make each product below. The calculator will show you how much you earn on each sale.</p>
+                <LearnTip title="Cost = Materials + Time" color="amber">
+                  <p>Your real cost is not just supplies. Your TIME has value too.</p>
+                  <p>Think about it: if you babysit for $10/hour, your time is worth $10/hour. If a bracelet takes 30 minutes to make, that is $5 of your time.</p>
+                  <p><strong>Total cost = materials + time</strong></p>
+                  <p>Try filling in both below to see your true profit.</p>
                 </LearnTip>
               </div>
               <div className="space-y-3">
                 {products.map((p) => {
-                  const cost = parseFloat(productCosts[p.id]) || 0;
-                  const profit = p.price - cost;
+                  const costs = productCosts[p.id] || {};
+                  const materials = parseFloat(costs.materials) || 0;
+                  const minutes = parseFloat(costs.minutes) || 0;
+                  const hourlyRate = parseFloat(costs.hourlyRate) || 0;
+                  const timeCost = (minutes / 60) * hourlyRate;
+                  const totalCost = materials + timeCost;
+                  const hasCost = materials > 0 || (minutes > 0 && hourlyRate > 0);
+                  const profit = p.price - totalCost;
                   const margin = p.price > 0 ? Math.round((profit / p.price) * 100) : 0;
+
+                  const updateCost = (field, value) => {
+                    setProductCosts(prev => ({
+                      ...prev,
+                      [p.id]: { ...(prev[p.id] || {}), [field]: value }
+                    }));
+                  };
+
                   return (
                     <div key={p.id} className="bg-gray-50 rounded-xl p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <span className="text-2xl">{p.emoji || '🎁'}</span>
-                        <div className="flex-1">
+                        <div>
                           <div className="font-semibold text-gray-800">{p.name}</div>
-                          <div className="text-sm text-gray-500">Selling for <strong>${p.price}</strong></div>
+                          <div className="text-sm text-gray-500">Sells for <strong>${p.price}</strong></div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <label className="text-sm text-gray-600 shrink-0">It costs me:</label>
+
+                      {/* Materials cost */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-gray-500 w-20 shrink-0">Materials</span>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                           <input
-                            type="number"
-                            min="0"
-                            step="0.25"
-                            placeholder="0.00"
-                            value={productCosts[p.id] || ''}
-                            onChange={(e) => setProductCosts(prev => ({ ...prev, [p.id]: e.target.value }))}
-                            className="w-24 pl-7 pr-2 py-2 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                            type="number" min="0" step="0.25" placeholder="0.00"
+                            value={costs.materials || ''}
+                            onChange={(e) => updateCost('materials', e.target.value)}
+                            className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
                           />
                         </div>
-                        <span className="text-sm text-gray-400">to make</span>
                       </div>
-                      {cost > 0 && (
-                        <div className="flex items-center gap-4 pt-2 border-t border-gray-200">
-                          <div className="flex-1">
-                            <div className={`text-lg font-bold ${profit > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                              {profit > 0 ? '+' : ''}${profit.toFixed(2)} profit
-                            </div>
-                            <div className="text-xs text-gray-500 mt-0.5">per sale</div>
-                          </div>
-                          <div className="w-24">
-                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all ${margin >= 50 ? 'bg-emerald-400' : margin >= 25 ? 'bg-amber-400' : 'bg-red-400'}`}
-                                style={{ width: Math.max(0, Math.min(margin, 100)) + '%' }}
-                              />
-                            </div>
-                            <div className={`text-xs mt-1 text-center font-medium ${margin >= 50 ? 'text-emerald-600' : margin >= 25 ? 'text-amber-600' : 'text-red-500'}`}>
-                              {margin}% margin
-                            </div>
-                          </div>
-                          {profit <= 0 && (
-                            <div className="text-xs text-red-500 font-medium">
-                              Uh oh! You are losing money. Try raising your price.
-                            </div>
-                          )}
+
+                      {/* Time cost */}
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="text-xs text-gray-500 w-20 shrink-0">Time</span>
+                        <input
+                          type="number" min="0" step="5" placeholder="min"
+                          value={costs.minutes || ''}
+                          onChange={(e) => updateCost('minutes', e.target.value)}
+                          className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm text-center"
+                        />
+                        <span className="text-xs text-gray-400">min @</span>
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                          <input
+                            type="number" min="0" step="1" placeholder="0"
+                            value={costs.hourlyRate || ''}
+                            onChange={(e) => updateCost('hourlyRate', e.target.value)}
+                            className="w-16 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                          />
                         </div>
-                      )}
-                      {cost > 0 && profit > 0 && margin < 30 && (
-                        <div className="mt-2 text-xs text-amber-600 bg-amber-50 rounded-lg p-2">
-                          💡 Tip: Your margin is pretty low. Could you find cheaper supplies or raise your price a little?
-                        </div>
-                      )}
-                      {cost > 0 && margin >= 60 && (
-                        <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 rounded-lg p-2">
-                          🌟 Great margin! You are keeping most of what you earn on this one.
+                        <span className="text-xs text-gray-400">/hr</span>
+                      </div>
+
+                      {/* Results */}
+                      {hasCost && (
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                            <span>Materials: ${materials.toFixed(2)}</span>
+                            {timeCost > 0 && <span>Time: ${timeCost.toFixed(2)}</span>}
+                            <span className="font-semibold text-gray-700">Total cost: ${totalCost.toFixed(2)}</span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex-1">
+                              <div className={`text-lg font-bold ${profit > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                                {profit > 0 ? '+' : ''}${profit.toFixed(2)} profit
+                              </div>
+                            </div>
+                            <div className="w-20">
+                              <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${margin >= 50 ? 'bg-emerald-400' : margin >= 25 ? 'bg-amber-400' : 'bg-red-400'}`}
+                                  style={{ width: Math.max(0, Math.min(margin, 100)) + '%' }}
+                                />
+                              </div>
+                              <div className={`text-[10px] mt-0.5 text-center font-medium ${margin >= 50 ? 'text-emerald-600' : margin >= 25 ? 'text-amber-600' : 'text-red-500'}`}>{margin}%</div>
+                            </div>
+                          </div>
+                          {profit <= 0 && <p className="text-xs text-red-500 mt-1">You are losing money on this one. Try raising your price or lowering your costs.</p>}
+                          {profit > 0 && margin < 30 && <p className="text-xs text-amber-600 mt-1">💡 Low margin. Could you find cheaper supplies or charge a little more?</p>}
+                          {profit > 0 && margin >= 60 && <p className="text-xs text-emerald-600 mt-1">🌟 Great margin. You are keeping most of what you earn.</p>}
                         </div>
                       )}
                     </div>
@@ -249,12 +268,13 @@ export default function BizPage() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-400">
-              <p className="text-sm">Add products to your store to use the Profit Calculator.</p>
+            <div className="text-center py-4 text-gray-400">
+              <p className="text-sm">Add products to use the Profit Calculator.</p>
               <button onClick={() => router.push('/editor')} className="mt-2 text-amber-600 text-sm font-medium hover:underline">Go to Editor →</button>
             </div>
           )}
         </div>
+
 
         {/* Marketing & Promotion */}
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
