@@ -22,6 +22,8 @@ export default function BizPage() {
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFlyer, setShowFlyer] = useState(false);
+  const [productCosts, setProductCosts] = useState({});
+  const [showCalculator, setShowCalculator] = useState(true);
 
   const handleCopyLink = () => {
     setCopiedLink(true);
@@ -115,6 +117,143 @@ export default function BizPage() {
               <div className="text-xs font-medium text-gray-700">Savings</div>
             </button>
           </div>
+        </div>
+
+
+        {/* Money Math */}
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-bold text-gray-800">💰 Money Math</h2>
+            <LearnTip title="Understanding Your Money" color="green">
+              <p>Every business owner needs to understand three numbers:</p>
+              <p><strong>Cost</strong> is what you spend to make your product. Beads, string, flour, paint — all of that is your cost.</p>
+              <p><strong>Price</strong> is what you charge your customers.</p>
+              <p><strong>Profit</strong> is what you KEEP. It is your price minus your cost. This is the money you actually earn.</p>
+              <p>The bigger the gap between your cost and your price, the more money you make on each sale.</p>
+            </LearnTip>
+          </div>
+
+          {/* Quick stats from real data */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="bg-amber-50 rounded-xl p-4 text-center">
+              <div className="text-2xl font-bold text-amber-600">${totalEarnings.toFixed(2)}</div>
+              <div className="text-xs text-amber-700 mt-1 font-medium">Total money earned</div>
+              <LearnTip title="Revenue" color="amber">
+                <p>This is your <strong>revenue</strong>. It means all the money that came in from your sales.</p>
+                <p>But remember: not all of this is yours to keep. You had to spend money on supplies to make your products.</p>
+              </LearnTip>
+            </div>
+            <div className="bg-emerald-50 rounded-xl p-4 text-center">
+              <div className="text-2xl font-bold text-emerald-600">${confirmedSavings.toFixed(2)}</div>
+              <div className="text-xs text-emerald-700 mt-1 font-medium">In your savings jar</div>
+              <LearnTip title="Savings" color="green">
+                <p>This is money you set aside for your goal. Saving part of what you earn is one of the smartest things a business owner can do.</p>
+                <p>You are saving <strong>{savingsPercentConfig}%</strong> of each sale. That means for every dollar you earn, {savingsPercentConfig} cents goes into your jar.</p>
+              </LearnTip>
+            </div>
+          </div>
+
+          {completedOrders.length > 0 && (
+            <div className="bg-blue-50 rounded-xl p-4 mb-5">
+              <div className="text-sm font-semibold text-blue-800 mb-1">📊 Your numbers</div>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p>You have made <strong>{completedOrders.length}</strong> sale{completedOrders.length !== 1 ? 's' : ''} so far.</p>
+                {completedOrders.length > 0 && <p>That is about <strong>${(totalEarnings / completedOrders.length).toFixed(2)}</strong> per sale on average.</p>}
+                {savingsGoalAmount > confirmedSavings && (
+                  <p>You need <strong>{Math.ceil((savingsGoalAmount - confirmedSavings) / (totalEarnings / Math.max(completedOrders.length, 1)))}</strong> more sale{Math.ceil((savingsGoalAmount - confirmedSavings) / (totalEarnings / Math.max(completedOrders.length, 1))) !== 1 ? 's' : ''} to reach your savings goal. You got this!</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Profit Calculator */}
+          {products.length > 0 ? (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="text-sm font-bold text-gray-700">🧮 Profit Calculator</div>
+                <LearnTip title="What is Profit?" color="amber">
+                  <p><strong>Profit</strong> is the money you keep after paying for your supplies.</p>
+                  <p>If you sell a bracelet for $5 and the beads cost you $2, your profit is $3.</p>
+                  <p>Try typing in how much it costs to make each product below. The calculator will show you how much you earn on each sale.</p>
+                </LearnTip>
+              </div>
+              <div className="space-y-3">
+                {products.map((p) => {
+                  const cost = parseFloat(productCosts[p.id]) || 0;
+                  const profit = p.price - cost;
+                  const margin = p.price > 0 ? Math.round((profit / p.price) * 100) : 0;
+                  return (
+                    <div key={p.id} className="bg-gray-50 rounded-xl p-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">{p.emoji || '🎁'}</span>
+                        <div className="flex-1">
+                          <div className="font-semibold text-gray-800">{p.name}</div>
+                          <div className="text-sm text-gray-500">Selling for <strong>${p.price}</strong></div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <label className="text-sm text-gray-600 shrink-0">It costs me:</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.25"
+                            placeholder="0.00"
+                            value={productCosts[p.id] || ''}
+                            onChange={(e) => setProductCosts(prev => ({ ...prev, [p.id]: e.target.value }))}
+                            className="w-24 pl-7 pr-2 py-2 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                          />
+                        </div>
+                        <span className="text-sm text-gray-400">to make</span>
+                      </div>
+                      {cost > 0 && (
+                        <div className="flex items-center gap-4 pt-2 border-t border-gray-200">
+                          <div className="flex-1">
+                            <div className={`text-lg font-bold ${profit > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {profit > 0 ? '+' : ''}${profit.toFixed(2)} profit
+                            </div>
+                            <div className="text-xs text-gray-500 mt-0.5">per sale</div>
+                          </div>
+                          <div className="w-24">
+                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${margin >= 50 ? 'bg-emerald-400' : margin >= 25 ? 'bg-amber-400' : 'bg-red-400'}`}
+                                style={{ width: Math.max(0, Math.min(margin, 100)) + '%' }}
+                              />
+                            </div>
+                            <div className={`text-xs mt-1 text-center font-medium ${margin >= 50 ? 'text-emerald-600' : margin >= 25 ? 'text-amber-600' : 'text-red-500'}`}>
+                              {margin}% margin
+                            </div>
+                          </div>
+                          {profit <= 0 && (
+                            <div className="text-xs text-red-500 font-medium">
+                              Uh oh! You are losing money. Try raising your price.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {cost > 0 && profit > 0 && margin < 30 && (
+                        <div className="mt-2 text-xs text-amber-600 bg-amber-50 rounded-lg p-2">
+                          💡 Tip: Your margin is pretty low. Could you find cheaper supplies or raise your price a little?
+                        </div>
+                      )}
+                      {cost > 0 && margin >= 60 && (
+                        <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 rounded-lg p-2">
+                          🌟 Great margin! You are keeping most of what you earn on this one.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6 text-gray-400">
+              <p className="text-sm">Add products to your store to use the Profit Calculator.</p>
+              <button onClick={() => router.push('/editor')} className="mt-2 text-amber-600 text-sm font-medium hover:underline">Go to Editor →</button>
+            </div>
+          )}
         </div>
 
         {/* Marketing & Promotion */}
