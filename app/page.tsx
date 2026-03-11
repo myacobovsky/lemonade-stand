@@ -201,7 +201,6 @@ export default function LandingPage() {
             >
               Start Your Kid&apos;s Store for Free
             </button>
-            <p className="text-gray-500 text-xs mt-3">No account required to get started. Set up in under 2 minutes.</p>
           </div>
         </div>
       </section>
