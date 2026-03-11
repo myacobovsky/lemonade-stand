@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { Logo } from '../components';
 
 // Add your admin email(s) here
-const ADMIN_EMAILS = ['mikkel@getlemonadestand.com', 'myacobovsky@gmail.com'];
+const ADMIN_EMAILS = ['mikkelholmj@gmail.com', 'myacobovsky@gmail.com'];
 
 export default function AdminDashboard() {
   const router = useRouter();
