@@ -16,8 +16,8 @@ export default function StorePage() {
   const [buyerInfo, setBuyerInfo] = useState({ name: '', contact: '', note: '' });
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const storeName = storeData?.store_name || "Emma's Crafts";
-  const kidName = storeData?.kid_name || 'Emma';
+  const storeName = storeData?.store_name || 'My Store';
+  const kidName = storeData?.kid_name || 'Kid';
   const kidAge = storeData?.kidAge || '7';
 
   const addToCart = (product) => {
