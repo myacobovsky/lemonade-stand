@@ -7,7 +7,7 @@ import { useApp } from '../../lib/context';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, user, store, loading: appLoading } = useApp();
+  const { signIn, signUp, user, stores, loading: appLoading } = useApp();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +40,7 @@ export default function LoginPage() {
 
   // Redirect logged-in users
   if (user && !appLoading) {
-    if (store) { router.push('/biz'); return null; }
+    if (stores.length > 0) { router.push('/biz'); return null; }
     else { router.push('/setup'); return null; }
   }
 
