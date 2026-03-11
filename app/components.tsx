@@ -85,7 +85,7 @@ export const LearnTip = ({ title, color = 'amber', children }) => {
 // --- NavBar ---
 export const NavBar = ({ active }) => {
   const pathname = usePathname();
-  const { user, signOut, store } = useApp();
+  const { user, signOut, store, stores, switchStore } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const tabs = store ? [
@@ -106,10 +106,23 @@ export const NavBar = ({ active }) => {
   return (
     <header className="bg-white border-b border-gray-100 px-4 sm:px-8 py-3 relative">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo size="sm" />
-          <span className="font-semibold text-gray-900">Lemonade Stand</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
+            <Logo size="sm" />
+            <span className="font-semibold text-gray-900">Lemonade Stand</span>
+          </Link>
+          {stores.length > 1 && (
+            <select
+              value={store?.id || ''}
+              onChange={(e) => switchStore(e.target.value)}
+              className="ml-2 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-lg px-2 py-1 font-medium focus:outline-none focus:border-amber-400"
+            >
+              {stores.map(s => (
+                <option key={s.id} value={s.id}>{s.store_name}</option>
+              ))}
+            </select>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <nav className="hidden sm:flex gap-1 text-sm">
             {tabs.map((tab) => (
