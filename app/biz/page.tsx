@@ -381,7 +381,7 @@ export default function BizPage() {
               <span className="text-[10px] font-medium text-gray-700">{copiedLink ? 'Copied!' : 'Copy Link'}</span>
             </button>
             <button
-              onClick={() => { window.open(`sms:?body=Check out ${kidName}'s store on Lemonade Stand! getlemonadestand.com/store/${kidName.toLowerCase()}`); }}
+              onClick={() => { window.open(`sms:?body=Check out ${kidName}'s store on Lemonade Stand! getlemonadestand.com/store/${encodeURIComponent(kidName.toLowerCase())}`); }}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-gray-100 bg-gray-50 hover:border-green-300 hover:shadow-sm transition-all"
             >
               <span className="text-2xl">💬</span>
@@ -408,7 +408,7 @@ export default function BizPage() {
             <div className="text-xs text-gray-500 mb-1">Your store link</div>
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-white rounded-lg px-3 py-2 text-sm text-gray-600 border border-gray-200 truncate font-mono text-xs">
-                getlemonadestand.com/store/{kidName.toLowerCase()}
+                getlemonadestand.com/store/{encodeURIComponent(kidName.toLowerCase())}
               </div>
             </div>
           </div>
@@ -431,7 +431,7 @@ export default function BizPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-[10px] text-gray-500 font-mono">getlemonadestand.com/store/{kidName.toLowerCase()}</div>
+                  <div className="text-[10px] text-gray-500 font-mono">getlemonadestand.com/store/{encodeURIComponent(kidName.toLowerCase())}</div>
                 </div>
                 <p className="text-xs text-gray-400">Scan the code or visit the link to shop!</p>
               </div>
