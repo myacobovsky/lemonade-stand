@@ -23,9 +23,9 @@ export default function BizPage() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFlyer, setShowFlyer] = useState(false);
   const [productCosts, setProductCosts] = useState({});
-  const [whatIfProduct, setWhatIfProduct] = useState(null);
-  const [whatIfPrice, setWhatIfPrice] = useState('');
-  const [whatIfGoal, setWhatIfGoal] = useState('');; // { productId: { materials: '', minutes: '', hourlyRate: '' } }
+  
+  
+  ; // { productId: { materials: '', minutes: '', hourlyRate: '' } }
   
 
   const handleCopyLink = () => {
@@ -124,15 +124,15 @@ export default function BizPage() {
 
 
 
+
         {/* Money Math */}
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="font-bold text-gray-800">💰 Money Math</h2>
-            <LearnTip title="Understanding Your Money" color="green">
-              <p>Every business owner tracks three numbers:</p>
-              <p><strong>Cost</strong> = what you spend (supplies + your time)</p>
-              <p><strong>Price</strong> = what you charge customers</p>
-              <p><strong>Profit</strong> = what you keep (price minus cost)</p>
+            <LearnTip title="Your Money" color="green">
+              <p>When you sell something, the money you get is called <strong>sales</strong>.</p>
+              <p>But you had to spend money to make it. That is your <strong>cost</strong>.</p>
+              <p>The money left over is your <strong>profit</strong>. That is the money you actually keep.</p>
             </LearnTip>
           </div>
 
@@ -149,29 +149,27 @@ export default function BizPage() {
           </div>
 
           {completedOrders.length > 0 && (
-            <div className="bg-blue-50 rounded-xl p-4 mb-5">
-              <div className="text-sm text-blue-700 space-y-1">
-                <p><strong>{completedOrders.length}</strong> sale{completedOrders.length !== 1 ? 's' : ''} so far · <strong>${(totalEarnings / completedOrders.length).toFixed(2)}</strong> avg per sale</p>
-                {savingsGoalAmount > confirmedSavings && (
-                  <p><strong>{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1))}</strong> more sale{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1)) !== 1 ? 's' : ''} to reach your savings goal</p>
-                )}
-              </div>
+            <div className="bg-blue-50 rounded-xl p-4 mb-5 text-sm text-blue-700">
+              <p><strong>{completedOrders.length}</strong> sale{completedOrders.length !== 1 ? 's' : ''} so far · <strong>${(totalEarnings / completedOrders.length).toFixed(2)}</strong> avg per sale</p>
+              {savingsGoalAmount > confirmedSavings && (
+                <p className="mt-1"><strong>{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1))}</strong> more sale{Math.ceil((savingsGoalAmount - confirmedSavings) / Math.max(totalEarnings / Math.max(completedOrders.length, 1), 1)) !== 1 ? 's' : ''} to reach your savings goal</p>
+              )}
             </div>
           )}
 
-          {/* Profit Calculator */}
+          {/* Product profit cards */}
           {products.length > 0 ? (
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="text-sm font-bold text-gray-700">🧮 Profit Calculator</div>
-                <LearnTip title="Cost = Materials + Time" color="amber">
+                <div className="text-sm font-bold text-gray-700">🧮 How much do I earn?</div>
+                <LearnTip title="Cost = Supplies + Time" color="amber">
                   <p>Making things costs money AND time.</p>
-                  <p>The beads and string you buy? That is your <strong>materials</strong> cost.</p>
+                  <p>The beads and string you buy? That is your <strong>supplies</strong> cost.</p>
                   <p>The time you spend making it? That has value too. If you could earn $10/hour babysitting, then 30 minutes of your time is worth $5.</p>
-                  <p>Type in what you spend on each product below and see how much you really earn.</p>
+                  <p>Type in what you spend below and see how much you really earn.</p>
                 </LearnTip>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {products.map((p) => {
                   const costs = productCosts[p.id] || {};
                   const materials = parseFloat(costs.materials) || 0;
@@ -180,8 +178,15 @@ export default function BizPage() {
                   const timeCost = (minutes / 60) * hourlyRate;
                   const totalCost = materials + timeCost;
                   const hasCost = materials > 0 || (minutes > 0 && hourlyRate > 0);
-                  const profit = p.price - totalCost;
-                  const margin = p.price > 0 ? Math.round((profit / p.price) * 100) : 0;
+
+                  const customPrice = costs.customPrice !== undefined ? parseFloat(costs.customPrice) : null;
+                  const currentPrice = customPrice !== null && !isNaN(customPrice) ? customPrice : p.price;
+                  const profit = currentPrice - totalCost;
+                  const margin = currentPrice > 0 ? Math.round((profit / currentPrice) * 100) : 0;
+                  const priceChanged = customPrice !== null && !isNaN(customPrice) && customPrice !== p.price;
+
+                  const goal = parseFloat(costs.goal) || 0;
+                  const unitsNeeded = profit > 0 && goal > 0 ? Math.ceil(goal / profit) : 0;
 
                   const updateCost = (field, value) => {
                     setProductCosts(prev => ({
@@ -192,77 +197,149 @@ export default function BizPage() {
 
                   return (
                     <div key={p.id} className="bg-gray-50 rounded-xl p-4">
+                      {/* Product header with price controls */}
                       <div className="flex items-center gap-3 mb-3">
                         <span className="text-2xl">{p.emoji || '🎁'}</span>
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold text-gray-800">{p.name}</div>
-                          <div className="text-sm text-gray-500">Sells for <strong>${p.price}</strong></div>
                         </div>
                       </div>
 
-                      {/* Materials cost */}
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-gray-500 w-20 shrink-0">Materials</span>
-                        <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
-                          <input
-                            type="number" min="0" step="0.25" placeholder="0.00"
-                            value={costs.materials || ''}
-                            onChange={(e) => updateCost('materials', e.target.value)}
-                            className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Time cost */}
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-xs text-gray-500 w-20 shrink-0">Time</span>
-                        <input
-                          type="number" min="0" step="5" placeholder="min"
-                          value={costs.minutes || ''}
-                          onChange={(e) => updateCost('minutes', e.target.value)}
-                          className="w-16 px-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm text-center"
-                        />
-                        <span className="text-xs text-gray-400">min @</span>
-                        <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
-                          <input
-                            type="number" min="0" step="1" placeholder="0"
-                            value={costs.hourlyRate || ''}
-                            onChange={(e) => updateCost('hourlyRate', e.target.value)}
-                            className="w-16 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
-                          />
-                        </div>
-                        <span className="text-xs text-gray-400">/hr</span>
-                      </div>
-
-                      {/* Results */}
-                      {hasCost && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                            <span>Materials: ${materials.toFixed(2)}</span>
-                            {timeCost > 0 && <span>Time: ${timeCost.toFixed(2)}</span>}
-                            <span className="font-semibold text-gray-700">Total cost: ${totalCost.toFixed(2)}</span>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                              <div className={`text-lg font-bold ${profit > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                                {profit > 0 ? '+' : ''}${profit.toFixed(2)} profit
+                      {/* Price control */}
+                      <div className="bg-white rounded-lg p-3 mb-3 border border-gray-100">
+                        <div className="text-xs font-medium text-gray-500 mb-2">Selling price</div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => updateCost('customPrice', String(Math.max(0.5, currentPrice - 1)))}
+                            className="w-10 h-10 rounded-lg bg-red-50 text-red-600 font-bold text-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                          >-$1</button>
+                          <div className="flex-1 text-center">
+                            <div className="text-2xl font-bold text-gray-800">${currentPrice.toFixed(2)}</div>
+                            {priceChanged && (
+                              <div className="text-[10px] text-gray-400 mt-0.5">
+                                was ${p.price.toFixed(2)} · <button onClick={() => updateCost('customPrice', undefined)} className="text-amber-600 hover:underline">reset</button>
                               </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => updateCost('customPrice', String(currentPrice + 1))}
+                            className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 font-bold text-lg hover:bg-emerald-100 transition-colors flex items-center justify-center"
+                          >+$1</button>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs text-gray-400">or set price to</span>
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                            <input
+                              type="number" min="0" step="0.50" placeholder={String(p.price)}
+                              value={customPrice !== null && !isNaN(customPrice) ? costs.customPrice : ''}
+                              onChange={(e) => updateCost('customPrice', e.target.value)}
+                              className="w-20 pl-5 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                            />
+                          </div>
+                        </div>
+                        {priceChanged && (
+                          <div className="mt-2 text-xs text-purple-600 bg-purple-50 rounded-lg p-2">
+                            {customPrice > p.price
+                              ? '📈 Higher price = more profit per sale, but fewer people might buy.'
+                              : '📉 Lower price = more people might buy, but you earn less on each one.'}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Cost inputs */}
+                      <div className="bg-white rounded-lg p-3 mb-3 border border-gray-100">
+                        <div className="text-xs font-medium text-gray-500 mb-2">My costs</div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs text-gray-500 w-16 shrink-0">Supplies</span>
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                            <input
+                              type="number" min="0" step="0.25" placeholder="0.00"
+                              value={costs.materials || ''}
+                              onChange={(e) => updateCost('materials', e.target.value)}
+                              className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs text-gray-500 w-16 shrink-0">Time</span>
+                          <input
+                            type="number" min="0" step="5" placeholder="min"
+                            value={costs.minutes || ''}
+                            onChange={(e) => updateCost('minutes', e.target.value)}
+                            className="w-14 px-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm text-center"
+                          />
+                          <span className="text-xs text-gray-400">min @</span>
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                            <input
+                              type="number" min="0" step="1" placeholder="0"
+                              value={costs.hourlyRate || ''}
+                              onChange={(e) => updateCost('hourlyRate', e.target.value)}
+                              className="w-14 pl-5 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
+                            />
+                          </div>
+                          <span className="text-xs text-gray-400">/hr</span>
+                        </div>
+                      </div>
+
+                      {/* Profit result */}
+                      {hasCost && (
+                        <div className="bg-white rounded-lg p-3 mb-3 border border-gray-100">
+                          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                            <span>Supplies: ${materials.toFixed(2)}{timeCost > 0 ? ` + Time: $${timeCost.toFixed(2)}` : ''}</span>
+                            <span className="font-semibold text-gray-700">Cost: ${totalCost.toFixed(2)}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className={`text-xl font-bold ${profit > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {profit > 0 ? '+' : ''}${profit.toFixed(2)} profit
                             </div>
-                            <div className="w-20">
+                            <div className="flex-1">
                               <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all ${margin >= 50 ? 'bg-emerald-400' : margin >= 25 ? 'bg-amber-400' : 'bg-red-400'}`}
                                   style={{ width: Math.max(0, Math.min(margin, 100)) + '%' }}
                                 />
                               </div>
-                              <div className={`text-[10px] mt-0.5 text-center font-medium ${margin >= 50 ? 'text-emerald-600' : margin >= 25 ? 'text-amber-600' : 'text-red-500'}`}>{margin}%</div>
                             </div>
                           </div>
-                          {profit <= 0 && <p className="text-xs text-red-500 mt-1">You are losing money on this one. Try raising your price or lowering your costs.</p>}
-                          {profit > 0 && margin < 30 && <p className="text-xs text-amber-600 mt-1">💡 Low margin. Could you find cheaper supplies or charge a little more?</p>}
-                          {profit > 0 && margin >= 60 && <p className="text-xs text-emerald-600 mt-1">🌟 Great margin. You are keeping most of what you earn.</p>}
+                          {profit <= 0 && <p className="text-xs text-red-500 mt-2">You are losing money. Raise your price or lower your costs.</p>}
+                          {profit > 0 && margin < 30 && <p className="text-xs text-amber-600 mt-2">💡 You are not keeping much. Try raising your price a little.</p>}
+                          {profit > 0 && margin >= 60 && <p className="text-xs text-emerald-600 mt-2">🌟 Great. You are keeping most of what you earn.</p>}
+                        </div>
+                      )}
+
+                      {/* Goal calculator */}
+                      {hasCost && profit > 0 && (
+                        <div className="bg-white rounded-lg p-3 border border-gray-100">
+                          <div className="text-xs font-medium text-gray-500 mb-2">🎯 I want to earn</div>
+                          <div className="flex gap-2 flex-wrap">
+                            {[25, 50, 100].map((g) => (
+                              <button
+                                key={g}
+                                onClick={() => updateCost('goal', String(g))}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                  costs.goal === String(g) ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                              >${g}</button>
+                            ))}
+                            <div className="relative">
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                              <input
+                                type="number" min="0" step="10" placeholder="Other"
+                                value={!['25','50','100'].includes(costs.goal) ? (costs.goal || '') : ''}
+                                onChange={(e) => updateCost('goal', e.target.value)}
+                                className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm"
+                              />
+                            </div>
+                          </div>
+                          {unitsNeeded > 0 && (
+                            <div className="bg-purple-50 rounded-lg p-3 mt-3 text-center">
+                              <div className="text-2xl font-bold text-purple-700">{unitsNeeded}</div>
+                              <div className="text-sm text-purple-600">sales to reach ${goal}</div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -272,149 +349,12 @@ export default function BizPage() {
             </div>
           ) : (
             <div className="text-center py-4 text-gray-400">
-              <p className="text-sm">Add products to use the Profit Calculator.</p>
+              <p className="text-sm">Add products to use Money Math.</p>
               <button onClick={() => router.push('/editor')} className="mt-2 text-amber-600 text-sm font-medium hover:underline">Go to Editor →</button>
             </div>
           )}
         </div>
 
-        {/* What If Simulator */}
-        {products.length > 0 && (
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="font-bold text-gray-800">🔮 What If?</h2>
-            <LearnTip title="Planning Ahead" color="purple">
-              <p>What if you want to earn $50? How many things do you need to sell?</p>
-              <p>This tool helps you figure that out. Pick a product, choose a price, and set a goal.</p>
-              <p>Try sliding the price up and down. See how the number changes? A higher price means you sell fewer to reach your goal.</p>
-            </LearnTip>
-          </div>
-
-          {/* Product picker */}
-          <div className="space-y-3">
-            <div>
-              <div className="text-xs font-medium text-gray-500 mb-1.5">Pick a product</div>
-              <div className="flex gap-2 flex-wrap">
-                {products.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => { setWhatIfProduct(p.id); setWhatIfPrice(String(p.price)); }}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm transition-all ${
-                      whatIfProduct === p.id ? 'border-purple-400 bg-purple-50' : 'border-gray-100 hover:border-gray-300'
-                    }`}
-                  >
-                    <span>{p.emoji || '🎁'}</span>
-                    <span className="font-medium text-gray-700">{p.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {whatIfProduct && (() => {
-              const p = products.find(pr => pr.id === whatIfProduct);
-              if (!p) return null;
-              const costs = productCosts[p.id] || {};
-              const materials = parseFloat(costs.materials) || 0;
-              const minutes = parseFloat(costs.minutes) || 0;
-              const hourlyRate = parseFloat(costs.hourlyRate) || 0;
-              const timeCost = (minutes / 60) * hourlyRate;
-              const totalCost = materials + timeCost;
-              const price = parseFloat(whatIfPrice) || 0;
-              const profitPerUnit = price - totalCost;
-              const goal = parseFloat(whatIfGoal) || 0;
-              const unitsNeeded = profitPerUnit > 0 && goal > 0 ? Math.ceil(goal / profitPerUnit) : 0;
-              const totalRevenue = unitsNeeded * price;
-              const totalCosts = unitsNeeded * totalCost;
-
-              return (
-                <div className="mt-3 space-y-3">
-                  {/* Price slider */}
-                  <div>
-                    <div className="text-xs font-medium text-gray-500 mb-1.5">Selling price</div>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="range"
-                        min={Math.max(totalCost + 0.5, 0.5)}
-                        max={Math.max(price * 3, 20)}
-                        step="0.5"
-                        value={whatIfPrice || p.price}
-                        onChange={(e) => setWhatIfPrice(e.target.value)}
-                        className="flex-1 h-2 bg-gray-200 rounded-full appearance-none accent-purple-500"
-                      />
-                      <div className="relative shrink-0">
-                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                        <input
-                          type="number" min="0" step="0.50"
-                          value={whatIfPrice}
-                          onChange={(e) => setWhatIfPrice(e.target.value)}
-                          className="w-20 pl-6 pr-2 py-2 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm font-semibold"
-                        />
-                      </div>
-                    </div>
-                    {totalCost > 0 && <div className="text-xs text-gray-400 mt-1">Your cost: ${totalCost.toFixed(2)} · Profit per sale: <span className={profitPerUnit > 0 ? 'text-emerald-600 font-semibold' : 'text-red-500 font-semibold'}>${profitPerUnit.toFixed(2)}</span></div>}
-                    {totalCost === 0 && <div className="text-xs text-gray-400 mt-1">Fill in your costs in the calculator above to get accurate results</div>}
-                  </div>
-
-                  {/* Goal input */}
-                  <div>
-                    <div className="text-xs font-medium text-gray-500 mb-1.5">Profit goal</div>
-                    <div className="flex gap-2">
-                      {[25, 50, 100, 250].map((g) => (
-                        <button
-                          key={g}
-                          onClick={() => setWhatIfGoal(String(g))}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                            whatIfGoal === String(g) ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                          }`}
-                        >${g}</button>
-                      ))}
-                      <div className="relative">
-                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                        <input
-                          type="number" min="0" step="10" placeholder="Custom"
-                          value={![25,50,100,250].map(String).includes(whatIfGoal) ? whatIfGoal : ''}
-                          onChange={(e) => setWhatIfGoal(e.target.value)}
-                          className="w-24 pl-6 pr-2 py-2 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Results */}
-                  {profitPerUnit > 0 && goal > 0 && (
-                    <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 mt-2">
-                      <div className="text-center mb-3">
-                        <div className="text-3xl font-bold text-purple-700">{unitsNeeded}</div>
-                        <div className="text-sm text-purple-600 font-medium">{p.name}{unitsNeeded !== 1 ? 's' : ''} to sell</div>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                        <div className="bg-white rounded-lg p-2">
-                          <div className="font-bold text-gray-800">${totalRevenue.toFixed(0)}</div>
-                          <div className="text-gray-500">total sales</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-2">
-                          <div className="font-bold text-gray-800">${totalCosts.toFixed(0)}</div>
-                          <div className="text-gray-500">total costs</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-2">
-                          <div className="font-bold text-emerald-600">${goal}</div>
-                          <div className="text-gray-500">your profit</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {profitPerUnit <= 0 && price > 0 && totalCost > 0 && (
-                    <div className="bg-red-50 rounded-xl p-4 border border-red-200 text-sm text-red-700">
-                      Your price (${price.toFixed(2)}) is less than your cost (${totalCost.toFixed(2)}). Raise your price to make a profit.
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-        )}
 
         {/* Marketing & Promotion */}
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
