@@ -2,7 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { NavBar, Logo } from '../components';
+import { NavBar } from '../components';
 
 const learnArticles = [
   // ===== STAGE 1: BRAINSTORM =====
@@ -22,7 +22,7 @@ const learnArticles = [
       { type: 'text', text: "Talk to friends, family, and neighbors. Ask them: What would you buy from a kid's store? What do you wish someone made? Their answers might surprise you!" },
       { type: 'example', text: 'Your neighbor says: "I wish someone sold homemade dog treats." You love dogs. Boom. Business idea!' },
       { type: 'heading', text: 'The 3-Question Test' },
-      { type: 'text', text: "For every idea, ask yourself:\n1. Do I enjoy making this?\n2. Can I make it again and again?\n3. Would someone pay money for it?\nIf you answer yes to all three, you have a winner!" },
+      { type: 'text', text: "For every idea, ask yourself three questions. Do I enjoy making this? Can I make it again and again? Would someone pay money for it? If you answer yes to all three, you have a winner." },
       { type: 'tip', text: "Start with ONE product. You can always add more later. It's better to be great at one thing than okay at five things." },
       { type: 'heading', text: 'Key Words You Learned' },
       { type: 'vocab', term: 'Product', definition: 'The thing you make and sell' },
@@ -40,9 +40,9 @@ const learnArticles = [
     content: [
       { type: 'intro', text: "Anyone can make something. But making something people LOVE? That takes a little extra thought." },
       { type: 'heading', text: 'Make It Well' },
-      { type: 'text', text: "Quality matters. If you sell bracelets, make sure the knots are tight and the colors look good. If you sell cookies, make sure they taste amazing every time. People come back when they trust your quality." },
+      { type: 'text', text: "Quality matters. If you sell painted rocks, make sure the paint is smooth and the colors pop. If you sell cookies, make sure they taste amazing every single time. People come back when they trust your quality." },
       { type: 'heading', text: 'Make It Special' },
-      { type: 'text', text: "What makes YOUR product different from something you could buy at a store? Maybe it's handmade. Maybe you use special colors. Maybe you take custom orders. Find your special thing!" },
+      { type: 'text', text: "What makes YOUR product different from something you could buy at a store? Maybe it's handmade. Maybe you use special colors. Maybe you take custom orders. Find your special thing." },
       { type: 'example', text: 'Two kids sell bracelets. One sells plain ones. The other lets you pick your own colors and adds your name. The second one sells way more. That\'s the power of being special!' },
       { type: 'heading', text: 'Solve a Problem' },
       { type: 'text', text: "The best products fix something. A bookmark solves the problem of losing your page. A snack bag solves the problem of being hungry. Think about what little problems your product can solve." },
@@ -71,7 +71,7 @@ const learnArticles = [
       { type: 'text', text: "Add up what it costs to make your product, then add your profit on top. We have a whole lesson on pricing!" },
       { type: 'heading', text: 'Question 4: What is my goal?' },
       { type: 'text', text: "Why are you doing this? Saving for something? Learning new skills? Just for fun? Having a goal keeps you going when things get hard." },
-      { type: 'example', text: "Emma's plan: I sell friendship bracelets ($5 each) to kids and parents in my building. I want to save $100 for new art supplies. I need to sell 20 bracelets!" },
+      { type: 'example', text: "Here is a real plan: I sell painted rocks ($4 each) to neighbors in my building. I want to save $80 for a skateboard. That means I need to sell 20 rocks." },
       { type: 'tip', text: "Write your plan down! Even on a sticky note. Having it written makes it real." },
       { type: 'heading', text: 'Key Words You Learned' },
       { type: 'vocab', term: 'Business Plan', definition: 'A simple list of what you sell, who buys it, and what your goal is' },
@@ -87,7 +87,7 @@ const learnArticles = [
     readTime: '3 min',
     summary: 'Learn how to figure out what to charge so you make money and customers feel happy!',
     content: [
-      { type: 'intro', text: "Picking a price can feel tricky. Too high and nobody buys. Too low and you don't make enough. Let's find the sweet spot!" },
+      { type: 'intro', text: "Picking a price can feel tricky. Too high and nobody buys. Too low and you don't make enough. Here is how to find the sweet spot." },
       { type: 'heading', text: 'Step 1: Figure Out What It Costs You' },
       { type: 'text', text: 'Before you set a price, add up everything you spend to make your product. If you make bracelets, that means the beads, the string, and anything else you buy. This is called your "cost."' },
       { type: 'example', text: "If beads cost $1 and string costs $0.50, your cost is $1.50 per bracelet." },
@@ -112,18 +112,18 @@ const learnArticles = [
     readTime: '4 min',
     summary: 'Selling stuff is fun, but are you really making money? Learn how to check!',
     content: [
-      { type: 'intro', text: "Just because money comes in doesn't mean you're making a profit. Let's learn how to figure out if your business is really making money!" },
-      { type: 'heading', text: 'Revenue vs. Profit' },
+      { type: 'intro', text: "Just because money comes in doesn't mean you're making a profit. Here is how to figure out if your business is really making money!" },
+      { type: 'heading', text: 'Money In vs. Money You Keep' },
       { type: 'text', text: "Revenue is ALL the money that comes in from sales. Profit is what's LEFT after you pay for your supplies. They're not the same thing!" },
       { type: 'example', text: "You sold 10 bracelets for $5 each. Revenue = $50. But beads and string cost $20. Profit = $50 - $20 = $30!" },
       { type: 'heading', text: 'What Is a Margin?' },
-      { type: 'text', text: "Margin tells you what percentage of each sale is profit. It's a way to see how healthy your business is. Higher margin = more money in your pocket!" },
+      { type: 'text', text: "Margin tells you how much of each dollar you get to keep. If you sell something for one dollar and keep 60 cents, your margin is 60 percent. The bigger that number, the more money you are making." },
       { type: 'example', text: "You sell for $5, it costs $2 to make. Profit = $3. Margin = $3 / $5 = 60%. That means you keep 60 cents of every dollar!" },
       { type: 'tip', text: "A margin above 50% is great for a kid's business. If yours is below 30%, think about raising your price or finding cheaper supplies." },
       { type: 'heading', text: 'Key Words You Learned' },
-      { type: 'vocab', term: 'Revenue', definition: 'All the money that comes in from sales' },
+      { type: 'vocab', term: 'Revenue', definition: 'All the money that comes in when you sell things' },
       { type: 'vocab', term: 'Profit', definition: 'Money left over after paying for supplies' },
-      { type: 'vocab', term: 'Margin', definition: 'The percentage of each sale that is profit' },
+      { type: 'vocab', term: 'Margin', definition: 'How much of each dollar you sell is money you keep' },
     ],
   },
   // ===== STAGE 3: BUILD =====
@@ -136,19 +136,19 @@ const learnArticles = [
     readTime: '3 min',
     summary: 'Your store is your brand! Learn how to make it look amazing and feel like YOU.',
     content: [
-      { type: 'intro', text: 'When someone visits your store, you want them to think "Wow, this is cool!" Your store design is the first thing people see, so let\'s make it great.' },
+      { type: 'intro', text: 'Picture someone visiting your store for the first time. You want them to think "Wow, this is cool!" Your store design is the first thing people see, so let\'s make it great.' },
       { type: 'heading', text: 'Pick a Color That Fits' },
-      { type: 'text', text: "Colors make people feel things. Bright yellow feels happy and fun. Blue feels calm and trustworthy. Pink feels creative and playful. Pick a color that matches the vibe of your products." },
+      { type: 'text', text: "Colors make people feel things. Bright yellow feels happy and fun. Blue feels calm and safe. Pink feels creative and playful. Pick a color that matches the vibe of your products." },
       { type: 'heading', text: 'Choose a Fun Font' },
-      { type: 'text', text: 'Your store name font shows your personality. A bubbly font says "fun and playful." A clean font says "serious and professional." Pick one that matches your brand!' },
+      { type: 'text', text: 'The font you pick for your store name shows what your store is all about. A bubbly font says "fun and playful." A clean font says "I mean business." Pick one that matches your brand!' },
       { type: 'heading', text: 'Write a Great Bio' },
-      { type: 'text', text: "Tell people who you are in 1-2 sentences. Include what you sell and what makes it special. Be yourself!" },
+      { type: 'text', text: "Tell people who you are in 1-2 sentences. Include what you sell and what makes it special. Be yourself." },
       { type: 'example', text: 'Good bio: "Hi! I\'m Emma and I make one-of-a-kind bracelets with cool patterns. Every one is different!"' },
       { type: 'heading', text: 'Add a Banner Photo' },
-      { type: 'text', text: "A banner image at the top of your store makes it look professional. Take a photo of your products laid out nicely, or your workspace where you make things." },
+      { type: 'text', text: "A banner image at the top of your store makes it look polished and real. Take a photo of your products laid out nicely, or your workspace where you make things." },
       { type: 'tip', text: "Look at your favorite stores. What do you like about how they look? Use those ideas for your own store!" },
       { type: 'heading', text: 'Key Words You Learned' },
-      { type: 'vocab', term: 'Brand', definition: 'How people recognize and remember your store' },
+      { type: 'vocab', term: 'Brand', definition: 'The look, name, and feeling that makes people remember your store' },
       { type: 'vocab', term: 'Bio', definition: 'A short description about you or your store' },
     ],
   },
@@ -161,7 +161,7 @@ const learnArticles = [
     readTime: '3 min',
     summary: 'Good photos make people want to buy. Learn easy tricks to take awesome pictures!',
     content: [
-      { type: 'intro', text: "People can't touch or hold your product online. They can only see a photo. A great photo can be the difference between someone buying or scrolling past!" },
+      { type: 'intro', text: "People can't touch or hold your product online. They can only see a photo. A great photo can be what makes someone buy instead of skip!" },
       { type: 'heading', text: 'Use Natural Light' },
       { type: 'text', text: "Take photos near a window during the day. Sunlight makes colors look real and bright. Avoid using flash because it makes things look flat and weird." },
       { type: 'heading', text: 'Keep the Background Simple' },
@@ -187,11 +187,11 @@ const learnArticles = [
     readTime: '4 min',
     summary: 'Your store is awesome, but people need to know it exists! Here are easy ways to spread the word.',
     content: [
-      { type: 'intro', text: "You made great products and set up your store. But how do people find out about it? That's where marketing comes in!" },
+      { type: 'intro', text: "You made great products and set up your store. But how do people find out about it? That is called marketing." },
       { type: 'heading', text: 'What Is Marketing?' },
-      { type: 'text', text: "Marketing just means telling people about what you sell. Big companies spend millions on it, but you can do it for free!" },
+      { type: 'text', text: "Marketing just means telling people about what you sell. Big companies spend millions on it, but you can do it for free." },
       { type: 'heading', text: 'Way #1: Word of Mouth' },
-      { type: 'text', text: "Tell your friends, family, and neighbors about your store. This is the oldest and best way to get customers! When someone buys from you and loves it, they'll tell other people too." },
+      { type: 'text', text: "Tell your friends, family, and neighbors about your store. This is the oldest and best way to get customers. When someone buys from you and loves it, they'll tell other people too." },
       { type: 'tip', text: "Make it easy: share your store link with your parents so they can text it to other families." },
       { type: 'heading', text: 'Way #2: Make a Sign or Flyer' },
       { type: 'text', text: "Draw a cool poster or flyer and ask if you can put it up in your building lobby, school, or local coffee shop. Include your store name and what you sell." },
@@ -215,13 +215,13 @@ const learnArticles = [
       { type: 'heading', text: 'Be Ready' },
       { type: 'text', text: "Before you get your first order, make sure you are prepared. Do you have your product ready? Do you know how to deliver it? Talk to your parent about the plan." },
       { type: 'heading', text: 'Be Excited (But Not Nervous)' },
-      { type: 'text', text: "It's totally normal to feel a little nervous. That's just excitement in disguise! Your customer already decided they want what you are selling. They are rooting for you!" },
+      { type: 'text', text: "It's totally normal to feel a little nervous. That's just excitement in disguise! Your customer already decided they want what you are selling. They are rooting for you." },
       { type: 'heading', text: 'Deliver With Care' },
       { type: 'text', text: "When you hand over your product, make it special. Wrap it nicely if you can. Say thank you. A little thank-you note goes a long way!" },
       { type: 'example', text: 'Write a quick note: "Thanks for being my first customer! I hope you love your bracelet. -Emma"' },
       { type: 'heading', text: 'Ask What They Think' },
       { type: 'text', text: "After a day or two, ask your customer if they like it. Their feedback helps you get better. And if they love it, ask them to tell a friend!" },
-      { type: 'tip', text: "Take a mental picture of this moment. You just made your first sale. That is something most people never do!" },
+      { type: 'tip', text: "Take a mental picture of this moment. You just made your first sale. That is something most people never do." },
       { type: 'heading', text: 'Key Words You Learned' },
       { type: 'vocab', term: 'First Sale', definition: 'The very first time someone pays for your product' },
       { type: 'vocab', term: 'Feedback', definition: 'What customers tell you about their experience' },
@@ -260,11 +260,11 @@ const learnArticles = [
     readTime: '3 min',
     summary: 'Happy customers come back and tell their friends. Learn how to give great service!',
     content: [
-      { type: 'intro', text: "When someone buys from you, the sale isn't over! How you treat your customers after they buy is just as important." },
+      { type: 'intro', text: "The sale is not over once someone buys from you. How you treat your customers after they buy is just as important." },
       { type: 'heading', text: 'Why Does It Matter?' },
       { type: 'text', text: "A happy customer will buy from you again AND tell their friends about you. An unhappy customer won't come back and might tell others to skip your store too." },
       { type: 'heading', text: 'The Golden Rules' },
-      { type: 'text', text: "1. Be friendly and say thank you every time someone buys something.\n2. If something goes wrong, fix it quickly and kindly.\n3. Deliver what you promised. If you said the cookies are chocolate chip, they should be chocolate chip!\n4. Ask customers what they think. Their ideas can help you make better products." },
+      { type: 'text', text: "1. Always be friendly and say thank you.\n2. If something goes wrong, fix it quickly and kindly.\n3. Deliver what you promised. If you said chocolate chip cookies, they better be chocolate chip.\n4. Ask your customers what they think. Their ideas help you get better." },
       { type: 'tip', text: "Write a little thank-you note and include it with your product. It makes people smile and remember your store!" },
       { type: 'heading', text: 'What If Someone Is Unhappy?' },
       { type: 'text', text: "Don't panic! Listen to what they say, say you're sorry, and try to make it right. Maybe offer a replacement or a discount on their next order. Fixing a problem well can turn an unhappy customer into your biggest fan." },
@@ -282,15 +282,15 @@ const learnArticles = [
     readTime: '3 min',
     summary: 'Reviews help new customers trust your store. Learn how to earn 5-star ratings!',
     content: [
-      { type: 'intro', text: "When you shop online, do you look at the stars and reviews? Your customers do too! Let's learn how to earn great reviews." },
+      { type: 'intro', text: "Think about when you shop online. Do you look at the stars and reviews? Your customers do too! Here is how you earn great reviews." },
       { type: 'heading', text: 'Why Reviews Matter' },
-      { type: 'text', text: 'Reviews are like a report card for your store. When new people see 5 stars and nice comments, they feel safe buying from you. It\'s called "social proof" because people trust what other people say.' },
+      { type: 'text', text: 'Reviews are like a report card for your store. When new people see 5 stars and nice comments, they feel safe buying from you. People trust what other people say. So good reviews help new customers feel safe buying from you.' },
       { type: 'heading', text: 'How to Get Good Reviews' },
-      { type: 'text', text: "1. Make a great product. This is the most important thing!\n2. Be nice and helpful to every customer.\n3. After someone buys, ask them nicely if they'd leave a review.\n4. If someone has a problem, fix it before they leave a bad review." },
+      { type: 'text', text: "1. Make a great product. That is the most important thing.\n2. Be nice and helpful to every customer.\n3. After someone buys, ask them nicely to leave a review.\n4. If someone has a problem, fix it before they leave a bad review." },
       { type: 'tip', text: "Don't be scared of a bad review. One or two is normal. What matters is how you respond. Be kind and try to fix it!" },
       { type: 'heading', text: 'Key Words You Learned' },
       { type: 'vocab', term: 'Review', definition: 'What a customer writes about their experience' },
-      { type: 'vocab', term: 'Social Proof', definition: 'When people trust something because other people liked it' },
+      
     ],
   },
   {
@@ -307,9 +307,9 @@ const learnArticles = [
       { type: 'text', text: 'Your best ideas for new products will come from the people who already buy from you. If three people ask "Do you sell earrings too?" that is a sign you should try making earrings!' },
       { type: 'heading', text: 'Stick to What You Know' },
       { type: 'text', text: "If you sell bracelets, earrings make sense as a new product. Jumping from bracelets to baked goods is a bigger leap. Start with products that are close to what you already make." },
-      { type: 'example', text: "Emma sells bracelets. She adds anklets and keychains using the same beads. Her customers love them because the style matches!" },
+      { type: 'example', text: "Mia sells painted flower pots. She adds matching garden markers using the same paint. Her customers love them because the style matches." },
       { type: 'heading', text: 'Test Before You Go Big' },
-      { type: 'text', text: "Make a small batch of your new product first. Sell a few and see how people react. If they love it, make more! If not, try something else. This saves you time and money." },
+      { type: 'text', text: "Make a small batch (just a few) of your new product first. Sell a few and see how people react. If they love it, make more! If not, try something else. This saves you time and money." },
       { type: 'heading', text: "Don't Do Too Much at Once" },
       { type: 'text', text: "It is tempting to add 10 new products at once. But that is hard to manage and your quality might drop. Add one new product at a time and do it well." },
       { type: 'tip', text: 'Every time you add a new product, update your announcement bar to let people know! "NEW: Matching earrings now available!"' },
@@ -332,28 +332,83 @@ const learnArticles = [
 
       { type: 'heading', text: '🎨 Arts & Crafts' },
       { type: 'text', text: "If you love making things with your hands, these are for you." },
-      { type: 'example', text: "1. Friendship bracelets — Beads and string cost about $10. Sell for $3-5 each.\n2. Painted rocks — Collect rocks for free, buy paint for $8. Sell as decor or gifts for $2-4.\n3. Custom bookmarks — Cardstock and markers. Sell for $1-2 each.\n4. Handmade greeting cards — Way more special than store-bought. Sell for $2-4.\n5. Sticker designs — Draw them, print on sticker paper ($12). Sell packs for $3-5.\n6. Keychains — Beads, charms, and keychain rings cost about $10. Tons of styles! Sell for $3-6.\n7. Painted flower pots — Buy plain pots for $1 each, paint them fun. Sell for $5-8.\n8. Custom name signs — Cardboard or wood scraps, paint, and glitter. Sell for $5-10.\n9. Origami art — Paper is basically free. Sell cranes, flowers, and animals for $1-3.\n10. Pressed flower frames — Collect flowers, press them in a book, frame them. Sell for $5-8.\n11. Paperweights — Smooth rocks, paint, glitter, or decoupage. Super easy to make. Sell for $3-6.\n12. Beaded suncatchers — Wire, beads, and fishing line. Hang in a window and they sparkle! Sell for $4-7.\n13. Woven potholders — Potholder looms cost about $8. Sell potholders for $3-5 each.\n14. Clay magnets — Air-dry clay ($8) and paint. Make fun shapes, glue magnets on the back. Sell for $2-4." },
+      { type: 'ideas', items: [
+        { num: 1, name: 'Friendship bracelets', cost: '$10 to start', price: '$3-5 each', desc: 'Beads and string. Endless color combos!' },
+        { num: 2, name: 'Painted rocks', cost: '$8 for paint', price: '$2-4 each', desc: 'Collect rocks for free. Paint animals, words, or patterns.' },
+        { num: 3, name: 'Custom bookmarks', cost: '$5 for supplies', price: '$1-2 each', desc: 'Cardstock and markers. Great for book lovers!' },
+        { num: 4, name: 'Handmade greeting cards', cost: '$5 for supplies', price: '$2-4 each', desc: 'Way more special than store-bought.' },
+        { num: 5, name: 'Sticker designs', cost: '$12 for sticker paper', price: '$3-5 per pack', desc: 'Draw your own designs and print them.' },
+        { num: 6, name: 'Keychains', cost: '$10 to start', price: '$3-6 each', desc: 'Beads, charms, and keychain rings. Tons of styles!' },
+        { num: 7, name: 'Painted flower pots', cost: '$1 per pot + paint', price: '$5-8 each', desc: 'Plain pots become works of art.' },
+        { num: 8, name: 'Custom name signs', cost: '$5 for supplies', price: '$5-10 each', desc: 'Wood scraps, paint, and glitter.' },
+        { num: 9, name: 'Origami art', cost: 'Almost free!', price: '$1-3 each', desc: 'Paper is all you need. Cranes, flowers, and animals.' },
+        { num: 10, name: 'Pressed flower frames', cost: '$5 for frames', price: '$5-8 each', desc: 'Collect flowers, press them, frame them.' },
+        { num: 11, name: 'Paperweights', cost: '$8 for supplies', price: '$3-6 each', desc: 'Smooth rocks with paint, glitter, or paper cutouts glued on.' },
+        { num: 12, name: 'Beaded suncatchers', cost: '$10 to start', price: '$4-7 each', desc: 'Wire, beads, and fishing line. They sparkle in windows.' },
+        { num: 13, name: 'Woven potholders', cost: '$8 for a loom', price: '$3-5 each', desc: 'Colorful and useful. People love handmade kitchen stuff.' },
+        { num: 14, name: 'Clay magnets', cost: '$8 for clay', price: '$2-4 each', desc: 'Air-dry clay in fun shapes with magnets on the back.' },
+      ] },
 
       { type: 'heading', text: '🍪 Food & Treats' },
       { type: 'text', text: "People love homemade food. Always have a parent help in the kitchen and check about food rules in your area." },
-      { type: 'example', text: "15. Lemonade — The classic! Lemons, sugar, and cups cost about $10-15.\n16. Cookies — A batch costs about $5 to make, sell for $1-2 each.\n17. Rice crispy treats — Super cheap to make, kids love them. Sell for $1-2.\n18. Trail mix bags — Buy ingredients in bulk, mix your own combos. Sell bags for $2-3.\n19. Hot cocoa kits — Fill jars with cocoa mix, marshmallows, and a candy cane. Sell for $4-6.\n20. Flavored popcorn — Popcorn is cheap! Add cinnamon sugar, cheese, or caramel. Sell bags for $2-3.\n21. Dog treats — Peanut butter, oats, and banana. Dogs go crazy for them. Sell bags for $3-5.\n22. Fruit popsicles — Blend fruit, pour into molds ($8). Sell for $1-2 each in summer.\n23. Decorated sugar cookies — Plain cookies plus frosting and sprinkles. Sell for $2-3.\n24. Homemade granola — Oats, honey, and mix-ins. Sell jars for $5-7.\n25. Cake pops — Crumbled cake, frosting, and sticks. Decorate with sprinkles. Sell for $2-3 each.\n26. Banana bread loaves — One batch costs about $4. Sell mini loaves for $5-6." },
+      { type: 'ideas', items: [
+        { num: 15, name: 'Lemonade', cost: '$10-15 to start', price: '$1-3 per cup', desc: 'The classic kid business!' },
+        { num: 16, name: 'Cookies', cost: '$5 per batch', price: '$1-2 each', desc: 'Everyone loves homemade cookies.' },
+        { num: 17, name: 'Rice crispy treats', cost: '$3 per batch', price: '$1-2 each', desc: 'Super cheap to make, kids love them.' },
+        { num: 18, name: 'Trail mix bags', cost: '$10 for bulk ingredients', price: '$2-3 per bag', desc: 'Mix your own custom combos.' },
+        { num: 19, name: 'Hot cocoa kits', cost: '$10 for supplies', price: '$4-6 each', desc: 'Jars with cocoa mix, marshmallows, and a candy cane.' },
+        { num: 20, name: 'Flavored popcorn', cost: '$5 to start', price: '$2-3 per bag', desc: 'Cinnamon sugar, cheese, or caramel flavors.' },
+        { num: 21, name: 'Dog treats', cost: '$8 for ingredients', price: '$3-5 per bag', desc: 'Peanut butter, oats, and banana. Dogs go crazy for them.' },
+        { num: 22, name: 'Fruit popsicles', cost: '$8 for molds', price: '$1-2 each', desc: 'Blend fruit and freeze. Perfect for summer!' },
+        { num: 23, name: 'Decorated sugar cookies', cost: '$8 for supplies', price: '$2-3 each', desc: 'Plain cookies plus frosting and sprinkles.' },
+        { num: 24, name: 'Homemade granola', cost: '$8 for ingredients', price: '$5-7 per jar', desc: 'Oats, honey, and your favorite mix-ins.' },
+        { num: 25, name: 'Cake pops', cost: '$10 for supplies', price: '$2-3 each', desc: 'Crumbled cake on sticks with sprinkles.' },
+        { num: 26, name: 'Banana bread loaves', cost: '$4 per batch', price: '$5-6 per mini loaf', desc: 'Smells amazing. Sells even better.' },
+      ] },
 
       { type: 'heading', text: '🌱 Nature & Garden' },
       { type: 'text', text: "Love being outside? These businesses start in your backyard." },
-      { type: 'example', text: "27. Potted plant babies — Split off baby plants from ones you already have. Sell in small pots for $3-5.\n28. Seed starter kits — Small pots, soil, seeds, and handwritten instructions. Sell kits for $4-6.\n29. Flower bouquets — Grow flowers from $2 seed packets, sell fresh bouquets for $5-8.\n30. Painted garden markers — Flat rocks or popsicle sticks labeled with plant names. Sell sets for $3-5.\n31. Bug hotel kits — Sticks, pinecones, and a small box. Fun and educational! Sell for $5-8.\n32. Herb growing kits — Small pots with basil, mint, or cilantro seeds. People love fresh herbs! Sell for $4-6.\n33. Fairy garden supplies — Tiny painted doors, mini mushrooms, pebble paths. Sell kits for $6-10.\n34. Dried flower bouquets — Hang flowers upside down to dry, arrange in bundles. Last forever! Sell for $5-8.\n35. Terrarium kits — Small jars, pebbles, soil, moss, and tiny plants. Sell assembled or as DIY kits for $8-12.\n36. Nature journals — Collect and press leaves, draw insects, label everything. Photocopy and sell for $3-5." },
+      { type: 'ideas', items: [
+        { num: 27, name: 'Potted plant babies', cost: 'Almost free!', price: '$3-5 each', desc: 'Split baby plants from ones you already have.' },
+        { num: 28, name: 'Seed starter kits', cost: '$8 for supplies', price: '$4-6 per kit', desc: 'Small pots, soil, seeds, and instructions.' },
+        { num: 29, name: 'Flower bouquets', cost: '$2 for seed packets', price: '$5-8 per bouquet', desc: 'Grow them yourself and sell fresh bundles.' },
+        { num: 30, name: 'Painted garden markers', cost: '$5 for supplies', price: '$3-5 per set', desc: 'Rocks or popsicle sticks labeled with plant names.' },
+        { num: 31, name: 'Bug hotel kits', cost: '$3 for supplies', price: '$5-8 each', desc: 'Sticks, pinecones, and a box. Fun and educational.' },
+        { num: 32, name: 'Herb growing kits', cost: '$8 for supplies', price: '$4-6 per kit', desc: 'Basil, mint, or cilantro. People love fresh herbs.' },
+        { num: 33, name: 'Fairy garden supplies', cost: '$10 for supplies', price: '$6-10 per kit', desc: 'Tiny doors, mini mushrooms, pebble paths.' },
+        { num: 34, name: 'Dried flower bouquets', cost: 'Almost free!', price: '$5-8 each', desc: 'Hang flowers to dry, arrange in bundles. They last forever.' },
+        { num: 35, name: 'Terrarium kits', cost: '$12 for supplies', price: '$8-12 each', desc: 'Small jars with pebbles, soil, moss, and tiny plants.' },
+        { num: 36, name: 'Nature journals', cost: '$5 for supplies', price: '$3-5 each', desc: 'Press leaves, draw insects, label everything.' },
+      ] },
 
       { type: 'heading', text: '🎁 Seasonal & Holiday' },
       { type: 'text', text: "These products sell best at certain times of year. Plan ahead!" },
-      { type: 'example', text: "37. Holiday ornaments — Handmade ornaments in November and December. Huge demand! Sell for $3-6.\n38. Valentine's Day cards — Handmade valentines in February. Sell packs of 5 for $3-5.\n39. Back-to-school pencil cases — Decorate plain pouches with fabric paint. Sell for $4-6.\n40. Summer activity kits — Outdoor games, chalk, bubbles in a bag. Sell boxes for $8-12.\n41. Custom party favors — Themed favor bags for birthday parties. Sell packs for $10-15.\n42. Halloween treat bags — Decorated bags filled with candy or toys. Sell for $3-5.\n43. Mother's Day gift boxes — A candle, card, and small craft in a box. Sell for $8-12." },
+      { type: 'ideas', items: [
+        { num: 37, name: 'Holiday ornaments', cost: '$10 for supplies', price: '$3-6 each', desc: 'Huge demand in November and December.' },
+        { num: 38, name: "Valentine's Day cards", cost: '$5 for supplies', price: '$3-5 per pack', desc: 'Handmade valentines in February.' },
+        { num: 39, name: 'Back-to-school pencil cases', cost: '$8 for supplies', price: '$4-6 each', desc: 'Decorate plain pouches with fabric paint.' },
+        { num: 40, name: 'Summer activity kits', cost: '$15 for supplies', price: '$8-12 per box', desc: 'Outdoor games, chalk, bubbles in a bag.' },
+        { num: 41, name: 'Custom party favors', cost: '$10 for supplies', price: '$10-15 per pack', desc: 'Themed favor bags for birthday parties.' },
+        { num: 42, name: 'Halloween treat bags', cost: '$8 for supplies', price: '$3-5 each', desc: 'Decorated bags filled with candy or toys.' },
+        { num: 43, name: "Mother's Day gift boxes", cost: '$12 for supplies', price: '$8-12 each', desc: 'A candle, card, and small craft in a box.' },
+      ] },
 
       { type: 'heading', text: '🧶 Wearable & Useful' },
       { type: 'text', text: "Make things people can actually use every day." },
-      { type: 'example', text: "44. Tie-dye shirts — Buy plain white shirts ($3 each), tie-dye kits cost about $15. Sell for $10-15.\n45. Scrunchies — Fabric scraps and elastic. Cost almost nothing! Sell for $2-4.\n46. Tote bags — Buy plain canvas totes ($3 each), paint or stamp designs on them. Sell for $8-12.\n47. Lip balm — Beeswax, coconut oil, and small tins. Sell for $2-4 each.\n48. Bath bombs — Baking soda, citric acid, and essential oils. Sell for $3-5 each.\n49. Beeswax wraps — Fabric and beeswax pellets. Reusable food wraps! Sell for $5-8.\n50. Coasters — Tiles from the hardware store ($0.50 each), paint or decoupage. Sell sets of 4 for $8-10." },
+      { type: 'ideas', items: [
+        { num: 44, name: 'Tie-dye shirts', cost: '$15 for kit + shirts', price: '$10-15 each', desc: 'Every shirt comes out different.' },
+        { num: 45, name: 'Scrunchies', cost: 'Almost free!', price: '$2-4 each', desc: 'Fabric scraps and elastic. So many patterns to try.' },
+        { num: 46, name: 'Tote bags', cost: '$3 per blank bag', price: '$8-12 each', desc: 'Paint or stamp your own designs on canvas.' },
+        { num: 47, name: 'Lip balm', cost: '$12 for supplies', price: '$2-4 each', desc: 'Beeswax and coconut oil in small tins. Ask a parent to help melt it.' },
+        { num: 48, name: 'Bath bombs', cost: '$10 for supplies', price: '$3-5 each', desc: 'Baking soda, citric acid (ask a parent), and scented oils.' },
+        { num: 49, name: 'Beeswax wraps', cost: '$15 for supplies', price: '$5-8 each', desc: 'Reusable food wraps. Good for the planet too.' },
+        { num: 50, name: 'Coasters', cost: '$5 for tiles', price: '$8-10 per set of 4', desc: 'Paint or decoupage on hardware store tiles.' },
+      ] },
 
       { type: 'tip', text: "Don't try to do all 50! Pick ONE idea that sounds fun, start small, and see how it goes. You can always try a different one later." },
 
       { type: 'heading', text: 'How to Pick YOUR Idea' },
-      { type: 'text', text: "Ask yourself these questions:\n1. Which idea sounds the most FUN to me?\n2. Which one can I start THIS WEEK?\n3. Who would buy this in my neighborhood?\nThe best business is one you are excited about. Pick the one that makes you say 'I want to try THAT!' and go for it." },
+      { type: 'text', text: "Ask yourself: which idea sounds the most FUN? Which one can I start THIS WEEK? And who in my neighborhood would buy it? The best business is one you are excited about. Pick the one that makes you say 'I want to try that' and just go for it." },
 
       { type: 'heading', text: 'Key Words You Learned' },
       { type: 'vocab', term: 'Startup Cost', definition: 'The money you need to spend before you can start selling' },
@@ -364,147 +419,160 @@ const learnArticles = [
   },
 ];
 
-const LearnHub = () => {
+const stages = [
+  {
+    id: '1. Brainstorm',
+    num: 1,
+    title: 'Brainstorm',
+    emoji: '💡',
+    color: 'amber',
+    tagline: 'Figure out what to sell',
+    description: "Every great business starts with an idea. These lessons help you find the perfect product based on what you love, what people want, and what you can actually make.",
+  },
+  {
+    id: '2. Plan',
+    num: 2,
+    title: 'Plan',
+    emoji: '📋',
+    color: 'blue',
+    tagline: 'Get your business ready',
+    description: "Before you start selling, you need a plan. Learn how to price your products, figure out if you'll make money, and set goals for your business.",
+  },
+  {
+    id: '3. Build',
+    num: 3,
+    title: 'Build',
+    emoji: '🏗️',
+    color: 'emerald',
+    tagline: 'Set up your store',
+    description: "Time to build your store! Learn how to make it look amazing, take great product photos, and create a brand people remember.",
+  },
+  {
+    id: '4. Launch',
+    num: 4,
+    title: 'Launch',
+    emoji: '🚀',
+    color: 'purple',
+    tagline: 'Get your first customers',
+    description: "Your store is ready. Now it's time to tell the world! Learn how to market your store, land your first sale, and understand what makes products sell.",
+  },
+  {
+    id: '5. Grow',
+    num: 5,
+    title: 'Grow',
+    emoji: '🌱',
+    color: 'pink',
+    tagline: 'Keep getting better',
+    description: "You made some sales. Now learn how to keep customers happy, get great reviews, and expand your product line to earn even more.",
+  },
+];
+
+const colorMap = {
+  amber: { bg: 'bg-amber-50', border: 'border-amber-200', numBg: 'bg-amber-400', tag: 'bg-amber-100 text-amber-700', line: 'bg-amber-200' },
+  blue: { bg: 'bg-blue-50', border: 'border-blue-200', numBg: 'bg-blue-400', tag: 'bg-blue-100 text-blue-700', line: 'bg-blue-200' },
+  emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', numBg: 'bg-emerald-400', tag: 'bg-emerald-100 text-emerald-700', line: 'bg-emerald-200' },
+  purple: { bg: 'bg-purple-50', border: 'border-purple-200', numBg: 'bg-purple-400', tag: 'bg-purple-100 text-purple-700', line: 'bg-purple-200' },
+  pink: { bg: 'bg-pink-50', border: 'border-pink-200', numBg: 'bg-pink-400', tag: 'bg-pink-100 text-pink-700', line: 'bg-pink-200' },
+};
+
+export default function LearnHub() {
   const router = useRouter();
-  const [selectedArticle, setSelectedArticle] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [expandedStage, setExpandedStage] = useState(null);
 
-  const categories = ['all', '1. Brainstorm', '2. Plan', '3. Build', '4. Launch', '5. Grow'];
-
-  const filteredArticles = selectedCategory === 'all'
-    ? learnArticles
-    : learnArticles.filter((a) => a.category === selectedCategory);
-
-  // Article Detail View
-  if (selectedArticle) {
-    const article = learnArticles.find((a) => a.id === selectedArticle);
-    return (
-      <div className="min-h-screen bg-white">
-        <NavBar active="learn" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 pt-4">
-          <button onClick={() => setSelectedArticle(null)} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors mb-2">
-            <span>←</span>
-            <span className="text-sm font-medium">Back to Learn</span>
-          </button>
-        </div>
-
-        <main className="max-w-3xl mx-auto px-4 sm:px-8 py-4">
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs font-medium px-2 py-1 rounded-full bg-amber-50 text-amber-700">{article.category}</span>
-              <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-500">{article.difficulty}</span>
-              <span className="text-xs text-gray-400">{article.readTime} read</span>
-            </div>
-            <div className="text-4xl mb-3">{article.emoji}</div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{article.title}</h1>
-            <p className="text-gray-500">{article.summary}</p>
-          </div>
-
-          <div className="space-y-4">
-            {article.content.map((block, i) => {
-              if (block.type === 'intro') return (
-                <p key={i} className="text-gray-600 text-lg leading-relaxed border-l-4 border-amber-300 pl-4">{block.text}</p>
-              );
-              if (block.type === 'heading') return (
-                <h2 key={i} className="text-lg font-bold text-gray-800 mt-6">{block.text}</h2>
-              );
-              if (block.type === 'text') return (
-                <p key={i} className="text-gray-600 leading-relaxed whitespace-pre-line">{block.text}</p>
-              );
-              if (block.type === 'example') return (
-                <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                  <div className="text-xs font-semibold text-amber-700 mb-1">📝 Example</div>
-                  <p className="text-amber-900 text-sm">{block.text}</p>
-                </div>
-              );
-              if (block.type === 'tip') return (
-                <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <div className="text-xs font-semibold text-blue-700 mb-1">💡 Pro Tip</div>
-                  <p className="text-blue-900 text-sm">{block.text}</p>
-                </div>
-              );
-              if (block.type === 'vocab') return (
-                <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-                  <span className="text-xs font-bold text-white bg-gray-800 px-2 py-0.5 rounded mt-0.5">{block.term}</span>
-                  <span className="text-sm text-gray-600">{block.definition}</span>
-                </div>
-              );
-              return null;
-            })}
-          </div>
-
-          <div className="mt-10 pt-6 border-t border-gray-100 flex justify-between items-center">
-            <button onClick={() => setSelectedArticle(null)} className="text-sm text-gray-500 hover:text-gray-700">← Back to all articles</button>
-            <button onClick={() => router.push('/editor')} className="bg-amber-400 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-              Go to My Store →
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Article Listing View
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
+    <div className="min-h-screen bg-white">
       <NavBar active="learn" />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">📚 Learn & Grow</h1>
-          <p className="text-gray-500">Tips, tricks, and lessons to help you run a great business!</p>
+      <main className="max-w-3xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="text-4xl mb-3">📚</div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">The Kids MBA</h1>
+          <p className="text-gray-500 max-w-lg mx-auto">Learn how to start and run a real business, step by step. From your very first idea all the way to growing your store.</p>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                selectedCategory === cat
-                  ? 'bg-amber-400 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              {cat === 'all' ? '📚 All' : cat.replace(/^\d+\.\s*/, '')}
-            </button>
-          ))}
-        </div>
+        {/* Stage progression */}
+        <div className="space-y-4">
+          {stages.map((stage, stageIndex) => {
+            const colors = colorMap[stage.color];
+            const articles = learnArticles.filter(a => a.category === stage.id);
+            const isExpanded = expandedStage === stage.id || expandedStage === null;
 
-        {/* Article Cards */}
-        <div className="grid sm:grid-cols-2 gap-4">
-          {filteredArticles.map((article) => (
-            <button
-              key={article.id}
-              onClick={() => setSelectedArticle(article.id)}
-              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all text-left w-full"
-            >
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">{article.emoji}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">{article.category}</span>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{article.difficulty}</span>
+            return (
+              <div key={stage.id}>
+                {/* Stage header */}
+                <button
+                  onClick={() => setExpandedStage(expandedStage === stage.id ? null : stage.id)}
+                  className={`w-full rounded-xl p-5 text-left transition-all ${colors.bg} ${colors.border} border hover:shadow-sm`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Step number */}
+                    <div className={`w-10 h-10 rounded-full ${colors.numBg} text-white flex items-center justify-center font-bold text-lg shrink-0`}>
+                      {stage.num}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-lg font-bold text-gray-800">{stage.emoji} {stage.title}</h2>
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${colors.tag}`}>{articles.length} lesson{articles.length !== 1 ? 's' : ''}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">{stage.tagline}</p>
+                      <p className="text-xs text-gray-500 mt-1">{stage.description}</p>
+                    </div>
+                    <div className="text-gray-400 shrink-0 mt-1">
+                      <svg className={`w-5 h-5 transition-transform ${isExpanded && expandedStage !== null ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-gray-800 mb-1">{article.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{article.summary}</p>
-                  <p className="text-xs text-gray-400 mt-2">{article.readTime} read</p>
-                </div>
+                </button>
+
+                {/* Articles within this stage */}
+                {isExpanded && (
+                  <div className="ml-9 pl-5 mt-2 mb-6 space-y-2 relative">
+                    {/* Connecting line */}
+                    <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${colors.line} rounded-full`} />
+
+                    {articles.map((article) => (
+                      <button
+                        key={article.id}
+                        onClick={() => router.push(`/learn/${article.id}`)}
+                        className="w-full bg-white rounded-xl p-4 border border-gray-100 hover:border-gray-300 hover:shadow-sm transition-all text-left flex items-start gap-3 relative"
+                      >
+                        {/* Dot on the line */}
+                        <div className={`absolute -left-[22px] top-5 w-2.5 h-2.5 rounded-full ${colors.numBg} border-2 border-white`} />
+
+                        <span className="text-2xl shrink-0">{article.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-800 text-sm">{article.title}</h3>
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{article.summary}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[10px] text-gray-400">{article.readTime} read</span>
+                            <span className="text-[10px] text-gray-300">·</span>
+                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${article.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{article.difficulty}</span>
+                          </div>
+                        </div>
+                        <span className="text-gray-300 text-sm shrink-0 mt-1">→</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Connector between stages */}
+                {stageIndex < stages.length - 1 && !isExpanded && (
+                  <div className="flex justify-center py-1">
+                    <div className="w-0.5 h-4 bg-gray-200 rounded-full" />
+                  </div>
+                )}
               </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Coming soon teaser */}
-        <div className="mt-8 text-center p-6 bg-amber-50 rounded-2xl border border-amber-100">
-          <div className="text-3xl mb-2">🚀</div>
-          <h3 className="font-bold text-gray-800 mb-1">More lessons coming soon!</h3>
-          <p className="text-sm text-gray-500">We're always adding new tips to help you grow your business.</p>
+        {/* Coming soon */}
+        <div className="mt-10 text-center p-6 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="text-2xl mb-2">🎓</div>
+          <h3 className="font-bold text-gray-800 mb-1">More lessons on the way!</h3>
+          <p className="text-sm text-gray-500">We are always adding new lessons to help you become a better business owner.</p>
         </div>
       </main>
     </div>
   );
 }
-
-export default LearnHub;
