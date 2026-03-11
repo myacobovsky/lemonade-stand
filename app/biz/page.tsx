@@ -11,8 +11,8 @@ export default function BizPage() {
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
   const storeBio = storeData?.bio || '';
-  const kidName = storeData?.kid_name || 'Emma';
-  const storeName = storeData?.store_name || "Emma's Shop";
+  const kidName = storeData?.kid_name || 'Kid';
+  const storeName = storeData?.store_name || 'My Store';
   const savingsGoalAmount = storeData?.savings_amount || 100;
   const savingsGoalName = storeData?.savings_goal || 'New Art Supplies';
   const savingsPercentConfig = storeData?.savings_percent || 50;
