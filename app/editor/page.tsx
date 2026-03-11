@@ -57,7 +57,7 @@ export default function EditorPage() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null, usePhoto: false, category: '' });
 
-  const kidName = storeData?.kidName || 'Emma';
+  const kidName = storeData?.kid_name || 'Kid';
 
   const colorOptions = [
     { name: 'Sunshine', value: 'amber', bg: 'bg-amber-400' },
@@ -477,7 +477,7 @@ export default function EditorPage() {
                   <p><strong>Keep it short.</strong> One or two sentences is perfect.</p>
                   <p><strong>Be yourself.</strong> Talk like YOU talk. If you're funny, be funny. If you're serious about your craft, say that.</p>
                   <p><strong>Say what you sell.</strong> People should know right away what kind of stuff they'll find here.</p>
-                  <p>Example: "Hi, I'm Emma! I make friendship bracelets with cool patterns. Every one is handmade and totally unique!"</p>
+                  <p>Example: "Hi there! I make friendship bracelets with cool patterns. Every one is handmade and totally unique!"</p>
                 </LearnTip>
               </div>
               <p className="text-xs text-gray-400 mb-3">Tell people about your store in a few words!</p>
