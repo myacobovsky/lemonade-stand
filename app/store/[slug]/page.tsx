@@ -22,19 +22,42 @@ export default function PublicStorePage({ params }) {
 
   useEffect(() => {
     async function loadStore() {
-      // Find store by kid name (case insensitive)
-      const { data: stores } = await supabase
-        .from('stores')
-        .select('*')
-        .ilike('kid_name', slug);
+      // Try to find store by ID first, then by kid name
+      let store = null;
 
-      if (!stores || stores.length === 0) {
+      // Check if slug looks like a UUID (store ID)
+      if (slug.length > 20 && slug.includes('-')) {
+        const { data } = await supabase
+          .from('stores')
+          .select('*')
+          .eq('id', slug)
+          .single();
+        if (data) store = data;
+      }
+
+      // Fall back to kid name lookup
+      if (!store) {
+        const { data: stores } = await supabase
+          .from('stores')
+          .select('*')
+          .ilike('kid_name', decodeURIComponent(slug).replace(/-/g, ' '));
+        if (stores && stores.length > 0) store = stores[0];
+      }
+
+      // Also try with hyphens as spaces
+      if (!store) {
+        const { data: stores } = await supabase
+          .from('stores')
+          .select('*')
+          .ilike('kid_name', slug);
+        if (stores && stores.length > 0) store = stores[0];
+      }
+
+      if (!store) {
         setNotFound(true);
         setLoading(false);
         return;
       }
-
-      const store = stores[0];
       setStoreData(store);
 
       // Load theme
