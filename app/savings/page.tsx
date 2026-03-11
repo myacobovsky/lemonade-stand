@@ -9,7 +9,7 @@ export default function SavingsPage() {
   const { loading, store: storeData } = useApp();
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
-  const kidName = storeData?.kid_name || 'Emma';
+  const kidName = storeData?.kid_name || 'Kid';
   const savingsGoalAmount = parseFloat(storeData?.savings_amount) || 100;
   const savingsGoalName = storeData?.savings_goal || 'New Art Supplies';
   const savingsPercentConfig = storeData?.savings_percent || 50;
