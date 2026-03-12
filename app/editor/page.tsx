@@ -55,6 +55,7 @@ export default function EditorPage() {
     setTimeout(() => setThemeUpdated(false), 2000);
   };
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({ name: '', price: '', description: '', image: null, usePhoto: false, category: '' });
 
   const kidName = storeData?.kid_name || 'Kid';
@@ -95,6 +96,49 @@ export default function EditorPage() {
 
 
   const emojiOptions = ['🎁', '🧸', '🎨', '🍪', '💎', '🌸', '⭐', '🦋'];
+
+  const handleStartEdit = (p) => {
+    setEditingProduct(p.id);
+    setNewProduct({
+      name: p.name,
+      price: String(p.price),
+      description: p.description || '',
+      image: p.image_url || p.image || null,
+      usePhoto: !!(p.image_url || p.image),
+      emoji: p.emoji || '🎁',
+      category: p.category || 'General',
+    });
+    setShowAddProduct(true);
+  };
+
+  const handleSaveProduct = async () => {
+    if (!newProduct.name || !newProduct.price) return;
+    const productData = {
+      name: newProduct.name,
+      price: parseFloat(newProduct.price),
+      description: newProduct.description,
+      emoji: newProduct.usePhoto ? null : (newProduct.emoji || '🎁'),
+      image_url: newProduct.usePhoto ? newProduct.image : null,
+      category: newProduct.category || 'General',
+    };
+
+    if (editingProduct) {
+      // Update existing - set back to pending_review so parent re-approves
+      await updateProduct(editingProduct, { ...productData, status: 'pending_review' });
+      setEditingProduct(null);
+    } else {
+      // Add new
+      await addProductToDb({ ...productData, in_stock: true, status: 'pending_review' });
+    }
+    setNewProduct({ name: '', price: '', description: '', image: null, usePhoto: false, emoji: '🎁', category: '' });
+    setShowAddProduct(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setNewProduct({ name: '', price: '', description: '', image: null, usePhoto: false, emoji: '🎁', category: '' });
+    setShowAddProduct(false);
+  };
 
   const handleAddProduct = () => {
     if (newProduct.name && newProduct.price) {
@@ -791,7 +835,7 @@ export default function EditorPage() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-gray-800">Your Products</h3>
                 <button
-                  onClick={() => setShowAddProduct(true)}
+                  onClick={() => { setEditingProduct(null); setNewProduct({ name: "", price: "", description: "", image: null, usePhoto: false, emoji: "🎁", category: "" }); setShowAddProduct(true); }}
                   className="bg-amber-400 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-full"
                 >
                   + Add Product
@@ -801,7 +845,7 @@ export default function EditorPage() {
               {/* Add Product Form */}
               {showAddProduct && (
                 <div className="bg-amber-50 rounded-xl p-4 mb-4 border border-amber-200 animate-fadeIn">
-                  <h4 className="font-medium text-amber-800 mb-3">New Product</h4>
+                  <h4 className="font-medium text-amber-800 mb-3">{editingProduct ? "Edit Product" : "New Product"}</h4>
                   <div className="space-y-3">
                     <input
                       type="text"
@@ -946,7 +990,7 @@ export default function EditorPage() {
               {/* Product List */}
               <div className="space-y-3">
                 {products.map((p, index) => (
-                  <div key={p.id} className={`p-3 rounded-xl border transition-all ${p.inStock === false ? 'border-gray-200 bg-gray-50 opacity-70' : 'border-gray-100 hover:bg-gray-50'}`}>
+                  <div key={p.id} className={`p-3 rounded-xl border transition-all ${p.in_stock === false ? 'border-gray-200 bg-gray-50 opacity-70' : 'border-gray-100 hover:bg-gray-50'}`}>
                     <div className="flex items-center gap-3">
                       {/* Reorder arrows */}
                       <div className="flex flex-col gap-1 shrink-0">
@@ -969,7 +1013,7 @@ export default function EditorPage() {
                           ▼
                         </button>
                       </div>
-                      <div className={`w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-2xl overflow-hidden shrink-0 ${p.inStock === false ? 'grayscale' : ''}`}>
+                      <div className={`w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-2xl overflow-hidden shrink-0 ${p.in_stock === false ? 'grayscale' : ''}`}>
                         {p.image ? (
                           <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                         ) : (
@@ -987,26 +1031,34 @@ export default function EditorPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <div className="font-bold text-amber-600">${p.price}</div>
-                        {p.inStock === false && <div className="text-xs text-red-500 font-medium">Out of stock</div>}
+                        {p.in_stock === false && <div className="text-xs text-red-500 font-medium">Out of stock</div>}
                       </div>
                     </div>
                     <div className="flex gap-2 mt-2 pt-2 border-t border-gray-100">
                       <button
-                        onClick={() => // Local state handles this
-    setLocalProducts((prev) => prev.map((item) => item.id === p.id ? { ...item, inStock: !item.inStock } : item))}
+                        onClick={() => handleStartEdit(p)}
+                        className="flex-1 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-[0.98] transition-all"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          const newStock = p.in_stock === false ? true : false;
+                          updateProduct(p.id, { in_stock: newStock });
+                        }}
                         className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                           p.inStock === false
                             ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                             : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
                         }`}
                       >
-                        {p.inStock === false ? '✅ Mark In Stock' : '⏸ Mark Out of Stock'}
+                        {p.in_stock === false ? '✅ In Stock' : '⏸ Out of Stock'}
                       </button>
                       <button
-                        onClick={() => { if (confirm('Remove this product?')) setLocalProducts((prev) => prev.filter((item) => item.id !== p.id)); }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        onClick={() => { if (confirm('Remove this product? This cannot be undone.')) deleteProduct(p.id); }}
+                        className="px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 active:scale-[0.98] transition-all"
                       >
-                        Remove
+                        🗑️
                       </button>
                     </div>
                   </div>
