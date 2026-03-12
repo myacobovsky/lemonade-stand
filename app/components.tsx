@@ -89,13 +89,11 @@ export const NavBar = ({ active }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const tabs = store ? [
-    { id: 'dashboard', href: '/dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪' },
     { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨' },
-    { id: 'store', href: '/store', label: 'Store', icon: '🛍️' },
-    { id: 'savings', href: '/savings', label: 'Savings', icon: '🫙' },
     { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
     { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
+    { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒' },
   ] : [
     { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
     { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
