@@ -169,7 +169,7 @@ export function AppProvider({ children }) {
       if (remaining.length > 0) {
         switchStore(remaining[0].id);
       } else {
-        setStore(null);
+        setActiveStoreId(null);
         setProducts([]);
         setOrders([]);
         setTheme(null);
