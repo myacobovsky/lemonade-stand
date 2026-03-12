@@ -967,9 +967,14 @@ export default function EditorPage() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setShowAddProduct(false)} className="flex-1 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm">Cancel</button>
-                      <button onClick={handleAddProduct} disabled={!newProduct.name || !newProduct.price} className="flex-1 py-2 rounded-lg bg-amber-400 text-white text-sm font-medium disabled:bg-gray-200 disabled:text-gray-400">Add Product</button>
+                      <button onClick={handleCancelEdit} className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-base active:scale-[0.98] transition-all">Cancel</button>
+                      <button onClick={handleSaveProduct} disabled={!newProduct.name || !newProduct.price} className="flex-1 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-white text-base font-semibold disabled:bg-gray-200 disabled:text-gray-400 active:scale-[0.98] transition-all">
+                        {editingProduct ? '✓ Save Changes' : '+ Add Product'}
+                      </button>
                     </div>
+                    {editingProduct && (
+                      <p className="text-xs text-purple-600 mt-2 text-center">Saving changes will send this product back to your parent for approval.</p>
+                    )}
                   </div>
                 </div>
               )}
