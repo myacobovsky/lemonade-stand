@@ -2,7 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { NavBar } from '../components';
+import { NavBar, ParentGate } from '../components';
 import { useApp } from '../../lib/context';
 
 export default function DashboardPage() {
@@ -55,6 +55,7 @@ export default function DashboardPage() {
   );
 
   return (
+    <ParentGate onCancel={() => router.push('/biz')}>
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
       <NavBar active="parent-dashboard" />
@@ -367,5 +368,6 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+    </ParentGate>
   );
 }
