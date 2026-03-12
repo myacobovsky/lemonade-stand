@@ -58,19 +58,19 @@ export default function BizPage() {
         {/* Business Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl mb-1">💰</div>
-            <div className="text-lg font-bold text-amber-600">${totalEarnings.toFixed(2)}</div>
-            <div className="text-[10px] text-gray-500">Earned</div>
+            <div className="text-3xl mb-1">💰</div>
+            <div className="text-xl font-bold text-amber-600">${totalEarnings.toFixed(2)}</div>
+            <div className="text-xs text-gray-500">Earned</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl mb-1">📦</div>
-            <div className="text-lg font-bold text-blue-600">{pendingOrders.length}</div>
-            <div className="text-[10px] text-gray-500">Orders to fill</div>
+            <div className="text-3xl mb-1">📦</div>
+            <div className="text-xl font-bold text-blue-600">{pendingOrders.length}</div>
+            <div className="text-xs text-gray-500">Orders to fill</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl mb-1">🏪</div>
-            <div className="text-lg font-bold text-emerald-600">{products.length}</div>
-            <div className="text-[10px] text-gray-500">Products</div>
+            <div className="text-3xl mb-1">🏪</div>
+            <div className="text-xl font-bold text-emerald-600">{products.length}</div>
+            <div className="text-xs text-gray-500">Products</div>
           </div>
         </div>
 
@@ -107,17 +107,17 @@ export default function BizPage() {
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
           <h2 className="font-bold text-gray-800 mb-3">🏪 My Store</h2>
           <div className="grid grid-cols-3 gap-2">
-            <button onClick={() => router.push('/editor')} className="bg-amber-50 hover:bg-amber-100 rounded-xl p-3 text-center transition-colors">
-              <div className="text-xl mb-1">🎨</div>
-              <div className="text-xs font-medium text-gray-700">Edit Store</div>
+            <button onClick={() => router.push('/editor')} className="bg-amber-50 hover:bg-amber-100 active:scale-95 rounded-xl p-4 text-center transition-all">
+              <div className="text-2xl mb-1">🎨</div>
+              <div className="text-sm font-medium text-gray-700">Edit Store</div>
             </button>
-            <button onClick={() => router.push('/store')} className="bg-blue-50 hover:bg-blue-100 rounded-xl p-3 text-center transition-colors">
-              <div className="text-xl mb-1">👀</div>
-              <div className="text-xs font-medium text-gray-700">View Store</div>
+            <button onClick={() => router.push('/store')} className="bg-blue-50 hover:bg-blue-100 active:scale-95 rounded-xl p-4 text-center transition-all">
+              <div className="text-2xl mb-1">👀</div>
+              <div className="text-sm font-medium text-gray-700">View Store</div>
             </button>
-            <button onClick={() => router.push('/savings')} className="bg-emerald-50 hover:bg-emerald-100 rounded-xl p-3 text-center transition-colors">
-              <div className="text-xl mb-1">🫙</div>
-              <div className="text-xs font-medium text-gray-700">Savings</div>
+            <button onClick={() => router.push('/savings')} className="bg-emerald-50 hover:bg-emerald-100 active:scale-95 rounded-xl p-4 text-center transition-all">
+              <div className="text-2xl mb-1">🫙</div>
+              <div className="text-sm font-medium text-gray-700">Savings</div>
             </button>
           </div>
         </div>
@@ -373,33 +373,33 @@ export default function BizPage() {
           <div className="grid grid-cols-4 gap-2 mb-4">
             <button
               onClick={handleCopyLink}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
+              className={`flex flex-col items-center gap-1.5 p-4 rounded-xl active:scale-95 border-2 transition-all ${
                 copiedLink ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100 bg-gray-50 hover:border-amber-300 hover:shadow-sm'
               }`}
             >
               <span className="text-2xl">{copiedLink ? '✅' : '🔗'}</span>
-              <span className="text-[10px] font-medium text-gray-700">{copiedLink ? 'Copied!' : 'Copy Link'}</span>
+              <span className="text-xs font-medium text-gray-700">{copiedLink ? 'Copied!' : 'Copy Link'}</span>
             </button>
             <button
               onClick={() => { window.open(`sms:?body=Check out ${kidName}'s store on Lemonade Stand! getlemonadestand.com/store/${encodeURIComponent(kidName.toLowerCase())}`); }}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-gray-100 bg-gray-50 hover:border-green-300 hover:shadow-sm transition-all"
             >
               <span className="text-2xl">💬</span>
-              <span className="text-[10px] font-medium text-gray-700">Text</span>
+              <span className="text-xs font-medium text-gray-700">Text</span>
             </button>
             <button
               onClick={() => { handleCopyLink(); }}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-gray-100 bg-gray-50 hover:border-pink-300 hover:shadow-sm transition-all"
             >
               <span className="text-2xl">📸</span>
-              <span className="text-[10px] font-medium text-gray-700">Instagram</span>
+              <span className="text-xs font-medium text-gray-700">Instagram</span>
             </button>
             <button
               onClick={() => setShowFlyer(!showFlyer)}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-gray-100 bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all"
             >
               <span className="text-2xl">🖨️</span>
-              <span className="text-[10px] font-medium text-gray-700">Flyer</span>
+              <span className="text-xs font-medium text-gray-700">Flyer</span>
             </button>
           </div>
 
@@ -501,42 +501,42 @@ export default function BizPage() {
               <span className="text-xl shrink-0">😊</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">Be Kind</div>
-                <p className="text-xs text-gray-600 mt-0.5">Treat every customer and fellow store owner the way you want to be treated. No mean words, no bullying.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Treat every customer and fellow store owner the way you want to be treated. No mean words, no bullying.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-blue-50 rounded-xl p-3">
               <span className="text-xl shrink-0">✅</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">Be Honest</div>
-                <p className="text-xs text-gray-600 mt-0.5">Show your real products. Describe them the way they really are. If something goes wrong with an order, tell your parent right away.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Show your real products. Describe them the way they really are. If something goes wrong with an order, tell your parent right away.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-emerald-50 rounded-xl p-3">
               <span className="text-xl shrink-0">🔒</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">Stay Safe</div>
-                <p className="text-xs text-gray-600 mt-0.5">Never share your address, phone number, or school name on your store. Your parent handles all the messages with customers.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Never share your address, phone number, or school name on your store. Your parent handles all the messages with customers.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-orange-50 rounded-xl p-3">
               <span className="text-xl shrink-0">📷</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">No Photos of Kids</div>
-                <p className="text-xs text-gray-600 mt-0.5">Never put pictures of yourself or other kids on your store. Use photos of your products instead. This is an important rule that keeps everyone safe.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Never put pictures of yourself or other kids on your store. Use photos of your products instead. This is an important rule that keeps everyone safe.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-purple-50 rounded-xl p-3">
               <span className="text-xl shrink-0">👀</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">Parent Approved</div>
-                <p className="text-xs text-gray-600 mt-0.5">Everything you add to your store gets checked by your parent first. This keeps everyone safe and helps you learn.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Everything you add to your store gets checked by your parent first. This keeps everyone safe and helps you learn.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-pink-50 rounded-xl p-3">
               <span className="text-xl shrink-0">⭐</span>
               <div>
                 <div className="font-semibold text-gray-800 text-sm">Do Your Best</div>
-                <p className="text-xs text-gray-600 mt-0.5">Make things you are proud of. Take care with every order. Happy customers come back and tell their friends.</p>
+                <p className="text-sm text-gray-600 mt-0.5">Make things you are proud of. Take care with every order. Happy customers come back and tell their friends.</p>
               </div>
             </div>
           </div>
