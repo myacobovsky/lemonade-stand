@@ -75,25 +75,25 @@ export default function BizPage() {
         </div>
 
         {/* Savings Progress */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+        <button onClick={() => router.push('/savings')} className="w-full bg-emerald-50 rounded-xl p-5 shadow-sm border border-emerald-200 mb-6 text-left hover:shadow-md active:scale-[0.99] transition-all">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-bold text-gray-800 text-sm">🫙 Saving for: {savingsGoalName}</div>
-            <div className="text-sm font-bold text-emerald-600">{Math.round(progressPercent)}%</div>
+            <div className="font-bold text-gray-800">🫙 Saving for: {savingsGoalName}</div>
+            <div className="text-sm font-bold text-emerald-600">{Math.round(progressPercent)}% →</div>
           </div>
-          <div className="h-4 bg-gray-100 rounded-full overflow-hidden mb-2">
+          <div className="h-5 bg-white rounded-full overflow-hidden mb-2">
             <div
               className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-sm text-gray-500">
             <span>${confirmedSavings.toFixed(2)} saved</span>
             <span>${savingsGoalAmount} goal</span>
           </div>
           {confirmedSavings >= savingsGoalAmount && (
-            <div className="mt-2 text-sm text-emerald-600 font-bold text-center">🎉 You reached your goal!</div>
+            <div className="mt-2 text-base text-emerald-600 font-bold text-center">🎉 You reached your goal!</div>
           )}
-        </div>
+        </button>
 
         {/* Pending Orders Alert */}
         {pendingOrders.length > 0 && (
