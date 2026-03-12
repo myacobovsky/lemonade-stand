@@ -267,7 +267,7 @@ export default function StorePage() {
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[80vh] overflow-y-auto animate-slideUp">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800">🛒 Your Cart</h2>
-              <button onClick={() => setShowCart(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+              <button onClick={() => setShowCart(false)} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 text-2xl rounded-full hover:bg-gray-100">&times;</button>
             </div>
             {cart.length === 0 ? (
               <p className="text-gray-500 text-center py-8">Your cart is empty!</p>
