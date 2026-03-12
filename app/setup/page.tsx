@@ -379,7 +379,7 @@ export default function SetupPage() {
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                   className="w-5 h-5 rounded border-gray-300 text-amber-500 mt-0.5 shrink-0"
                 />
-                <span className="text-sm text-gray-700">I have read and agree to the Lemonade Stand Community Standards. I understand that I am responsible for supervising my child's store and activity.</span>
+                <span className="text-sm text-gray-700">I have read and agree to the Lemonade Stand Community Standards. I understand that I am responsible for supervising my child's store and activity. <a href="/privacy" target="_blank" className="text-amber-600 underline">View our Privacy & Data Practices</a>.</span>
               </label>
             </div>
 
