@@ -66,14 +66,14 @@ export const LearnTip = ({ title, color = 'amber', children }) => {
   const colors = { amber: 'bg-amber-50 border-amber-200 text-amber-800', green: 'bg-emerald-50 border-emerald-200 text-emerald-800', blue: 'bg-blue-50 border-blue-200 text-blue-800', purple: 'bg-purple-50 border-purple-200 text-purple-800' };
   return (
     <div className="relative inline-block">
-      <button onClick={() => setIsOpen(!isOpen)} className="w-8 h-8 hover:scale-110 transition-transform flex items-center justify-center" title="Learn about this!">
+      <button onClick={() => setIsOpen(!isOpen)} className="w-10 h-10 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center" title="Learn about this!">
         <LemonBulb />
       </button>
       {isOpen && (
         <div className={`absolute z-50 right-0 top-12 w-72 sm:w-80 p-4 rounded-xl border-2 shadow-lg ${colors[color]}`}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2"><LemonBulb className="w-5 h-5" /><div className="font-bold text-sm">{title}</div></div>
-            <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">&times;</button>
+            <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 text-xl leading-none rounded-full hover:bg-gray-100">&times;</button>
           </div>
           <div className="text-sm space-y-2">{children}</div>
         </div>
@@ -115,7 +115,7 @@ export const NavBar = ({ active }) => {
             <select
               value={store?.id || ''}
               onChange={(e) => switchStore(e.target.value)}
-              className="ml-2 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-lg px-2 py-1 font-medium focus:outline-none focus:border-amber-400"
+              className="ml-2 text-sm bg-amber-50 border border-amber-200 text-amber-700 rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-amber-400"
             >
               {stores.map(s => (
                 <option key={s.id} value={s.id}>{s.store_name}</option>
@@ -135,8 +135,8 @@ export const NavBar = ({ active }) => {
           {user && (
             <button onClick={signOut} className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 ml-2">Log out</button>
           )}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-gray-50">
-            {menuOpen ? <span className="text-gray-600 text-xl leading-none">&times;</span> : <><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /></>}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-gray-50 active:bg-gray-100">
+            {menuOpen ? <span className="text-gray-600 text-2xl leading-none">&times;</span> : <><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /></>}
           </button>
         </div>
       </div>
