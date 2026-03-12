@@ -7,7 +7,7 @@ import { useApp } from '../../lib/context';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading, store: storeData, stores, products, orders, updateOrderStatus, confirmPayment, updateProduct } = useApp();
+  const { loading, store: storeData, stores, products, orders, updateOrderStatus, confirmPayment, updateProduct, deleteStore, switchStore } = useApp();
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
   const storeName = storeData?.store_name || 'My Store';
@@ -17,6 +17,8 @@ export default function DashboardPage() {
 
   const [completingOrder, setCompletingOrder] = useState(null);
   const [confirmAmount, setConfirmAmount] = useState('');
+  const [deletingStore, setDeletingStore] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [confirmSavings, setConfirmSavings] = useState('');
 
   const pendingOrders = orders.filter((o) => o.status === 'pending');
@@ -166,16 +168,97 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Add Another Store */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6 flex items-center justify-between">
-          <div>
-            <div className="text-sm font-medium text-gray-800">Managing {stores.length} store{stores.length !== 1 ? 's' : ''}</div>
-            <div className="text-xs text-gray-400">Switch stores using the dropdown in the nav bar</div>
+        {/* Store Management */}
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-800 text-sm">Your Stores</h2>
+            <button onClick={() => router.push('/setup')} className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-medium rounded-lg transition-colors">
+              + Add Store
+            </button>
           </div>
-          <button onClick={() => router.push('/setup')} className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-medium rounded-lg transition-colors">
-            + Add Store
-          </button>
+          <div className="space-y-2">
+            {stores.map((s) => (
+              <div key={s.id} className={`flex items-center justify-between p-3 rounded-xl border ${storeData?.id === s.id ? 'border-amber-200 bg-amber-50' : 'border-gray-100'}`}>
+                <div className="flex items-center gap-3">
+                  <div className="text-xl">{storeData?.id === s.id ? '🏪' : '🏬'}</div>
+                  <div>
+                    <div className="font-medium text-gray-800 text-sm">{s.store_name}</div>
+                    <div className="text-xs text-gray-400">{s.kid_name}{storeData?.id === s.id ? ' · Active' : ''}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {storeData?.id !== s.id && (
+                    <button
+                      onClick={() => switchStore(s.id)}
+                      className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                    >
+                      Switch
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setDeletingStore(s)}
+                    className="px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Delete Store Confirmation */}
+        {deletingStore && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+              <div className="text-3xl text-center mb-3">⚠️</div>
+              <h3 className="font-bold text-lg text-center text-gray-800 mb-2">Delete {deletingStore.store_name}?</h3>
+              <div className="bg-red-50 rounded-xl p-4 mb-4 text-sm text-red-700 space-y-1">
+                <p>This will permanently delete:</p>
+                <p>• All products in this store</p>
+                <p>• All order history</p>
+                <p>• Store design and settings</p>
+                <p>• Savings tracking data</p>
+                <p className="font-semibold mt-2">This cannot be undone.</p>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm text-gray-600 mb-2">Type <strong>{deletingStore.kid_name}</strong> to confirm:</label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder={deletingStore.kid_name}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-red-400 focus:outline-none text-base"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setDeletingStore(null); setDeleteConfirmText(''); }}
+                  className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium transition-colors hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    if (deleteConfirmText.toLowerCase() === deletingStore.kid_name.toLowerCase()) {
+                      await deleteStore(deletingStore.id);
+                      setDeletingStore(null);
+                      setDeleteConfirmText('');
+                    }
+                  }}
+                  disabled={deleteConfirmText.toLowerCase() !== deletingStore.kid_name.toLowerCase()}
+                  className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
+                    deleteConfirmText.toLowerCase() === deletingStore.kid_name.toLowerCase()
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Delete Forever
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pending orders alert */}
         {pendingOrders.length > 0 && (
