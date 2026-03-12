@@ -492,6 +492,56 @@ export default function BizPage() {
           </button>
         </div>
 
+
+        {/* Community Rules */}
+        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+          <h2 className="font-bold text-gray-800 mb-3">🤝 Our Community Rules</h2>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 bg-amber-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">😊</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">Be Kind</div>
+                <p className="text-xs text-gray-600 mt-0.5">Treat every customer and fellow store owner the way you want to be treated. No mean words, no bullying.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-blue-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">✅</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">Be Honest</div>
+                <p className="text-xs text-gray-600 mt-0.5">Show your real products. Describe them the way they really are. If something goes wrong with an order, tell your parent right away.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-emerald-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">🔒</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">Stay Safe</div>
+                <p className="text-xs text-gray-600 mt-0.5">Never share your address, phone number, or school name on your store. Your parent handles all the messages with customers.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-orange-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">📷</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">No Photos of Kids</div>
+                <p className="text-xs text-gray-600 mt-0.5">Never put pictures of yourself or other kids on your store. Use photos of your products instead. This is an important rule that keeps everyone safe.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-purple-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">👀</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">Parent Approved</div>
+                <p className="text-xs text-gray-600 mt-0.5">Everything you add to your store gets checked by your parent first. This keeps everyone safe and helps you learn.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-pink-50 rounded-xl p-3">
+              <span className="text-xl shrink-0">⭐</span>
+              <div>
+                <div className="font-semibold text-gray-800 text-sm">Do Your Best</div>
+                <p className="text-xs text-gray-600 mt-0.5">Make things you are proud of. Take care with every order. Happy customers come back and tell their friends.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Motivational Footer */}
         <div className="text-center py-4">
           {completedOrders.length === 0 ? (
