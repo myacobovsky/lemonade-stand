@@ -14,8 +14,18 @@ export default function ShopPage() {
 
   useEffect(() => {
     async function fetchStores() {
-      const { data } = await supabase.from('stores').select('*');
-      if (data) setRealStores(data);
+      const { data: storesData } = await supabase.from('stores').select('*');
+      const { data: themesData } = await supabase.from('store_themes').select('*');
+      const { data: productsData } = await supabase.from('products').select('id, store_id, status');
+      if (storesData) {
+        // Enrich stores with theme and product count
+        const enriched = storesData.map(s => {
+          const theme = (themesData || []).find(t => t.store_id === s.id);
+          const productCount = (productsData || []).filter(p => p.store_id === s.id && (p.status === 'approved' || !p.status)).length;
+          return { ...s, _theme: theme, _productCount: productCount };
+        });
+        setRealStores(enriched);
+      }
     }
     fetchStores();
   }, []);
@@ -36,10 +46,12 @@ export default function ShopPage() {
     name: s.store_name,
     owner: s.kid_name,
     neighborhood: 'tribeca',
-    image: '🏪',
-    productCount: 0,
+    sticker: s._theme?.sticker || '🏪',
+    bannerUrl: s._theme?.banner_image_url || null,
+    color: s._theme?.color || 'amber',
+    productCount: s._productCount || 0,
     rating: 5,
-    description: s.bio || `${s.kid_name}'s store! Check out what's for sale!`,
+    description: s.bio || `${s.kid_name}'s store!`,
     isUserStore: storeData?.id === s.id,
     isReal: true,
   }));
@@ -104,15 +116,25 @@ export default function ShopPage() {
               className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all text-left w-full"
             >
               <div className="flex gap-4">
-                <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                  {store.image}
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 overflow-hidden ${
+                  store.color === 'blue' ? 'bg-blue-50' :
+                  store.color === 'green' ? 'bg-emerald-50' :
+                  store.color === 'pink' ? 'bg-pink-50' :
+                  store.color === 'purple' ? 'bg-purple-50' :
+                  store.color === 'orange' ? 'bg-orange-50' : 'bg-amber-50'
+                }`}>
+                  {store.bannerUrl ? (
+                    <img src={store.bannerUrl} alt={store.name} className="w-full h-full object-cover" />
+                  ) : (
+                    store.sticker
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-gray-800 truncate">{store.name}</h3>
                     {store.isUserStore && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0">Your store</span>}
                   </div>
-                  <p className="text-xs text-gray-400 mb-1">by {store.owner} • {store.productCount} items</p>
+                  <p className="text-xs text-gray-400 mb-1">by {store.owner}{store.productCount > 0 ? ` • ${store.productCount} product${store.productCount !== 1 ? 's' : ''}` : ''}</p>
                   <div className="text-amber-400 text-xs mb-2">{'★'.repeat(store.rating)}{'☆'.repeat(5 - store.rating)}</div>
                   <p className="text-sm text-gray-500 line-clamp-2">{store.description}</p>
                 </div>
