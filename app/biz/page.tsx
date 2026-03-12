@@ -231,7 +231,7 @@ export default function BizPage() {
                           <div className="relative">
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                             <input
-                              type="number" min="0" step="0.50" placeholder={String(p.price)}
+                              type="number" inputMode="decimal" min="0" step="0.50" placeholder={String(p.price)}
                               value={customPrice !== null && !isNaN(customPrice) ? costs.customPrice : ''}
                               onChange={(e) => updateCost('customPrice', e.target.value)}
                               className="w-20 pl-5 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
@@ -255,7 +255,7 @@ export default function BizPage() {
                           <div className="relative">
                             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                             <input
-                              type="number" min="0" step="0.25" placeholder="0.00"
+                              type="number" inputMode="decimal" min="0" step="0.25" placeholder="0.00"
                               value={costs.materials || ''}
                               onChange={(e) => updateCost('materials', e.target.value)}
                               className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
@@ -265,7 +265,7 @@ export default function BizPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs text-gray-500 w-16 shrink-0">Time</span>
                           <input
-                            type="number" min="0" step="5" placeholder="min"
+                            type="number" inputMode="decimal" min="0" step="5" placeholder="min"
                             value={costs.minutes || ''}
                             onChange={(e) => updateCost('minutes', e.target.value)}
                             className="w-14 px-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm text-center"
@@ -274,7 +274,7 @@ export default function BizPage() {
                           <div className="relative">
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                             <input
-                              type="number" min="0" step="1" placeholder="0"
+                              type="number" inputMode="decimal" min="0" step="1" placeholder="0"
                               value={costs.hourlyRate || ''}
                               onChange={(e) => updateCost('hourlyRate', e.target.value)}
                               className="w-14 pl-5 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
@@ -327,7 +327,7 @@ export default function BizPage() {
                             <div className="relative">
                               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                               <input
-                                type="number" min="0" step="10" placeholder="Other"
+                                type="number" inputMode="decimal" min="0" step="10" placeholder="Other"
                                 value={!['25','50','100'].includes(costs.goal) ? (costs.goal || '') : ''}
                                 onChange={(e) => updateCost('goal', e.target.value)}
                                 className="w-20 pl-6 pr-2 py-1.5 rounded-lg border border-gray-200 focus:border-purple-400 focus:outline-none text-sm"
