@@ -60,7 +60,7 @@ export default function DashboardPage() {
     <ParentGate onCancel={() => router.push('/biz')}>
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <NavBar active="parent-dashboard" />
+      <NavBar active="dashboard" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Welcome back, {storeData?.parent_name || 'Parent'}!</h1>
