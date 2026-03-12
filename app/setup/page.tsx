@@ -58,7 +58,7 @@ export default function SetupPage() {
   };
 
   const ageTiers = [
-    { id: '5-8', label: 'Ages 5-8', desc: 'Young Entrepreneur' },
+    { id: '6-8', label: 'Ages 6-8', desc: 'Young Entrepreneur' },
     { id: '9-12', label: 'Ages 9-12', desc: 'Growing Entrepreneur' },
     { id: '13+', label: 'Ages 13+', desc: 'Teen Entrepreneur' },
   ];
