@@ -366,6 +366,18 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Community Standards */}
+        <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 mt-6">
+          <h2 className="font-semibold text-gray-700 text-sm mb-3">Community Standards</h2>
+          <div className="text-xs text-gray-500 space-y-2">
+            <p><strong>Parent Responsibility:</strong> You are responsible for supervising your child's activity, reviewing and approving all products, and overseeing all orders, payments, and customer interactions.</p>
+            <p><strong>Safe & Appropriate Content:</strong> All store names, product listings, descriptions, and images must be appropriate for a family audience. No offensive language, inappropriate imagery, or harmful content.</p>
+            <p><strong>Privacy & Safety:</strong> Never share personal information in store listings. Photos of children or children's faces are never permitted in store listings, product images, or banners. All customer communications should be handled by a parent.</p>
+            <p><strong>Honest Practices:</strong> Products must be accurately described with fair, clear pricing. Customers must be notified promptly if an order cannot be fulfilled.</p>
+            <p><strong>Respect & Moderation:</strong> Treat all community members with kindness. Bullying, harassment, or discrimination is not tolerated. Lemonade Stand reserves the right to review, flag, or remove content that violates these standards.</p>
+          </div>
+        </div>
       </main>
     </div>
     </ParentGate>
