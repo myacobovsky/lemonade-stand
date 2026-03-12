@@ -235,7 +235,7 @@ export default function EditorPage() {
                   <button
                     key={s}
                     onClick={() => setDraftTheme((prev) => ({ ...prev, sticker: s }))}
-                    className={`w-10 h-10 text-xl rounded-lg border-2 flex items-center justify-center transition-all ${
+                    className={`w-12 h-12 text-2xl rounded-xl border-2 flex items-center justify-center transition-all ${
                       draftTheme.sticker === s ? 'border-amber-400 bg-amber-50 scale-110' : 'border-gray-100 hover:border-gray-300'
                     }`}
                   >
@@ -271,7 +271,7 @@ export default function EditorPage() {
                       if (current.length >= 5) return prev;
                       return { ...prev, accentStickers: [...current, s] };
                     })}
-                    className={`w-8 h-8 text-base rounded-md border flex items-center justify-center transition-all ${
+                    className={`w-10 h-10 text-lg rounded-lg border flex items-center justify-center transition-all ${
                       (draftTheme.accentStickers || []).includes(s) ? 'border-amber-400 bg-amber-50' : 'border-gray-100 hover:border-gray-300'
                     }`}
                   >
@@ -288,12 +288,12 @@ export default function EditorPage() {
                 </div>
                 <button
                   onClick={() => setDraftTheme((prev) => ({ ...prev, stickerPattern: !prev.stickerPattern }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                  className={`relative w-14 h-8 rounded-full transition-colors ${
                     draftTheme.stickerPattern ? 'bg-amber-400' : 'bg-gray-300'
                   }`}
                 >
-                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    draftTheme.stickerPattern ? 'translate-x-5' : 'translate-x-0.5'
+                  <div className={`absolute top-0.5 w-7 h-7 rounded-full bg-white shadow transition-transform ${
+                    draftTheme.stickerPattern ? 'translate-x-6' : 'translate-x-0.5'
                   }`} />
                 </button>
               </div>
@@ -732,12 +732,12 @@ export default function EditorPage() {
                 </div>
                 <button
                   onClick={() => setDraftTheme((prev) => ({ ...prev, announcementOn: !prev.announcementOn }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                  className={`relative w-14 h-8 rounded-full transition-colors ${
                     draftTheme.announcementOn ? 'bg-amber-400' : 'bg-gray-300'
                   }`}
                 >
-                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    draftTheme.announcementOn ? 'translate-x-5' : 'translate-x-0.5'
+                  <div className={`absolute top-0.5 w-7 h-7 rounded-full bg-white shadow transition-transform ${
+                    draftTheme.announcementOn ? 'translate-x-6' : 'translate-x-0.5'
                   }`} />
                 </button>
               </div>
@@ -811,7 +811,7 @@ export default function EditorPage() {
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm"
                     />
                     <input
-                      type="number"
+                      type="number" inputMode="decimal"
                       value={newProduct.price}
                       onChange={(e) => setNewProduct((prev) => ({ ...prev, price: e.target.value }))}
                       placeholder="Price ($)"
