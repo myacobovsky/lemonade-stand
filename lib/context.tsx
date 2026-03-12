@@ -155,6 +155,29 @@ export function AppProvider({ children }) {
     return { data, error };
   }
 
+  async function deleteStore(storeId) {
+    // Delete products, theme, and orders for this store first
+    await supabase.from('products').delete().eq('store_id', storeId);
+    await supabase.from('store_themes').delete().eq('store_id', storeId);
+    await supabase.from('orders').delete().eq('store_id', storeId);
+    // Delete the store itself
+    const { error } = await supabase.from('stores').delete().eq('id', storeId);
+    if (!error) {
+      const remaining = stores.filter(s => s.id !== storeId);
+      setStores(remaining);
+      // Switch to another store or clear
+      if (remaining.length > 0) {
+        switchStore(remaining[0].id);
+      } else {
+        setStore(null);
+        setProducts([]);
+        setOrders([]);
+        setTheme(null);
+      }
+    }
+    return { error };
+  }
+
   async function updateTheme(updates) {
     if (!theme) return;
     const { data, error } = await supabase
@@ -254,7 +277,7 @@ export function AppProvider({ children }) {
       // Stores (multi)
       stores, activeStoreId, switchStore,
       // Active store
-      store, createStore, updateStore,
+      store, createStore, updateStore, deleteStore,
       // Theme
       theme, updateTheme,
       // Products
