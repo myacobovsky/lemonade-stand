@@ -89,16 +89,16 @@ export const NavBar = ({ active }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const tabs = store ? [
-    { id: 'dashboard', href: '/dashboard', label: 'Dashboard' },
-    { id: 'biz', href: '/biz', label: 'My Biz' },
-    { id: 'editor', href: '/editor', label: 'Editor' },
-    { id: 'store', href: '/store', label: 'Store' },
-    { id: 'savings', href: '/savings', label: 'Savings' },
-    { id: 'shop', href: '/shop', label: 'Shop' },
-    { id: 'learn', href: '/learn', label: 'Learn' },
+    { id: 'dashboard', href: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪' },
+    { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨' },
+    { id: 'store', href: '/store', label: 'Store', icon: '🛍️' },
+    { id: 'savings', href: '/savings', label: 'Savings', icon: '🫙' },
+    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
+    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
   ] : [
-    { id: 'shop', href: '/shop', label: 'Shop' },
-    { id: 'learn', href: '/learn', label: 'Learn' },
+    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
+    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
   ];
 
   const currentTab = active || pathname?.replace('/', '') || '';
@@ -126,8 +126,9 @@ export const NavBar = ({ active }) => {
         <div className="flex items-center gap-2">
           <nav className="hidden sm:flex gap-1 text-sm">
             {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.href} className={`px-3 py-1.5 rounded-lg transition-colors ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-gray-50 text-gray-500'}`}>
-                {tab.label}
+              <Link key={tab.id} href={tab.href} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-gray-50 text-gray-500'}`}>
+                <span className="text-base">{tab.icon}</span>
+                <span className="hidden md:inline">{tab.label}</span>
               </Link>
             ))}
           </nav>
@@ -143,8 +144,9 @@ export const NavBar = ({ active }) => {
         <div className="sm:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
           <div className="max-w-4xl mx-auto py-2 px-4">
             {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.href} onClick={() => setMenuOpen(false)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
-                <span className="text-sm">{tab.label}</span>
+              <Link key={tab.id} href={tab.href} onClick={() => setMenuOpen(false)} className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-left transition-all active:scale-95 ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <span className="text-xl">{tab.icon}</span>
+                <span className="text-base">{tab.label}</span>
               </Link>
             ))}
             {user && (
