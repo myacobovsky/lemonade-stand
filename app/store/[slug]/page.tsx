@@ -74,7 +74,7 @@ export default function PublicStorePage({ params }) {
         .select('*')
         .eq('store_id', store.id)
         .order('sort_order', { ascending: true });
-      if (prods) setProducts(prods);
+      if (prods) setProducts(prods.filter(p => p.status === 'approved' || !p.status));
 
       setLoading(false);
     }
