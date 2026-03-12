@@ -7,7 +7,7 @@ import { useApp } from '../../lib/context';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading, store: storeData, stores, orders, updateOrderStatus, confirmPayment } = useApp();
+  const { loading, store: storeData, stores, products, orders, updateOrderStatus, confirmPayment, updateProduct } = useApp();
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
   const storeName = storeData?.store_name || 'My Store';
@@ -208,6 +208,52 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+
+        {/* Product Review */}
+        {(() => {
+          const pendingProducts = products.filter(p => p.status === 'pending_review');
+          if (pendingProducts.length === 0) return null;
+          return (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 mb-6 animate-fadeIn">
+              <div className="font-semibold text-purple-800 text-sm mb-3">
+                ✋ {pendingProducts.length} product{pendingProducts.length !== 1 ? 's' : ''} waiting for your approval
+              </div>
+              <p className="text-xs text-purple-600 mb-4">{kidName} wants to add these to the store. Review and approve to make them visible to customers.</p>
+              <div className="space-y-3">
+                {pendingProducts.map((p) => (
+                  <div key={p.id} className="bg-white rounded-xl p-4 border border-purple-100">
+                    <div className="flex items-start gap-3">
+                      <span className="text-3xl">{p.emoji || '🎁'}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800">{p.name}</div>
+                        <div className="text-sm text-gray-500 mt-0.5">{p.description || 'No description'}</div>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-sm font-bold text-amber-600">${p.price}</span>
+                          <span className="text-xs text-gray-400">{p.category || 'General'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={() => updateProduct(p.id, { status: 'approved' })}
+                        className="flex-1 py-2.5 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors"
+                      >
+                        ✓ Approve
+                      </button>
+                      <button
+                        onClick={() => updateProduct(p.id, { status: 'changes_requested' })}
+                        className="py-2.5 px-4 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Request Changes
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Orders */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
