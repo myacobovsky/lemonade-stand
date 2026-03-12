@@ -172,7 +172,7 @@ export default function EditorPage() {
 
             {/* ===== STORE HEADER ===== */}
             <div className="bg-amber-50 rounded-xl px-4 py-2">
-              <h3 className="font-bold text-gray-700 text-sm">🏪 Store Header</h3>
+              <h3 className="font-bold text-gray-700 text-base">🏪 Store Header</h3>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -196,7 +196,7 @@ export default function EditorPage() {
                     }`}
                   >
                     <div className={`w-full h-8 rounded-lg ${c.bg} mb-2`} />
-                    <div className="text-xs font-medium text-gray-600">{c.name}</div>
+                    <div className="text-sm font-medium text-gray-600">{c.name}</div>
                   </button>
                 ))}
               </div>
@@ -229,13 +229,13 @@ export default function EditorPage() {
               </div>
 
               {/* Header Sticker */}
-              <div className="text-xs font-semibold text-gray-600 mb-2">Main sticker (shows in your header)</div>
+              <div className="text-sm font-semibold text-gray-600 mb-2">Main sticker (shows in your header)</div>
               <div className="flex flex-wrap gap-2 mb-4">
                 {(stickerSets[stickerTab] || stickerSets.popular).map((s) => (
                   <button
                     key={s}
                     onClick={() => setDraftTheme((prev) => ({ ...prev, sticker: s }))}
-                    className={`w-12 h-12 text-2xl rounded-xl border-2 flex items-center justify-center transition-all ${
+                    className={`w-12 h-12 text-2xl rounded-xl border-2 flex items-center justify-center transition-all active:scale-90 ${
                       draftTheme.sticker === s ? 'border-amber-400 bg-amber-50 scale-110' : 'border-gray-100 hover:border-gray-300'
                     }`}
                   >
@@ -245,8 +245,8 @@ export default function EditorPage() {
               </div>
 
               {/* Accent Stickers */}
-              <div className="text-xs font-semibold text-gray-600 mb-1">Accent stickers (pick up to 5, they decorate your store)</div>
-              <div className="text-[10px] text-gray-400 mb-2">Tap to add, tap again to remove</div>
+              <div className="text-sm font-semibold text-gray-600 mb-1">Accent stickers (pick up to 5, they decorate your store)</div>
+              <div className="text-sm text-gray-400 mb-2">Tap to add, tap again to remove</div>
               <div className="flex gap-1.5 mb-2">
                 {(draftTheme.accentStickers || []).map((s, i) => (
                   <button
@@ -271,7 +271,7 @@ export default function EditorPage() {
                       if (current.length >= 5) return prev;
                       return { ...prev, accentStickers: [...current, s] };
                     })}
-                    className={`w-10 h-10 text-lg rounded-lg border flex items-center justify-center transition-all ${
+                    className={`w-10 h-10 text-lg rounded-lg border flex items-center justify-center transition-all active:scale-90 ${
                       (draftTheme.accentStickers || []).includes(s) ? 'border-amber-400 bg-amber-50' : 'border-gray-100 hover:border-gray-300'
                     }`}
                   >
@@ -283,8 +283,8 @@ export default function EditorPage() {
               {/* Sticker as pattern toggle */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <div className="text-xs font-semibold text-gray-700">Use main sticker as background pattern</div>
-                  <div className="text-[10px] text-gray-400">Tiles your sticker across the store header</div>
+                  <div className="text-sm font-semibold text-gray-700">Use main sticker as background pattern</div>
+                  <div className="text-sm text-gray-400">Tiles your sticker across the store header</div>
                 </div>
                 <button
                   onClick={() => setDraftTheme((prev) => ({ ...prev, stickerPattern: !prev.stickerPattern }))}
@@ -311,7 +311,7 @@ export default function EditorPage() {
                   <p>A good rule: if your header font is fancy, keep your body font simple. That way your store looks cool AND is easy to read!</p>
                 </LearnTip>
               </div>
-              <p className="text-xs text-gray-400 mb-4">Use a fun font for your store name and a clear one for descriptions</p>
+              <p className="text-sm text-gray-400 mb-4">Use a fun font for your store name and a clear one for descriptions</p>
               <h4 className="text-sm font-semibold text-gray-600 mb-2">Store name font</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5">
                 {fontOptions.map((f) => (
@@ -323,7 +323,7 @@ export default function EditorPage() {
                     }`}
                   >
                     <div className="text-lg mb-0.5" style={{ fontFamily: f.family }}>{storeData?.kidName || 'Hello!'}</div>
-                    <div className="text-[10px] font-medium text-gray-400">{f.name}</div>
+                    <div className="text-sm font-medium text-gray-400">{f.name}</div>
                   </button>
                 ))}
               </div>
@@ -338,17 +338,17 @@ export default function EditorPage() {
                   <button
                     key={p.value}
                     onClick={() => setDraftTheme((prev) => ({ ...prev, pattern: p.value }))}
-                    className={`rounded-xl border-2 overflow-hidden transition-all ${
+                    className={`rounded-xl border-2 overflow-hidden transition-all active:scale-95 ${
                       draftTheme.pattern === p.value ? 'border-gray-800 scale-[1.02]' : 'border-transparent hover:border-gray-200'
                     }`}
                   >
                     <div className="h-16 relative bg-gray-50 flex items-center justify-center">
-                      {p.value === 'none' && <div className="text-xs text-gray-400">None</div>}
+                      {p.value === 'none' && <div className="text-sm text-gray-400">None</div>}
                       {p.emoji && <div className="absolute inset-0" style={getPatternStyle(p.value)} />}
                       {p.value === 'stripes' && <div className="absolute inset-0" style={getPatternStyle('stripes')} />}
                       {p.value === 'confetti' && <div className="absolute inset-0" style={getPatternStyle('confetti')} />}
                     </div>
-                    <div className="text-xs font-medium text-gray-500 py-1.5 text-center">{p.emoji ? `${p.emoji} ${p.name}` : p.name}</div>
+                    <div className="text-sm font-medium text-gray-500 py-2 text-center">{p.emoji ? `${p.emoji} ${p.name}` : p.name}</div>
                   </button>
                 ))}
               </div>
@@ -358,7 +358,7 @@ export default function EditorPage() {
             {/* Banner Image */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-gray-800">Store banner image</h3>
+                <h3 className="font-bold text-gray-800 text-base">Store banner image</h3>
                 <LearnTip title="First Impressions" color="green">
                   <p>Your banner is the first thing people see. Make it count!</p>
                   <p><strong>Show your products:</strong> A flat lay of your best items looks amazing.</p>
@@ -367,7 +367,7 @@ export default function EditorPage() {
                   <p>Did you know? Stores with banner images get looked at longer than stores without one. People are drawn to pictures!</p>
                 </LearnTip>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Add a photo of your workspace, products, or anything that shows off your brand!</p>
+              <p className="text-sm text-gray-400 mb-3">Add a photo of your workspace, products, or anything that shows off your brand!</p>
               {draftTheme.bannerImage ? (
                 <div className="relative">
                   <img src={draftTheme.bannerImage} alt="Store banner" className="w-full h-40 object-cover rounded-xl border border-gray-200" />
@@ -383,7 +383,7 @@ export default function EditorPage() {
                   <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-amber-400 transition-colors">
                     <div className="text-3xl mb-2">🖼️</div>
                     <div className="text-sm text-gray-500 font-medium">Tap to upload a banner photo</div>
-                    <div className="text-xs text-gray-400 mt-1">Looks best at a wide, short size</div>
+                    <div className="text-sm text-gray-400 mt-1">Looks best at a wide, short size</div>
                   </div>
                   <input
                     type="file"
@@ -411,7 +411,7 @@ export default function EditorPage() {
               draftTheme.color === 'purple' ? 'bg-purple-50 bg-opacity-30' :
               draftTheme.color === 'orange' ? 'bg-orange-50 bg-opacity-30' : 'bg-amber-50 bg-opacity-30'
             }`}>
-              <h3 className="font-bold text-gray-800 mb-4">Store header preview</h3>
+              <h3 className="font-bold text-gray-800 text-base mb-4">Store header preview</h3>
               {draftTheme.bannerImage && (
                 <img src={draftTheme.bannerImage} alt="Banner preview" className="w-full h-24 object-cover rounded-xl mb-3" />
               )}
@@ -465,13 +465,13 @@ export default function EditorPage() {
 
             {/* ===== ABOUT YOUR STORE ===== */}
             <div className="bg-amber-50 rounded-xl px-4 py-2">
-              <h3 className="font-bold text-gray-700 text-sm">📝 About Your Store</h3>
+              <h3 className="font-bold text-gray-700 text-base">📝 About Your Store</h3>
             </div>
 
             {/* Store Bio */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-gray-800">Describe your store</h3>
+                <h3 className="font-bold text-gray-800 text-base">Describe your store</h3>
                 <LearnTip title="Introducing Your Store" color="amber">
                   <p>Your store description is like saying hi to a new friend. Tell people who you are and what makes your stuff special!</p>
                   <p><strong>Keep it short.</strong> One or two sentences is perfect.</p>
@@ -480,7 +480,7 @@ export default function EditorPage() {
                   <p>Example: "Hi there! I make friendship bracelets with cool patterns. Every one is handmade and totally unique!"</p>
                 </LearnTip>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Tell people about your store in a few words!</p>
+              <p className="text-sm text-gray-400 mb-3">Tell people about your store in a few words!</p>
               <textarea
                 value={draftBio}
                 onChange={(e) => setDraftBio(e.target.value.slice(0, 150))}
@@ -489,7 +489,7 @@ export default function EditorPage() {
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-amber-400 focus:outline-none text-sm resize-none"
                 style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.bodyFont)?.family || "'Poppins', sans-serif" }}
               />
-              <div className="text-right text-xs text-gray-400 mt-1">{draftBio.length}/150</div>
+              <div className="text-right text-sm text-gray-400 mt-1">{draftBio.length}/150</div>
             </div>
 
 
@@ -506,7 +506,7 @@ export default function EditorPage() {
                     }`}
                   >
                     <div className="text-sm mb-0.5" style={{ fontFamily: f.family }}>The quick brown fox</div>
-                    <div className="text-[10px] font-medium text-gray-400">{f.name}</div>
+                    <div className="text-sm font-medium text-gray-400">{f.name}</div>
                   </button>
                 ))}
               </div>
@@ -514,12 +514,12 @@ export default function EditorPage() {
 
             {/* ===== PRODUCT CARDS ===== */}
             <div className="bg-amber-50 rounded-xl px-4 py-2">
-              <h3 className="font-bold text-gray-700 text-sm">📦 Product Cards</h3>
+              <h3 className="font-bold text-gray-700 text-base">📦 Product Cards</h3>
             </div>
 
             {/* Product Layout */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 mb-4">Product layout</h3>
+              <h3 className="font-bold text-gray-800 text-base mb-4">Product layout</h3>
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { name: 'Grid', value: 'grid' },
@@ -529,7 +529,7 @@ export default function EditorPage() {
                   <button
                     key={layout.value}
                     onClick={() => setDraftTheme((prev) => ({ ...prev, productLayout: layout.value }))}
-                    className={`rounded-xl border-2 overflow-hidden transition-all ${
+                    className={`rounded-xl border-2 overflow-hidden transition-all active:scale-95 ${
                       draftTheme.productLayout === layout.value ? 'border-gray-800 scale-[1.02]' : 'border-transparent hover:border-gray-200'
                     }`}
                   >
@@ -553,7 +553,7 @@ export default function EditorPage() {
                         </div>
                       )}
                     </div>
-                    <div className="text-xs font-medium text-gray-500 py-1.5 text-center">{layout.name}</div>
+                    <div className="text-sm font-medium text-gray-500 py-2 text-center">{layout.name}</div>
                   </button>
                 ))}
               </div>
@@ -561,7 +561,7 @@ export default function EditorPage() {
 
             {/* Card Style */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 mb-4">Product card style</h3>
+              <h3 className="font-bold text-gray-800 text-base mb-4">Product card style</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { name: 'Rounded', value: 'rounded' },
@@ -572,7 +572,7 @@ export default function EditorPage() {
                   <button
                     key={style.value}
                     onClick={() => setDraftTheme((prev) => ({ ...prev, cardStyle: style.value }))}
-                    className={`rounded-xl border-2 overflow-hidden transition-all ${
+                    className={`rounded-xl border-2 overflow-hidden transition-all active:scale-95 ${
                       draftTheme.cardStyle === style.value ? 'border-gray-800 scale-[1.02]' : 'border-transparent hover:border-gray-200'
                     }`}
                   >
@@ -594,12 +594,12 @@ export default function EditorPage() {
                         }`}>
                           🎀
                         </div>
-                        <div className={`text-[8px] font-medium text-gray-600 px-1.5 py-1 ${
+                        <div className={`text-xs font-medium text-gray-600 px-1.5 py-1 ${
                           style.value === 'polaroid' ? 'text-center pt-1.5' : ''
                         }`}>Product</div>
                       </div>
                     </div>
-                    <div className="text-xs font-medium text-gray-500 py-1.5 text-center">{style.name}</div>
+                    <div className="text-sm font-medium text-gray-500 py-2 text-center">{style.name}</div>
                   </button>
                 ))}
               </div>
@@ -618,14 +618,14 @@ export default function EditorPage() {
                     }`}
                   >
                     <div className="text-sm mb-0.5" style={{ fontFamily: f.family }}>Friendship Bracelet</div>
-                    <div className="text-[10px] font-medium text-gray-400">{f.name}</div>
+                    <div className="text-sm font-medium text-gray-400">{f.name}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 mt-0 mb-3">Product card preview</h3>
+              <h3 className="font-bold text-gray-800 text-base mt-0 mb-3">Product card preview</h3>
 
               {/* Grid preview */}
               {(!draftTheme.productLayout || draftTheme.productLayout === 'grid') && (
@@ -634,10 +634,10 @@ export default function EditorPage() {
                     <div key={i} className={getCardClasses(draftTheme.cardStyle, true, draftTheme.color)}>
                       <div className={`h-20 flex items-center justify-center text-2xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>{item.emoji}</div>
                       <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-2 pb-1' : 'p-3'}>
-                        <h4 className="font-bold text-gray-800 text-xs mb-0.5" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
+                        <h4 className="font-bold text-gray-800 text-sm mb-0.5" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold text-amber-600" style={{ fontFamily: "'Poppins', sans-serif" }}>${item.price}</span>
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-medium text-white ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
                             draftTheme.color === 'blue' ? 'bg-blue-400' :
                             draftTheme.color === 'green' ? 'bg-emerald-400' :
                             draftTheme.color === 'pink' ? 'bg-pink-400' :
@@ -658,11 +658,11 @@ export default function EditorPage() {
                     <div key={i} className={`flex gap-3 ${getCardClasses(draftTheme.cardStyle, true, draftTheme.color)}`}>
                       <div className={`w-20 shrink-0 flex items-center justify-center text-2xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>{item.emoji}</div>
                       <div className="flex-1 py-2 pr-2">
-                        <h4 className="font-bold text-gray-800 text-xs mb-0.5" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
-                        <p className="text-gray-400 text-[10px] mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
+                        <h4 className="font-bold text-gray-800 text-sm mb-0.5" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
+                        <p className="text-gray-400 text-sm mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold text-amber-600" style={{ fontFamily: "'Poppins', sans-serif" }}>${item.price}</span>
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-medium text-white ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
                             draftTheme.color === 'blue' ? 'bg-blue-400' :
                             draftTheme.color === 'green' ? 'bg-emerald-400' :
                             draftTheme.color === 'pink' ? 'bg-pink-400' :
@@ -683,7 +683,7 @@ export default function EditorPage() {
                     <div className={`h-32 flex items-center justify-center text-4xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>🎀</div>
                     <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-3 pb-1' : 'p-4'}>
                       <h4 className="font-bold text-gray-800 mb-0.5 text-base" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>Friendship Bracelet</h4>
-                      <p className="text-gray-400 text-xs mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Handmade with love! Choose your favorite colors.</p>
+                      <p className="text-gray-400 text-sm mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Handmade with love! Choose your favorite colors.</p>
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-bold text-amber-600" style={{ fontFamily: "'Poppins', sans-serif" }}>$5.00</span>
                         <span className={`px-3 py-1.5 rounded-full text-xs font-medium text-white ${
@@ -701,7 +701,7 @@ export default function EditorPage() {
                       <div key={i} className={getCardClasses(draftTheme.cardStyle, true, draftTheme.color)}>
                         <div className={`h-14 flex items-center justify-center text-xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>{item.emoji}</div>
                         <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-1.5 pb-1' : 'p-2'}>
-                          <h4 className="font-bold text-gray-800 text-[10px]" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
+                          <h4 className="font-bold text-gray-800 text-xs" style={{ fontFamily: fontOptions.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{item.name}</h4>
                           <span className="text-xs font-bold text-amber-600">${item.price}</span>
                         </div>
                       </div>
@@ -713,14 +713,14 @@ export default function EditorPage() {
 
             {/* ===== UPDATES & PROMOTIONS ===== */}
             <div className="bg-amber-50 rounded-xl px-4 py-2">
-              <h3 className="font-bold text-gray-700 text-sm">📣 Updates & Promotions</h3>
+              <h3 className="font-bold text-gray-700 text-base">📣 Updates & Promotions</h3>
             </div>
 
             {/* Announcement Bar */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-gray-800">Announcement bar</h3>
+                  <h3 className="font-bold text-gray-800 text-base">Announcement bar</h3>
                   <LearnTip title="Promotions & Announcements" color="amber">
                     <p>An announcement bar grabs attention right away. Big stores use these all the time!</p>
                     <p><strong>Sales and deals:</strong> "Buy 2 bracelets, get 1 free!"</p>
@@ -772,7 +772,7 @@ export default function EditorPage() {
 
             <button
               onClick={handleUpdateStore}
-              className={`w-full py-3 rounded-xl font-semibold text-base transition-all ${
+              className={`w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98] ${
                 themeUpdated
                   ? 'bg-emerald-500 text-white'
                   : 'bg-amber-400 hover:bg-amber-500 text-white'
@@ -979,9 +979,9 @@ export default function EditorPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-gray-800">{p.name}</div>
-                          {p.status === 'pending_review' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Waiting for parent</span>}
-                          {p.status === 'changes_requested' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Needs changes</span>}
-                          {p.status === 'approved' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Live</span>}
+                          {p.status === 'pending_review' && <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Waiting for parent</span>}
+                          {p.status === 'changes_requested' && <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Needs changes</span>}
+                          {p.status === 'approved' && <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Live</span>}
                         </div>
                         <div className="text-sm text-gray-500 truncate">{p.description}</div>
                       </div>
