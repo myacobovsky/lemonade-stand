@@ -9,6 +9,7 @@ export default function SetupPage() {
   const router = useRouter();
   const { user, createStore } = useApp();
   const [step, setStep] = useState(1);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [formData, setFormData] = useState({
     parentName: '',
     kidName: '',
@@ -345,11 +346,53 @@ export default function SetupPage() {
               ))}
             </div>
             <p className="text-xs text-gray-400 text-center mt-3">You can change all of this later in your dashboard.</p>
+
+            {/* Community Standards Agreement */}
+            <div className="bg-gray-50 rounded-2xl p-5 mt-6 border border-gray-200">
+              <h3 className="font-bold text-gray-800 mb-3">Community Standards</h3>
+              <div className="text-sm text-gray-600 space-y-3 mb-4 max-h-48 overflow-y-auto pr-2">
+                <p>Welcome to Lemonade Stand. By creating a store, you agree to the following:</p>
+
+                <p><strong>Parent Responsibility</strong><br/>
+                You, the parent or guardian, are responsible for supervising your child's activity on Lemonade Stand. You will review and approve all products before they go live. You will oversee all orders, payments, and customer interactions.</p>
+
+                <p><strong>Safe & Appropriate Content</strong><br/>
+                All store names, product listings, descriptions, and images must be appropriate for a family audience. No offensive language, inappropriate imagery, or content that could be harmful to children is permitted.</p>
+
+                <p><strong>Honest Business Practices</strong><br/>
+                Products must be accurately described. Prices must be fair and clearly stated. If an order cannot be fulfilled, the customer must be notified promptly.</p>
+
+                <p><strong>Privacy & Safety</strong><br/>
+                Never share personal information such as home addresses, phone numbers, or school names in store listings or product descriptions. Photos of children or children's faces are never permitted in store listings, product images, or banners. All order communications should be handled by a parent or guardian.</p>
+
+                <p><strong>Respect Others</strong><br/>
+                Treat every customer, fellow store owner, and community member with kindness and respect. Bullying, harassment, or discrimination of any kind is not tolerated.</p>
+
+                <p><strong>Moderation</strong><br/>
+                Lemonade Stand reserves the right to review, flag, or remove any content that violates these standards. Repeat violations may result in store suspension.</p>
+              </div>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-300 text-amber-500 mt-0.5 shrink-0"
+                />
+                <span className="text-sm text-gray-700">I have read and agree to the Lemonade Stand Community Standards. I understand that I am responsible for supervising my child's store and activity.</span>
+              </label>
+            </div>
+
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep(3)} className="px-6 py-4 rounded-full border-2 border-gray-200 text-gray-600 font-semibold">←</button>
               <button
                 onClick={handleComplete}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-4 rounded-full text-lg transition-colors shadow-lg shadow-amber-200"
+                disabled={!agreedToTerms}
+                className={`flex-1 font-bold py-4 rounded-full text-lg transition-colors ${
+                  agreedToTerms
+                    ? 'bg-amber-400 hover:bg-amber-500 text-white shadow-lg shadow-amber-200'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
               >
                 🍋 Launch My Store!
               </button>
