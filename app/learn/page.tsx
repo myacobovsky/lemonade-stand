@@ -108,7 +108,7 @@ export default function LearnHub() {
                     <button
                       key={article.id}
                       onClick={() => router.push(`/learn/${article.id}`)}
-                      className="w-full bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all text-left flex items-start gap-4 relative"
+                      className="w-full bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all text-left flex items-start gap-4 relative"
                     >
                       <div className={`absolute -left-[26px] top-6 w-3 h-3 rounded-full ${colors.numBg} border-2 border-white`} />
 
