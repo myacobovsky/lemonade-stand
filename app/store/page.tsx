@@ -8,6 +8,7 @@ import { useApp } from '../../lib/context';
 export default function StorePage() {
   const router = useRouter();
   const { loading, store: storeData, products, addOrder: addOrderToDb, theme: storeTheme } = useApp();
+  const approvedProducts = products.filter(p => p.status === 'approved' || !p.status);
   const storeBio = storeData?.bio || '';
   const addOrder = async (order) => { await addOrderToDb(order); };
   const [cart, setCart] = useState([]);
@@ -233,13 +234,13 @@ export default function StorePage() {
             );
           };
 
-          if (layout === 'featured' && products.length > 0) {
+          if (layout === 'featured' && approvedProducts.length > 0) {
             return (
               <div className="space-y-6">
                 {renderProductCard(products[0], true)}
-                {products.length > 1 && (
+                {approvedProducts.length > 1 && (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {products.slice(1).map((p) => renderProductCard(p))}
+                    {approvedProducts.slice(1).map((p) => renderProductCard(p))}
                   </div>
                 )}
               </div>
@@ -248,13 +249,13 @@ export default function StorePage() {
           if (layout === 'list') {
             return (
               <div className="space-y-4">
-                {products.map((p) => renderProductCard(p))}
+                {approvedProducts.map((p) => renderProductCard(p))}
               </div>
             );
           }
           return (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {products.map((p) => renderProductCard(p))}
+              {approvedProducts.map((p) => renderProductCard(p))}
             </div>
           );
         })()}
