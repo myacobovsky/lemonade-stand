@@ -212,6 +212,15 @@ export default function LandingPage() {
         </div>
         <p>Where kids learn business, one sale at a time.</p>
       </footer>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-6 px-4 text-center">
+        <div className="flex justify-center gap-4 text-xs text-gray-400">
+          <a href="/privacy" className="hover:text-gray-600">Privacy & Data Practices</a>
+          <span>·</span>
+          <span>© {new Date().getFullYear()} Lemonade Stand</span>
+        </div>
+      </footer>
     </div>
   );
 }
