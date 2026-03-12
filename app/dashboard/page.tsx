@@ -377,6 +377,7 @@ export default function DashboardPage() {
             <p><strong>Honest Practices:</strong> Products must be accurately described with fair, clear pricing. Customers must be notified promptly if an order cannot be fulfilled.</p>
             <p><strong>Respect & Moderation:</strong> Treat all community members with kindness. Bullying, harassment, or discrimination is not tolerated. Lemonade Stand reserves the right to review, flag, or remove content that violates these standards.</p>
           </div>
+          <a href="/privacy" className="inline-block mt-3 text-xs text-amber-600 hover:underline">Read our full Privacy & Data Practices →</a>
         </div>
       </main>
     </div>
