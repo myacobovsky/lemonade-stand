@@ -212,3 +212,59 @@ export const fontOptions = [
   { name: 'Ultra', value: 'Ultra', family: "'Ultra', serif" },
   { name: 'Quantico', value: 'Quantico', family: "'Quantico', sans-serif" },
 ];
+
+// --- Parent Gate (COPPA compliance) ---
+export const ParentGate = ({ children, onCancel }) => {
+  const [passed, setPassed] = useState(false);
+  const [answer, setAnswer] = useState('');
+  const [error, setError] = useState(false);
+  const [challenge] = useState(() => {
+    const a = Math.floor(Math.random() * 4) + 6; // 6-9
+    const b = Math.floor(Math.random() * 4) + 6; // 6-9
+    return { a, b, answer: a * b };
+  });
+
+  if (passed) return children;
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-sm text-center">
+        <div className="text-4xl mb-4">🔒</div>
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Parent Area</h2>
+        <p className="text-sm text-gray-500 mb-6">To keep kids safe, please solve this to continue.</p>
+        <div className="bg-gray-50 rounded-xl p-5 mb-4">
+          <div className="text-2xl font-bold text-gray-800 mb-3">What is {challenge.a} × {challenge.b}?</div>
+          <input
+            type="number"
+            inputMode="numeric"
+            value={answer}
+            onChange={(e) => { setAnswer(e.target.value); setError(false); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && parseInt(answer) === challenge.answer) setPassed(true);
+              else if (e.key === 'Enter') setError(true);
+            }}
+            className={`w-32 mx-auto text-center text-2xl font-bold py-3 rounded-xl border-2 focus:outline-none ${
+              error ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-amber-400'
+            }`}
+            placeholder="?"
+            autoFocus
+          />
+          {error && <p className="text-red-500 text-sm mt-2">Not quite. Try again.</p>}
+        </div>
+        <button
+          onClick={() => {
+            if (parseInt(answer) === challenge.answer) setPassed(true);
+            else setError(true);
+          }}
+          className="w-full bg-amber-400 hover:bg-amber-500 text-white font-semibold py-3 rounded-xl transition-colors mb-3"
+        >
+          Continue
+        </button>
+        {onCancel && (
+          <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600">Go back</button>
+        )}
+      </div>
+    </div>
+  );
+};
+
