@@ -108,7 +108,7 @@ export default function EditorPage() {
         inStock: true,
         category: newProduct.category || 'General',
       };
-      addProductToDb({ name: product.name, price: product.price, description: product.description, emoji: product.emoji, image_url: product.image || null, category: product.category || 'General', in_stock: true });
+      addProductToDb({ name: product.name, price: product.price, description: product.description, emoji: product.emoji, image_url: product.image || null, category: product.category || 'General', in_stock: true, status: 'pending_review' });
       setNewProduct({ name: '', price: '', description: '', image: null, usePhoto: false, category: '' });
       setShowAddProduct(false);
     }
@@ -977,7 +977,12 @@ export default function EditorPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-800">{p.name}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium text-gray-800">{p.name}</div>
+                          {p.status === 'pending_review' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Waiting for parent</span>}
+                          {p.status === 'changes_requested' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Needs changes</span>}
+                          {p.status === 'approved' && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Live</span>}
+                        </div>
                         <div className="text-sm text-gray-500 truncate">{p.description}</div>
                       </div>
                       <div className="text-right shrink-0">
