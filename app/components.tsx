@@ -96,10 +96,12 @@ export const NavBar = ({ active }) => {
     { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨' },
     { id: 'shop', href: shopHref, label: 'Shop', icon: '🛒' },
     { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
+    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫' },
     { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒' },
   ] : [
     { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
     { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
+    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫' },
   ];
 
   const currentTab = active || pathname?.replace('/', '') || '';
