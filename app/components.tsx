@@ -88,10 +88,13 @@ export const NavBar = ({ active }) => {
   const { user, signOut, store, stores, switchStore } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // If store belongs to a school, Shop links to the school marketplace instead of public shop
+  const shopHref = store?.school_id ? `/schools/${store.school_slug || 'ps150'}` : '/shop';
+
   const tabs = store ? [
     { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪' },
     { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨' },
-    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
+    { id: 'shop', href: shopHref, label: 'Shop', icon: '🛒' },
     { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
     { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒' },
   ] : [
@@ -267,4 +270,3 @@ export const ParentGate = ({ children, onCancel }) => {
     </div>
   );
 };
-
