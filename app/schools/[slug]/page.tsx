@@ -1,16 +1,5 @@
 // @ts-nocheck
 // FILE: app/schools/[slug]/page.tsx
-// 
-// This is the password-gated school marketplace page.
-// URL: /schools/ps150 (or any school slug)
-//
-// Flow:
-// 1. Load school info by slug
-// 2. Check if user has already entered the password (stored in localStorage)
-// 3. If not, show password gate
-// 4. If yes, show all stores belonging to this school
-//
-// Add this file to your project at: app/schools/[slug]/page.tsx
 
 'use client';
 
@@ -19,19 +8,27 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
-// Reuse your existing Logo component if available, otherwise inline it
 function Logo({ size = 'md' }) {
-  const sz = size === 'sm' ? 'w-8 h-8 text-lg' : size === 'lg' ? 'w-16 h-16 text-3xl' : 'w-12 h-12 text-2xl';
+  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-14 h-14' };
   return (
-    <div className={`${sz} bg-amber-100 rounded-full flex items-center justify-center`}>
-      <span role="img" aria-label="lemon">🍋</span>
-    </div>
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={sizes[size]}>
+      <circle cx="16" cy="16" r="15" fill="#FEF3C7"/>
+      <ellipse cx="16" cy="17" rx="11" ry="9" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
+      <circle cx="12" cy="16" r="2" fill="#292524"/>
+      <circle cx="20" cy="16" r="2" fill="#292524"/>
+      <circle cx="11" cy="15" r="0.75" fill="white"/>
+      <circle cx="19" cy="15" r="0.75" fill="white"/>
+      <path d="M12 20 Q16 24 20 20" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      <path d="M16 8 Q20 4 22 8 Q20 10 16 8" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round"/>
+      <circle cx="9" cy="19" r="1.5" fill="#FBBF24"/>
+      <circle cx="23" cy="19" r="1.5" fill="#FBBF24"/>
+    </svg>
   );
 }
 
 export default function SchoolPage() {
   const params = useParams();
-  const slug = params?.slug as string;
+  const slug = params?.slug;
   const router = useRouter();
 
   const [school, setSchool] = useState(null);
@@ -41,7 +38,6 @@ export default function SchoolPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Load school info
   useEffect(() => {
     if (!slug) return;
     loadSchool();
@@ -57,12 +53,11 @@ export default function SchoolPage() {
 
     if (schoolError || !schoolData) {
       setLoading(false);
-      return; // School not found — will show 404-style message
+      return;
     }
 
     setSchool(schoolData);
 
-    // Check if user already has access (password stored in localStorage)
     const storedKey = `school_access_${schoolData.id}`;
     const storedPassword = typeof window !== 'undefined' ? localStorage.getItem(storedKey) : null;
 
@@ -75,7 +70,6 @@ export default function SchoolPage() {
   }
 
   async function loadStores(schoolId) {
-    // Load all stores for this school, along with their themes and approved product counts
     const { data: storeData } = await supabase
       .from('stores')
       .select('*, store_themes(*)')
@@ -83,7 +77,6 @@ export default function SchoolPage() {
       .order('created_at', { ascending: true });
 
     if (storeData) {
-      // Load product counts for each store
       const storesWithCounts = await Promise.all(
         storeData.map(async (store) => {
           const { count } = await supabase
@@ -103,7 +96,6 @@ export default function SchoolPage() {
     if (!school) return;
 
     if (password === school.password) {
-      // Store access in localStorage
       const storedKey = `school_access_${school.id}`;
       if (typeof window !== 'undefined') {
         localStorage.setItem(storedKey, password);
@@ -116,13 +108,13 @@ export default function SchoolPage() {
     }
   }
 
-  // Loading state
+  // Loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center">
         <div className="text-center">
           <Logo size="lg" />
-          <p className="mt-4 text-gray-500">Loading...</p>
+          <p className="mt-4 text-gray-400 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -131,14 +123,14 @@ export default function SchoolPage() {
   // School not found
   if (!school) {
     return (
-      <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <Logo size="lg" />
           <h1 className="text-2xl font-bold text-gray-800 mt-6">School not found</h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 mt-2 text-sm">
             We could not find a school club at this address. Double check the link you were given.
           </p>
-          <Link href="/" className="inline-block mt-6 px-6 py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-xl font-medium transition-colors">
+          <Link href="/" className="inline-block mt-6 px-6 py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-full font-semibold transition-colors text-sm">
             Go to Lemonade Stand
           </Link>
         </div>
@@ -149,98 +141,126 @@ export default function SchoolPage() {
   // Password gate
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
-          <Logo size="lg" />
-          <h1 className="text-2xl font-bold text-gray-800 mt-4">{school.name}</h1>
-          {school.description && (
-            <p className="text-gray-500 mt-1 text-sm">{school.description}</p>
-          )}
-          <div className="mt-6 p-4 bg-amber-50 rounded-xl">
-            <p className="text-sm text-gray-600">
-              This is a private marketplace for {school.name} families. 
-              Enter the password your club leader shared with you.
-            </p>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
+        {/* Lemon accent bar */}
+        <div className="fixed top-0 left-0 right-0 h-1 bg-amber-400 z-50" />
+
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <Logo size="lg" />
+            <h1 className="text-2xl font-bold text-gray-800 mt-4">{school.name}</h1>
+            <div className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
+              Business Club
+            </div>
           </div>
-          <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(''); }}
-              placeholder="Enter club password"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-center text-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-              autoFocus
-            />
-            {error && (
-              <p className="text-red-500 text-sm">{error}</p>
-            )}
-            <button
-              type="submit"
-              className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-xl font-semibold transition-colors"
-            >
-              Enter
-            </button>
-          </form>
-          <p className="mt-4 text-xs text-gray-400">
-            Powered by <Link href="/" className="text-amber-500 hover:underline">Lemonade Stand</Link>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-amber-50 rounded-xl p-4 mb-5">
+              <p className="text-sm text-gray-600 text-center">
+                This is a private marketplace for {school.name} families.
+                Enter the password shared by your club leader.
+              </p>
+            </div>
+
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Club password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-400 focus:outline-none text-lg text-center"
+                  autoFocus
+                />
+                {error && (
+                  <p className="text-red-500 text-xs mt-2 text-center">{error}</p>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-full font-semibold transition-colors"
+              >
+                Enter Marketplace
+              </button>
+            </form>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-gray-300">
+            Powered by <Link href="/" className="text-amber-400 hover:text-amber-500">Lemonade Stand</Link>
           </p>
         </div>
       </div>
     );
   }
 
-  // Authenticated — show school marketplace
-  const getStoreColor = (theme) => {
+  // Authenticated — marketplace
+  const getStoreAccent = (theme) => {
     const colors = {
-      blue: 'bg-blue-100 text-blue-700',
-      green: 'bg-emerald-100 text-emerald-700',
-      pink: 'bg-pink-100 text-pink-700',
-      purple: 'bg-purple-100 text-purple-700',
-      orange: 'bg-orange-100 text-orange-700',
+      blue: { bg: 'bg-blue-50', icon: 'bg-blue-100 text-blue-600', badge: 'text-blue-600' },
+      green: { bg: 'bg-emerald-50', icon: 'bg-emerald-100 text-emerald-600', badge: 'text-emerald-600' },
+      pink: { bg: 'bg-pink-50', icon: 'bg-pink-100 text-pink-600', badge: 'text-pink-600' },
+      purple: { bg: 'bg-purple-50', icon: 'bg-purple-100 text-purple-600', badge: 'text-purple-600' },
+      orange: { bg: 'bg-orange-50', icon: 'bg-orange-100 text-orange-600', badge: 'text-orange-600' },
     };
-    return colors[theme?.color] || 'bg-amber-100 text-amber-700';
+    return colors[theme?.color] || { bg: 'bg-amber-50', icon: 'bg-amber-100 text-amber-600', badge: 'text-amber-600' };
   };
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
+      {/* Lemon accent bar */}
+      <div className="h-1 bg-amber-400" />
+
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Logo size="sm" />
             <div>
-              <h1 className="font-bold text-gray-800 text-sm">{school.name}</h1>
+              <h1 className="font-bold text-gray-800 text-sm leading-tight">{school.name}</h1>
               <p className="text-xs text-gray-400">Business Club Marketplace</p>
             </div>
           </div>
-          <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">
-            Lemonade Stand
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
+              Private
+            </div>
+            <Link href="/" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600">
+              <Logo size="sm" />
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
             {school.name} Marketplace
           </h2>
-          <p className="text-gray-500 mt-1">
-            Browse stores from our Business Club members
+          <p className="text-gray-500 mt-1 text-sm">
+            Browse and buy from our Business Club members
           </p>
-          <div className="inline-block mt-3 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
-            Private — {school.name} families only
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
+              {stores.length} {stores.length === 1 ? 'store' : 'stores'}
+            </span>
+            <span className="inline-block px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-medium">
+              {school.name} families only
+            </span>
           </div>
         </div>
       </div>
 
       {/* Store Grid */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
         {stores.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-4xl mb-4">🏗️</p>
+            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+              🏗️
+            </div>
             <h3 className="text-lg font-bold text-gray-800">Stores are coming soon!</h3>
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 mt-1 text-sm max-w-sm mx-auto">
               Club members are building their stores. Check back soon to see what they are selling.
             </p>
           </div>
@@ -249,31 +269,33 @@ export default function SchoolPage() {
             {stores.map((store) => {
               const theme = store.store_themes?.[0] || store.store_themes;
               const sticker = theme?.sticker || '🍋';
-              const colorClass = getStoreColor(theme);
+              const accent = getStoreAccent(theme);
 
               return (
                 <Link
                   key={store.id}
                   href={`/store/${store.id}`}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-amber-200 transition-all group"
                 >
                   <div className="text-center">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto ${colorClass}`}>
-                      {theme?.bannerImage ? (
-                        <img src={theme.bannerImage} alt="" className="w-full h-full object-cover rounded-2xl" />
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mx-auto overflow-hidden ${accent.icon}`}>
+                      {theme?.banner_image_url ? (
+                        <img src={theme.banner_image_url} alt="" className="w-full h-full object-cover rounded-xl" />
                       ) : (
                         sticker
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-800 mt-3">
+                    <h3 className="font-bold text-gray-800 mt-3 group-hover:text-amber-600 transition-colors">
                       {store.store_name}
                     </h3>
                     <p className="text-gray-400 text-sm mt-0.5">
                       by {store.kid_name}
                     </p>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {store.productCount} {store.productCount === 1 ? 'product' : 'products'}
-                    </p>
+                    {store.productCount > 0 && (
+                      <p className="text-xs text-gray-300 mt-2">
+                        {store.productCount} {store.productCount === 1 ? 'product' : 'products'}
+                      </p>
+                    )}
                   </div>
                 </Link>
               );
@@ -281,6 +303,19 @@ export default function SchoolPage() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Logo size="sm" />
+            <span className="text-xs text-gray-400">Lemonade Stand</span>
+          </div>
+          <Link href="/privacy" className="text-xs text-gray-300 hover:text-gray-500">
+            Privacy
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }
