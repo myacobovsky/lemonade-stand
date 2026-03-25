@@ -43,7 +43,7 @@ export function AppProvider({ children }) {
     if (activeStoreId) loadStoreData(activeStoreId);
   }, [activeStoreId]);
 
-  // Load all stores for a user
+  // Load all stores for a user, enriched with school slugs
   async function loadUserStores(userId) {
     try {
       const { data: userStores } = await supabase
@@ -53,11 +53,30 @@ export function AppProvider({ children }) {
         .order('created_at', { ascending: true });
 
       if (userStores && userStores.length > 0) {
-        setStores(userStores);
+        // Look up school slugs for any stores linked to a school
+        const schoolIds = [...new Set(userStores.filter(s => s.school_id).map(s => s.school_id))];
+        let schoolMap = {};
+        if (schoolIds.length > 0) {
+          const { data: schools } = await supabase
+            .from('schools')
+            .select('id, slug')
+            .in('id', schoolIds);
+          if (schools) {
+            schools.forEach(s => { schoolMap[s.id] = s.slug; });
+          }
+        }
+
+        // Attach school_slug to each store
+        const enrichedStores = userStores.map(s => ({
+          ...s,
+          school_slug: s.school_id ? (schoolMap[s.school_id] || null) : null,
+        }));
+
+        setStores(enrichedStores);
         // Auto-select: use saved preference or first store
         const savedId = typeof window !== 'undefined' ? localStorage.getItem('activeStoreId') : null;
-        const validSaved = savedId && userStores.some(s => s.id === savedId);
-        setActiveStoreId(validSaved ? savedId : userStores[0].id);
+        const validSaved = savedId && enrichedStores.some(s => s.id === savedId);
+        setActiveStoreId(validSaved ? savedId : enrichedStores[0].id);
       } else {
         setStores([]);
         setActiveStoreId(null);
@@ -137,8 +156,21 @@ export function AppProvider({ children }) {
         .single();
       if (themeData) setTheme(themeData);
 
-      setStores(prev => [...prev, data]);
-      setActiveStoreId(data.id);
+      // If the new store has a school_id, look up the slug
+      let enrichedData = data;
+      if (data.school_id) {
+        const { data: schoolData } = await supabase
+          .from('schools')
+          .select('slug')
+          .eq('id', data.school_id)
+          .single();
+        if (schoolData) {
+          enrichedData = { ...data, school_slug: schoolData.slug };
+        }
+      }
+
+      setStores(prev => [...prev, enrichedData]);
+      setActiveStoreId(enrichedData.id);
     }
     return { data, error };
   }
@@ -151,7 +183,7 @@ export function AppProvider({ children }) {
       .eq('id', store.id)
       .select()
       .single();
-    if (data) setStores(prev => prev.map(s => s.id === data.id ? data : s));
+    if (data) setStores(prev => prev.map(s => s.id === data.id ? { ...data, school_slug: s.school_slug } : s));
     return { data, error };
   }
 
