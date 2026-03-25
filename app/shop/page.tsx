@@ -14,7 +14,7 @@ export default function ShopPage() {
 
   useEffect(() => {
     async function fetchStores() {
-      const { data: storesData } = await supabase.from('stores').select('*');
+      const { data: storesData } = await supabase.from('stores').select('*').or('public_listing.eq.true,public_listing.is.null');
       const { data: themesData } = await supabase.from('store_themes').select('*');
       const { data: productsData } = await supabase.from('products').select('id, store_id, status');
       if (storesData) {
