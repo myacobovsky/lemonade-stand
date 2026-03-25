@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Logo } from '../components';
 import { useApp } from '../../lib/context';
+import { supabase } from '../../lib/supabase';
 
 export default function SetupPage() {
   const router = useRouter();
@@ -21,7 +22,13 @@ export default function SetupPage() {
     savingsGoalCustom: '',
     savingsAmount: '',
     savingsPercent: 50,
+    schoolCode: '',
+    schoolId: null,
+    schoolName: '',
+    joiningClub: false,
   });
+  const [schoolLookupError, setSchoolLookupError] = useState('');
+  const [schoolLookupLoading, setSchoolLookupLoading] = useState(false);
 
   const updateField = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -38,10 +45,42 @@ export default function SetupPage() {
     updateField('storeNameEdited', true);
   };
 
+  // Look up school by code (slug)
+  const handleSchoolCodeCheck = async (code) => {
+    const trimmed = code.trim().toLowerCase();
+    updateField('schoolCode', code);
+    setSchoolLookupError('');
+
+    if (!trimmed) {
+      updateField('schoolId', null);
+      updateField('schoolName', '');
+      return;
+    }
+
+    setSchoolLookupLoading(true);
+    const { data, error } = await supabase
+      .from('schools')
+      .select('id, name, slug')
+      .eq('slug', trimmed)
+      .eq('is_active', true)
+      .single();
+
+    setSchoolLookupLoading(false);
+
+    if (data) {
+      updateField('schoolId', data.id);
+      updateField('schoolName', data.name);
+      setSchoolLookupError('');
+    } else {
+      updateField('schoolId', null);
+      updateField('schoolName', '');
+      setSchoolLookupError('No club found with that code. Check with your club leader.');
+    }
+  };
+
   const handleComplete = async () => {
     const savingsGoal = formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal;
     if (!user) {
-      // Not logged in - redirect to login first
       router.push('/login');
       return;
     }
@@ -54,6 +93,8 @@ export default function SetupPage() {
       savings_goal: savingsGoal,
       savings_amount: parseFloat(formData.savingsAmount) || 100,
       savings_percent: parseInt(formData.savingsPercent) || 50,
+      school_id: formData.schoolId || null,
+      public_listing: formData.schoolId ? false : true,
     });
     router.push('/biz');
   };
@@ -155,10 +196,69 @@ export default function SetupPage() {
                   ))}
                 </div>
               </div>
+
+              {/* School Club Section */}
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    const next = !formData.joiningClub;
+                    updateField('joiningClub', next);
+                    if (!next) {
+                      updateField('schoolCode', '');
+                      updateField('schoolId', null);
+                      updateField('schoolName', '');
+                      setSchoolLookupError('');
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                    formData.joiningClub
+                      ? 'border-emerald-400 bg-emerald-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🏫</span>
+                    <div className="text-left">
+                      <div className={`font-medium text-sm ${formData.joiningClub ? 'text-emerald-700' : 'text-gray-700'}`}>Joining a school club?</div>
+                      <div className="text-xs text-gray-400">Enter your club code if you have one</div>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-6 rounded-full transition-colors flex items-center ${
+                    formData.joiningClub ? 'bg-emerald-400 justify-end' : 'bg-gray-200 justify-start'
+                  }`}>
+                    <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5" />
+                  </div>
+                </button>
+
+                {formData.joiningClub && (
+                  <div className="mt-3 animate-fadeIn">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Club code</label>
+                    <input
+                      type="text"
+                      value={formData.schoolCode}
+                      onChange={(e) => handleSchoolCodeCheck(e.target.value)}
+                      placeholder="e.g. ps150"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-400 focus:outline-none text-lg"
+                    />
+                    {schoolLookupLoading && (
+                      <p className="text-xs text-gray-400 mt-1">Looking up club...</p>
+                    )}
+                    {formData.schoolName && (
+                      <div className="mt-2 p-3 bg-emerald-50 rounded-xl flex items-center gap-2">
+                        <span className="text-emerald-500">✓</span>
+                        <span className="text-sm text-emerald-700 font-medium">{formData.schoolName}</span>
+                      </div>
+                    )}
+                    {schoolLookupError && (
+                      <p className="text-xs text-red-500 mt-1">{schoolLookupError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <button
               onClick={() => setStep(2)}
-              disabled={!formData.parentName || !formData.kidName || !formData.kidAge}
+              disabled={!formData.parentName || !formData.kidName || !formData.kidAge || (formData.joiningClub && !formData.schoolId)}
               className="w-full mt-8 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
             >
               Next →
@@ -337,6 +437,7 @@ export default function SetupPage() {
                 ['🎯', 'Saving for', formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal],
                 ['💰', 'Goal', `$${formData.savingsAmount}`],
                 ['📊', 'Split', `${formData.savingsPercent}% saved / ${100 - formData.savingsPercent}% spending`],
+                ...(formData.schoolName ? [['🏫', 'Club', formData.schoolName]] : []),
               ].map(([emoji, label, value], i, arr) => (
                 <div key={i} className={`flex items-center gap-3 py-3 ${i < arr.length - 1 ? 'border-b border-gray-100' : ''}`}>
                   <span className="text-lg w-8 text-center">{emoji}</span>
