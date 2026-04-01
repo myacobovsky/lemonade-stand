@@ -126,7 +126,7 @@ export default function LandingPage() {
       <section className="bg-amber-50/70 border-y border-amber-100/50">
         <div className="max-w-2xl mx-auto px-6 sm:px-8 py-14 sm:py-20 text-center">
           <p className="text-lg sm:text-xl text-gray-700 leading-[1.8]" style={{ fontFamily: font.body }}>
-            Every kid who set up a card table with a lemonade pitcher and a hand-drawn sign learned something no classroom could teach. We're bringing that same <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>scrappiness and pride</span> online.
+            Every kid who set up a card table with a lemonade pitcher and a hand-drawn sign learned something no classroom could teach. We're bringing that same scrappiness and pride online.
           </p>
           <p className="text-lg sm:text-xl text-gray-700 leading-[1.8] mt-6" style={{ fontFamily: font.body }}>
             <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is for a generation that finds joy in creating real products and knows that today's commerce happens on a screen.
