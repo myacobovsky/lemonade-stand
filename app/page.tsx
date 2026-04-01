@@ -136,44 +136,82 @@ export default function LandingPage() {
 
       {/* ============ WHAT THEY'LL DO ============ */}
       <section className="bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
             Their store. Their rules.
           </h2>
 
-          <div className="grid sm:grid-cols-2 gap-5 mt-14">
+          <div className="mt-14">
             {[
               {
-                num: '01',
                 title: 'They pick what to sell.',
                 desc: 'Bracelets, baked goods, painted rocks, stickers. Whatever they are already making at the kitchen table.',
-                gradient: 'from-amber-400 to-amber-500',
+                color: '#92400E',
+                bg: '#FEF3C7',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="12" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                    <path d="M10 16 L14 12 L18 18 L22 14" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="10" cy="16" r="2" fill="#92400E"/>
+                    <circle cx="22" cy="14" r="2" fill="#92400E"/>
+                  </svg>
+                ),
               },
               {
-                num: '02',
                 title: 'They build their own shop.',
                 desc: 'Name it, design it, make it theirs. Every choice belongs to them.',
-                gradient: 'from-emerald-400 to-emerald-500',
+                color: '#065F46',
+                bg: '#D1FAE5',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="6" y="10" width="20" height="14" rx="2" fill="#6EE7B7" stroke="#065F46" strokeWidth="1.5"/>
+                    <rect x="10" y="14" width="5" height="3" rx="1" fill="#065F46"/>
+                    <rect x="17" y="14" width="5" height="3" rx="1" fill="#065F46"/>
+                    <rect x="10" y="19" width="12" height="2" rx="1" fill="#065F46" opacity="0.3"/>
+                    <path d="M13 10 L13 7 L19 7 L19 10" stroke="#065F46" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
               },
               {
-                num: '03',
                 title: 'They set the price.',
                 desc: 'And discover what it costs to make something, what profit feels like, and what happens when they change it.',
-                gradient: 'from-blue-400 to-blue-500',
+                color: '#1E40AF',
+                bg: '#DBEAFE',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="10" fill="#93C5FD" stroke="#1E40AF" strokeWidth="1.5"/>
+                    <text x="16" y="21" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="14" fontWeight="700" fill="#1E40AF">$</text>
+                  </svg>
+                ),
               },
               {
-                num: '04',
                 title: 'They open for business.',
                 desc: "Real orders from real people who want what your kid made. That first notification is a moment.",
-                gradient: 'from-purple-400 to-purple-500',
+                color: '#5B21B6',
+                bg: '#EDE9FE',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="7" y="8" width="18" height="16" rx="2" fill="#C4B5FD" stroke="#5B21B6" strokeWidth="1.5"/>
+                    <path d="M12 16 L15 19 L21 13" stroke="#5B21B6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="22" cy="8" r="4" fill="#F87171" stroke="#5B21B6" strokeWidth="1.5"/>
+                    <text x="22" y="10.5" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="7" fontWeight="700" fill="white">1</text>
+                  </svg>
+                ),
               },
-            ].map((step) => (
-              <div key={step.num} className="group bg-white border border-gray-100 rounded-2xl p-7 hover:border-amber-200 hover:shadow-lg hover:shadow-amber-50 transition-all duration-300">
-                <div className={`w-11 h-11 bg-gradient-to-br ${step.gradient} rounded-xl flex items-center justify-center shadow-sm`}>
-                  <span className="text-white font-bold text-sm" style={{ fontFamily: font.heading }}>{step.num}</span>
+            ].map((step, i, arr) => (
+              <div key={i}>
+                <div className="flex items-start gap-5">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ background: step.bg }}>
+                    {step.icon}
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <h3 className="font-bold text-lg" style={{ fontFamily: font.accent, color: step.color }}>{step.title}</h3>
+                    <p className="text-gray-500 mt-1 leading-relaxed text-[15px]">{step.desc}</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 text-lg mt-5" style={{ fontFamily: font.heading }}>{step.title}</h3>
-                <p className="text-gray-500 mt-2 leading-relaxed text-[15px]">{step.desc}</p>
+                {i < arr.length - 1 && (
+                  <div className="ml-8 h-8 border-l-2 border-dashed" style={{ borderColor: '#E5DDD0' }} />
+                )}
               </div>
             ))}
           </div>
