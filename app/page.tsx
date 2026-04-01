@@ -145,7 +145,7 @@ export default function LandingPage() {
             {[
               {
                 title: 'They pick what to sell.',
-                desc: 'Bracelets, baked goods, painted rocks, stickers. Whatever they are already making at the kitchen table.',
+                desc: 'Bracelets, baked goods, painted rocks, stickers. Whatever they already enjoy making.',
                 color: '#92400E',
                 bg: '#FEF3C7',
                 icon: (
@@ -159,7 +159,7 @@ export default function LandingPage() {
               },
               {
                 title: 'They build their own shop.',
-                desc: 'Name it, design it, make it theirs. Every choice belongs to them.',
+                desc: 'Name it, design it, push it live. Every action belongs to them.',
                 color: '#065F46',
                 bg: '#D1FAE5',
                 icon: (
@@ -173,8 +173,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'They set the price.',
-                desc: 'And discover what it costs to make something, what profit feels like, and what happens when they change it.',
+                title: 'They learn the economics.',
+                desc: 'And discover what it costs to make something, what profit feels like, and how to make business decisions strategically.',
                 color: '#1E40AF',
                 bg: '#DBEAFE',
                 icon: (
@@ -186,7 +186,7 @@ export default function LandingPage() {
               },
               {
                 title: 'They open for business.',
-                desc: "Real orders from real people who want what your kid made. That first notification is a moment.",
+                desc: "Real orders from real people who want what they made and come back for more!",
                 color: '#5B21B6',
                 bg: '#EDE9FE',
                 icon: (
