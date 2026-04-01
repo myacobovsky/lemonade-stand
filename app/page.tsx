@@ -63,7 +63,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Logo size="sm" />
-            <span className="font-bold text-gray-900 text-lg" style={{ fontFamily: font.heading }}>Lemonade Stand</span>
+            <span className="font-bold text-gray-900 text-lg" style={{ fontFamily: font.accent }}>Lemonade Stand</span>
           </div>
           <div className="flex items-center gap-5">
             <Link href="/schools" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block" style={{ fontFamily: font.body }}>Schools</Link>
