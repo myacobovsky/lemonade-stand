@@ -126,10 +126,10 @@ export default function LandingPage() {
       <section className="bg-amber-50/70 border-y border-amber-100/50">
         <div className="max-w-2xl mx-auto px-6 sm:px-8 py-14 sm:py-20 text-center">
           <p className="text-lg sm:text-xl text-gray-700 leading-[1.8]" style={{ fontFamily: font.body }}>
-            Kids create for the same reason they build sandcastles at the beach. For the joy of it. They don't need to be asked.
+            Every kid who set up a card table with a lemonade pitcher and a hand-drawn sign learned something no classroom could teach. We're bringing that same scrappiness and pride online.
           </p>
           <p className="text-lg sm:text-xl text-gray-700 leading-[1.8] mt-6" style={{ fontFamily: font.body }}>
-            Lemonade Stand turns that creative energy into something real. A store they built. A product someone bought. A business they can be proud of.
+            Lemonade Stand is for a generation that finds joy in creating real products and knows that today's commerce happens on a screen.
           </p>
         </div>
       </section>
