@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useApp } from '../lib/context';
 
 function Logo({ size = 'md' }) {
-  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-16 h-16', xl: 'w-20 h-20' };
+  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-16 h-16', xl: 'w-24 h-24' };
   return (
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={sizes[size]}>
       <circle cx="16" cy="16" r="15" fill="#FEF3C7"/>
@@ -90,7 +90,7 @@ export default function LandingPage() {
         }} />
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-8 pt-20 sm:pt-28 pb-14 sm:pb-20 text-center">
-          <FadeIn>
+          <FadeIn className="flex justify-center">
             <Logo size="xl" />
           </FadeIn>
           <FadeIn delay={100}>
@@ -299,7 +299,7 @@ export default function LandingPage() {
           backgroundSize: '40px 40px',
         }} />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24 text-center">
-          <Logo size="lg" />
+          <div className="flex justify-center"><Logo size="xl" /></div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mt-6 tracking-tight" style={{ fontFamily: font.heading }}>
             Your kid already makes<br className="hidden sm:block" /> things worth selling.
           </h2>
