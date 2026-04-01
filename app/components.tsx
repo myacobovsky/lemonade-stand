@@ -112,7 +112,7 @@ export const NavBar = ({ active }) => {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Logo size="sm" />
-            <span className="font-semibold text-gray-900">Lemonade Stand</span>
+            <span className="font-bold text-gray-900" style={{ fontFamily: "'DynaPuff', cursive" }}>Lemonade Stand</span>
           </Link>
           {stores.length > 1 && (
             <select
