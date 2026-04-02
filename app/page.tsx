@@ -258,25 +258,26 @@ export default function LandingPage() {
       <section className="bg-amber-50/60 border-y border-amber-100/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
-            They do the work. You get to watch.
+            How it works for parents
           </h2>
+          <p className="text-center text-gray-400 mt-2 text-sm">(spoiler: your part takes about 3 minutes)</p>
 
           <div className="grid sm:grid-cols-3 gap-5 mt-14">
             {[
               {
                 step: '1',
-                title: 'Create an account',
-                desc: 'Takes 3 minutes. You own it.',
+                title: 'Create an account together',
+                desc: 'Takes 3 minutes to get started.',
               },
               {
                 step: '2',
                 title: 'They build their store',
-                desc: 'On their tablet, at the kitchen table, whenever inspiration hits.',
+                desc: 'They use the kid-editor to design their store, add products, and make it their own.',
               },
               {
                 step: '3',
                 title: 'You approve what goes live',
-                desc: 'One tap. Nothing is public without your say.',
+                desc: 'Approval lives on the parent portal. Nothing goes public without your say.',
               },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-2xl p-7 text-center shadow-sm border border-gray-100/80">
