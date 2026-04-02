@@ -89,34 +89,93 @@ export default function LandingPage() {
           backgroundSize: '40px 40px',
         }} />
 
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 pt-20 sm:pt-28 pb-14 sm:pb-20 text-center">
-          <FadeIn className="flex justify-center">
-            <Logo size="xl" />
-          </FadeIn>
-          <FadeIn delay={100}>
-            <h1 className="mt-8 leading-[1.1] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
-              <span className="text-3xl sm:text-4xl lg:text-5xl block">Your kid already makes things.</span>
-              <span className="text-3xl sm:text-4xl lg:text-5xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
-            </h1>
-          </FadeIn>
-          <FadeIn delay={200}>
-            <p className="text-lg sm:text-xl text-gray-800 font-semibold mt-4" style={{ fontFamily: font.heading }}>
-              <span style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
-            </p>
-          </FadeIn>
-          <FadeIn delay={300}>
-            
-          </FadeIn>
-          <FadeIn delay={400}>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/login" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
-                Get Started — Free
-              </Link>
-              <Link href="/shop" className="px-6 py-4 text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
-                Browse kid stores →
-              </Link>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-8 pt-16 sm:pt-24 pb-14 sm:pb-20">
+          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+            {/* Left: Copy */}
+            <div className="flex-1 text-center md:text-left">
+              <FadeIn>
+                <Logo size="lg" />
+              </FadeIn>
+              <FadeIn delay={100}>
+                <h1 className="mt-6 leading-[1.15] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
+                  <span className="text-3xl sm:text-4xl block">Your kid already makes things.</span>
+                  <span className="text-3xl sm:text-4xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
+                </h1>
+              </FadeIn>
+              <FadeIn delay={200}>
+                <p className="text-base sm:text-lg text-gray-600 mt-4 max-w-lg" style={{ fontFamily: font.heading }}>
+                  <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
+                </p>
+              </FadeIn>
+              <FadeIn delay={300}>
+                <div className="mt-8 flex flex-col sm:flex-row items-center md:items-start gap-3">
+                  <Link href="/login" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
+                    Get Started — Free
+                  </Link>
+                  <Link href="/shop" className="px-6 py-4 text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
+                    Browse kid stores →
+                  </Link>
+                </div>
+              </FadeIn>
             </div>
-          </FadeIn>
+
+            {/* Right: Stylized Store Illustration */}
+            <FadeIn delay={200} className="shrink-0 hidden md:block">
+              <div className="relative">
+                <svg width="320" height="280" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 4px 20px rgba(217, 119, 6, 0.1))' }}>
+                  {/* Store card background */}
+                  <rect x="0" y="0" width="320" height="280" rx="20" fill="white" stroke="#F3E8D0" strokeWidth="1.5"/>
+                  {/* Header bar */}
+                  <rect x="0" y="0" width="320" height="72" rx="20" fill="#FEF3C7"/>
+                  <rect x="0" y="40" width="320" height="32" fill="#FEF3C7"/>
+                  {/* Sticker */}
+                  <circle cx="40" cy="36" r="18" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                  <text x="40" y="42" textAnchor="middle" fontSize="18">🌸</text>
+                  {/* Store name */}
+                  <text x="68" y="32" fontFamily="'DynaPuff', cursive" fontSize="15" fontWeight="700" fill="#92400E">Emma's Bracelet Shop</text>
+                  <text x="68" y="50" fontFamily="'Poppins', sans-serif" fontSize="10" fill="#A8896A">Made with love by Emma</text>
+                  {/* Card 1 */}
+                  <rect x="16" y="84" width="136" height="120" rx="12" fill="#FFFBF5" stroke="#F3E8D0" strokeWidth="1"/>
+                  <rect x="24" y="92" width="120" height="56" rx="8" fill="#FEF3C7"/>
+                  <text x="84" y="124" textAnchor="middle" fontSize="24">📿</text>
+                  <text x="24" y="164" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#333">Friendship Bracelet</text>
+                  <text x="24" y="178" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="700" fill="#D97706">$4.50</text>
+                  <rect x="84" y="168" width="60" height="22" rx="11" fill="#FBBF24"/>
+                  <text x="114" y="183" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="9" fontWeight="600" fill="white">Add to cart</text>
+                  {/* Card 2 */}
+                  <rect x="168" y="84" width="136" height="120" rx="12" fill="#FFFBF5" stroke="#F3E8D0" strokeWidth="1"/>
+                  <rect x="176" y="92" width="120" height="56" rx="8" fill="#D1FAE5"/>
+                  <text x="236" y="124" textAnchor="middle" fontSize="24">🎨</text>
+                  <text x="176" y="164" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#333">Custom Painting</text>
+                  <text x="176" y="178" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="700" fill="#D97706">$12.00</text>
+                  <rect x="236" y="168" width="60" height="22" rx="11" fill="#FBBF24"/>
+                  <text x="266" y="183" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="9" fontWeight="600" fill="white">Add to cart</text>
+                  {/* Status bar */}
+                  <rect x="16" y="218" width="288" height="44" rx="12" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1"/>
+                  <circle cx="40" cy="240" r="10" fill="#4ADE80"/>
+                  <text x="40" y="244" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">✓</text>
+                  <text x="58" y="237" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#166534">Store is live!</text>
+                  <text x="58" y="251" fontFamily="'Poppins', sans-serif" fontSize="9" fill="#4ADE80">2 products · 3 orders this week</text>
+                </svg>
+
+                {/* Floating notification */}
+                <div className="absolute -top-3 -right-3 bg-white rounded-xl shadow-lg border border-gray-100 px-3 py-2 flex items-center gap-2" style={{ animation: 'heroFloat 3s ease-in-out infinite' }}>
+                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs">🎉</div>
+                  <div>
+                    <p className="text-[10px] font-semibold text-gray-800" style={{ fontFamily: font.heading }}>New order!</p>
+                    <p className="text-[9px] text-gray-400">Friendship Bracelet</p>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
+
+          <style>{`
+            @keyframes heroFloat {
+              0%, 100% { transform: translateY(0px); }
+              50% { transform: translateY(-6px); }
+            }
+          `}</style>
         </div>
       </section>
 
@@ -389,7 +448,6 @@ export default function LandingPage() {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="8" r="4" stroke="#FBBF24" strokeWidth="1.5"/>
                     <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M15 3l3 3-3 3" stroke="#FBBF24" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"/>
                   </svg>
                 ),
               },
