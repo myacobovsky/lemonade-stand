@@ -256,75 +256,164 @@ export default function LandingPage() {
 
       {/* ============ HOW IT WORKS FOR PARENTS ============ */}
       <section className="bg-amber-50/60 border-y border-amber-100/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
             How it works for parents
           </h2>
           <p className="text-center text-gray-400 mt-2 text-sm">(spoiler: your part takes about 3 minutes)</p>
 
-          <div className="grid sm:grid-cols-3 gap-5 mt-14">
+          <div className="mt-14">
             {[
               {
-                step: '1',
                 title: 'Create an account together',
                 desc: 'Takes 3 minutes to get started.',
+                color: '#92400E',
+                bg: '#FEF3C7',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="12" cy="12" r="5" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                    <circle cx="20" cy="12" r="5" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                    <path d="M6 26 C6 21 9 18 12 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M26 26 C26 21 23 18 20 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M12 18 C14 20 18 20 20 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
               },
               {
-                step: '2',
                 title: 'They build their store',
                 desc: 'They use the kid-editor to design their store, add products, and make it their own.',
+                color: '#92400E',
+                bg: '#FEF3C7',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="8" width="24" height="18" rx="2" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                    <rect x="8" y="12" width="7" height="5" rx="1" fill="#92400E" opacity="0.8"/>
+                    <rect x="17" y="12" width="7" height="5" rx="1" fill="#92400E" opacity="0.4"/>
+                    <rect x="8" y="19" width="16" height="2" rx="1" fill="#92400E" opacity="0.2"/>
+                    <circle cx="26" cy="8" r="4" fill="#92400E"/>
+                    <path d="M24.5 8 L25.5 9 L27.5 7" stroke="#FEF3C7" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
               },
               {
-                step: '3',
                 title: 'You approve what goes live',
                 desc: 'Approval lives on the parent portal. Nothing goes public without your say.',
+                color: '#92400E',
+                bg: '#FEF3C7',
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="6" y="4" width="20" height="24" rx="2" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                    <path d="M11 12 L14 15 L21 8" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <rect x="11" y="18" width="10" height="1.5" rx="0.75" fill="#92400E" opacity="0.3"/>
+                    <rect x="11" y="21" width="7" height="1.5" rx="0.75" fill="#92400E" opacity="0.3"/>
+                  </svg>
+                ),
               },
-            ].map((item) => (
-              <div key={item.step} className="bg-white rounded-2xl p-7 text-center shadow-sm border border-gray-100/80">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-full flex items-center justify-center mx-auto shadow-sm">
-                  <span className="text-white font-bold text-lg" style={{ fontFamily: font.heading }}>{item.step}</span>
+            ].map((step, i, arr) => (
+              <div key={i}>
+                <div className="flex items-start gap-5">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ background: step.bg }}>
+                    {step.icon}
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <h3 className="font-bold text-lg" style={{ fontFamily: font.accent, color: step.color }}>{step.title}</h3>
+                    <p className="text-gray-500 mt-1 leading-relaxed text-[15px]">{step.desc}</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 mt-5 text-[15px]" style={{ fontFamily: font.heading }}>{item.title}</h3>
-                <p className="text-gray-400 mt-2 text-sm leading-relaxed">{item.desc}</p>
+                {i < arr.length - 1 && (
+                  <div className="ml-8 h-8 border-l-2 border-dashed" style={{ borderColor: '#E5DDD0' }} />
+                )}
               </div>
             ))}
           </div>
 
-          <p className="text-center mt-10 text-gray-500 text-sm">
+          <p className="text-center mt-12 text-gray-500 text-sm">
             Total parent time: about 10 minutes. Total kid pride: <span className="text-amber-600 font-bold">immeasurable</span>.
           </p>
         </div>
       </section>
 
       {/* ============ SAFETY ============ */}
-      <section className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight leading-tight" style={{ fontFamily: font.heading }}>
+      <section className="relative bg-gray-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'radial-gradient(circle, #FBBF24 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }} />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white text-center tracking-tight leading-tight" style={{ fontFamily: font.heading }}>
             Built by a parent who asked every<br className="hidden sm:block" /> safety question you're thinking right now.
           </h2>
 
-          <div className="mt-14 space-y-3">
+          <div className="mt-14 space-y-4">
             {[
-              'You own the account and have total control over what they see and who they talk to.',
-              'You approve every product before it goes live.',
-              'Never any photos of children. We only allow product photos to be posted.',
-              'No messaging between users. All customer messages go to the parent portal.',
-              'First name only. No personal details like birthdays, last names, or addresses are ever collected.',
-              "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 bg-emerald-50/80 border border-emerald-100/80 rounded-xl px-5 py-4">
-                <div className="w-5 h-5 rounded-md bg-emerald-400 flex items-center justify-center shrink-0 shadow-sm">
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              {
+                text: 'You own the account and have total control over what they see and who they talk to.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="12" cy="16" r="1.5" fill="#FBBF24"/>
                   </svg>
-                </div>
-                <p className="text-gray-700 text-[15px]">{item}</p>
+                ),
+              },
+              {
+                text: 'You approve every product before it goes live.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <path d="M8 12l3 3 5-5" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+              {
+                text: 'Never any photos of children. We only allow product photos to be posted.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="3" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <path d="M4 20L20 4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
+              },
+              {
+                text: 'No messaging between users. All customer messages go to the parent portal.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 6h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <path d="M4 6l8 6 8-6" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14 13h4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
+              },
+              {
+                text: 'First name only. No personal details like birthdays, last names, or addresses are ever collected.',
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="8" r="4" stroke="#FBBF24" strokeWidth="1.5"/>
+                    <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M15 3l3 3-3 3" stroke="#FBBF24" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"/>
+                  </svg>
+                ),
+              },
+              {
+                text: "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
+                icon: (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#FBBF24" strokeWidth="1.5" strokeLinejoin="round"/>
+                    <path d="M9 12l2 2 4-4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-4 bg-white/[0.06] border border-white/[0.08] rounded-xl px-5 py-4">
+                <div className="shrink-0 mt-0.5">{item.icon}</div>
+                <p className="text-gray-300 text-[15px] leading-relaxed">{item.text}</p>
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-8">
-            <Link href="/privacy" className="text-sm text-gray-300 hover:text-gray-500 transition-colors">
+          <div className="text-center mt-10">
+            <Link href="/privacy" className="text-sm text-amber-400/60 hover:text-amber-400 transition-colors">
               Read our full privacy policy →
             </Link>
           </div>
