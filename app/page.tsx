@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useApp } from '../lib/context';
 
 function Logo({ size = 'md' }) {
-  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-16 h-16', xl: 'w-24 h-24' };
+  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-16 h-16', xl: 'w-48 h-48' };
   return (
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={sizes[size]}>
       <circle cx="16" cy="16" r="15" fill="#FEF3C7"/>
@@ -93,11 +93,8 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
             {/* Left: Copy */}
             <div className="flex-1 text-center md:text-left">
-              <FadeIn>
-                <Logo size="lg" />
-              </FadeIn>
-              <FadeIn delay={100}>
-                <h1 className="mt-6 leading-[1.15] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
+<FadeIn delay={100}>
+                <h1 className="mt-0 leading-[1.15] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
                   <span className="text-3xl sm:text-4xl block">Your kid already makes things.</span>
                   <span className="text-3xl sm:text-4xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
                 </h1>
@@ -119,61 +116,9 @@ export default function LandingPage() {
               </FadeIn>
             </div>
 
-            {/* Right: Lemonade Stand Icon */}
+            {/* Right: Lemon Character */}
             <FadeIn delay={200} className="shrink-0 hidden md:block">
-              <svg width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Background circle */}
-                <circle cx="130" cy="130" r="125" fill="#FEF3C7"/>
-
-                {/* Stand body */}
-                <rect x="65" y="120" width="130" height="55" rx="10" fill="#FCD34D" stroke="#292524" strokeWidth="2.5"/>
-
-                {/* Counter top */}
-                <rect x="55" y="115" width="150" height="14" rx="7" fill="#FBBF24" stroke="#292524" strokeWidth="2.5"/>
-
-                {/* Awning */}
-                <path d="M50 72 L130 48 L210 72 L210 88 L50 88 Z" fill="#FBBF24" stroke="#292524" strokeWidth="2.5" strokeLinejoin="round"/>
-                {/* Awning scallops */}
-                <path d="M50 88 Q77 102 104 88 Q130 102 156 88 Q183 102 210 88" fill="#FCD34D" stroke="#292524" strokeWidth="2.5" strokeLinejoin="round"/>
-
-                {/* Awning poles */}
-                <rect x="68" y="88" width="6" height="30" rx="3" fill="#292524"/>
-                <rect x="186" y="88" width="6" height="30" rx="3" fill="#292524"/>
-
-                {/* Stand legs */}
-                <rect x="80" y="173" width="6" height="40" rx="3" fill="#292524"/>
-                <rect x="174" y="173" width="6" height="40" rx="3" fill="#292524"/>
-                {/* Leg crossbar */}
-                <rect x="80" y="195" width="100" height="5" rx="2.5" fill="#292524"/>
-
-                {/* Lemon on counter */}
-                <ellipse cx="110" cy="113" rx="14" ry="11" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
-                <path d="M110 102 Q114 97 116 101" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round"/>
-
-                {/* Cup on counter */}
-                <path d="M148 104 L143 114 L157 114 L152 104 Z" fill="white" stroke="#292524" strokeWidth="2" strokeLinejoin="round"/>
-                <rect x="145" y="107" width="10" height="3" rx="1" fill="#FDE68A" opacity="0.7"/>
-                {/* Straw */}
-                <rect x="149" y="96" width="2" height="12" rx="1" fill="#F87171"/>
-                <rect x="149" y="96" width="8" height="2" rx="1" fill="#F87171"/>
-
-                {/* Lemon character face on the stand front */}
-                <circle cx="130" cy="148" r="16" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
-                <circle cx="125" cy="146" r="2.5" fill="#292524"/>
-                <circle cx="135" cy="146" r="2.5" fill="#292524"/>
-                <circle cx="124" cy="145" r="0.8" fill="white"/>
-                <circle cx="134" cy="145" r="0.8" fill="white"/>
-                <path d="M125 153 Q130 157 135 153" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                {/* Cheeks */}
-                <circle cx="121" cy="150" r="2.5" fill="#FBBF24" opacity="0.4"/>
-                <circle cx="139" cy="150" r="2.5" fill="#FBBF24" opacity="0.4"/>
-
-                {/* Coins */}
-                <circle cx="94" cy="142" r="7" fill="#FBBF24" stroke="#292524" strokeWidth="1.5"/>
-                <text x="94" y="146" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="8" fontWeight="700" fill="#292524">$</text>
-                <circle cx="166" cy="142" r="7" fill="#FBBF24" stroke="#292524" strokeWidth="1.5"/>
-                <text x="166" y="146" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="8" fontWeight="700" fill="#292524">$</text>
-              </svg>
+              <Logo size="xl" />
             </FadeIn>
           </div>
 
