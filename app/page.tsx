@@ -95,12 +95,12 @@ export default function LandingPage() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="mt-8 leading-[1.1] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
-              <span className="text-4xl sm:text-5xl lg:text-6xl block">Your kid already makes things.</span>
-              <span className="text-4xl sm:text-5xl lg:text-6xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl block">Your kid already makes things.</span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
-            <p className="text-xl sm:text-2xl text-gray-800 font-semibold mt-5" style={{ fontFamily: font.heading }}>
+            <p className="text-lg sm:text-xl text-gray-800 font-semibold mt-4" style={{ fontFamily: font.heading }}>
               <span style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
             </p>
           </FadeIn>
