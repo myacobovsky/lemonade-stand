@@ -309,7 +309,7 @@ export default function LandingPage() {
               'You approve every product before it goes live.',
               'Never any photos of children. We only allow product photos to be posted.',
               'No messaging between users. All customer messages go to the parent portal.',
-              'First name only. No birthday, last name, school, or location stored.',
+              'First name only. No personal details like birthdays, last names, or addresses are ever collected.',
               "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 bg-emerald-50/80 border border-emerald-100/80 rounded-xl px-5 py-4">
