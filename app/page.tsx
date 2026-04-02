@@ -95,19 +95,17 @@ export default function LandingPage() {
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className="mt-8 leading-[1.1] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
-              <span className="text-4xl sm:text-5xl lg:text-6xl block">You already know your</span>
-              <span className="text-4xl sm:text-5xl lg:text-6xl block mt-1">kid is a <span style={{ fontFamily: font.accent, color: '#D97706' }}>maker</span>.</span>
+              <span className="text-4xl sm:text-5xl lg:text-6xl block">Your kid already makes things.</span>
+              <span className="text-4xl sm:text-5xl lg:text-6xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
             </h1>
           </FadeIn>
           <FadeIn delay={200}>
             <p className="text-xl sm:text-2xl text-gray-800 font-semibold mt-5" style={{ fontFamily: font.heading }}>
-              Now they can be a business owner too.
+              <span style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
             </p>
           </FadeIn>
           <FadeIn delay={300}>
-            <p className="text-gray-400 mt-4 text-base sm:text-lg max-w-md mx-auto tracking-wide" style={{ fontFamily: font.body }}>
-              They make it. They name it. They price it. They sell it.
-            </p>
+            
           </FadeIn>
           <FadeIn delay={400}>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
