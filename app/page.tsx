@@ -119,98 +119,61 @@ export default function LandingPage() {
               </FadeIn>
             </div>
 
-            {/* Right: Lemonade Stand Illustration */}
+            {/* Right: Lemonade Stand Icon */}
             <FadeIn delay={200} className="shrink-0 hidden md:block">
-              <div className="relative">
-                <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Ground */}
-                  <ellipse cx="150" cy="275" rx="130" ry="12" fill="#FEF3C7"/>
+              <svg width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Background circle */}
+                <circle cx="130" cy="130" r="125" fill="#FEF3C7"/>
 
-                  {/* Stand legs */}
-                  <rect x="70" y="160" width="8" height="110" rx="3" fill="#D97706"/>
-                  <rect x="222" y="160" width="8" height="110" rx="3" fill="#D97706"/>
+                {/* Stand body */}
+                <rect x="65" y="120" width="130" height="55" rx="10" fill="#FCD34D" stroke="#292524" strokeWidth="2.5"/>
 
-                  {/* Stand counter */}
-                  <rect x="50" y="150" width="200" height="18" rx="6" fill="#FBBF24" stroke="#92400E" strokeWidth="1.5"/>
+                {/* Counter top */}
+                <rect x="55" y="115" width="150" height="14" rx="7" fill="#FBBF24" stroke="#292524" strokeWidth="2.5"/>
 
-                  {/* Awning */}
-                  <path d="M40 80 L150 50 L260 80 L260 100 L40 100 Z" fill="#FBBF24" stroke="#92400E" strokeWidth="1.5" strokeLinejoin="round"/>
-                  {/* Awning scallops */}
-                  <path d="M40 100 Q62 115 84 100 Q106 115 128 100 Q150 115 172 100 Q194 115 216 100 Q238 115 260 100" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                  {/* Awning poles */}
-                  <rect x="56" y="100" width="5" height="52" rx="2" fill="#92400E"/>
-                  <rect x="239" y="100" width="5" height="52" rx="2" fill="#92400E"/>
+                {/* Awning */}
+                <path d="M50 72 L130 48 L210 72 L210 88 L50 88 Z" fill="#FBBF24" stroke="#292524" strokeWidth="2.5" strokeLinejoin="round"/>
+                {/* Awning scallops */}
+                <path d="M50 88 Q77 102 104 88 Q130 102 156 88 Q183 102 210 88" fill="#FCD34D" stroke="#292524" strokeWidth="2.5" strokeLinejoin="round"/>
 
-                  {/* Sign */}
-                  <rect x="90" y="60" width="120" height="30" rx="8" fill="white" stroke="#92400E" strokeWidth="1.5"/>
-                  <text x="150" y="80" textAnchor="middle" fontFamily="'DynaPuff', cursive" fontSize="11" fontWeight="700" fill="#D97706">OPEN</text>
+                {/* Awning poles */}
+                <rect x="68" y="88" width="6" height="30" rx="3" fill="#292524"/>
+                <rect x="186" y="88" width="6" height="30" rx="3" fill="#292524"/>
 
-                  {/* Products on counter */}
-                  {/* Bracelet display */}
-                  <circle cx="100" cy="143" r="12" fill="#EDE9FE" stroke="#7C3AED" strokeWidth="1.2"/>
-                  <path d="M93 143 Q100 137 107 143" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                {/* Stand legs */}
+                <rect x="80" y="173" width="6" height="40" rx="3" fill="#292524"/>
+                <rect x="174" y="173" width="6" height="40" rx="3" fill="#292524"/>
+                {/* Leg crossbar */}
+                <rect x="80" y="195" width="100" height="5" rx="2.5" fill="#292524"/>
 
-                  {/* Lemonade pitcher */}
-                  <rect x="135" y="125" width="22" height="26" rx="4" fill="#FEF9C3" stroke="#92400E" strokeWidth="1.2"/>
-                  <path d="M157 132 L163 130 L163 138 L157 136" fill="#FEF9C3" stroke="#92400E" strokeWidth="1.2"/>
-                  <rect x="139" y="132" width="14" height="4" rx="1" fill="#FCD34D" opacity="0.6"/>
+                {/* Lemon on counter */}
+                <ellipse cx="110" cy="113" rx="14" ry="11" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
+                <path d="M110 102 Q114 97 116 101" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round"/>
 
-                  {/* Cookie/baked good */}
-                  <circle cx="196" cy="142" r="10" fill="#FDE68A" stroke="#92400E" strokeWidth="1.2"/>
-                  <circle cx="192" cy="139" r="1.5" fill="#92400E"/>
-                  <circle cx="199" cy="141" r="1.5" fill="#92400E"/>
-                  <circle cx="195" cy="145" r="1.5" fill="#92400E"/>
+                {/* Cup on counter */}
+                <path d="M148 104 L143 114 L157 114 L152 104 Z" fill="white" stroke="#292524" strokeWidth="2" strokeLinejoin="round"/>
+                <rect x="145" y="107" width="10" height="3" rx="1" fill="#FDE68A" opacity="0.7"/>
+                {/* Straw */}
+                <rect x="149" y="96" width="2" height="12" rx="1" fill="#F87171"/>
+                <rect x="149" y="96" width="8" height="2" rx="1" fill="#F87171"/>
 
-                  {/* Laptop on side */}
-                  <rect x="175" y="175" width="50" height="32" rx="3" fill="#E0E7FF" stroke="#4F46E5" strokeWidth="1.2"/>
-                  <rect x="180" y="180" width="40" height="22" rx="2" fill="white"/>
-                  {/* Screen content - mini store */}
-                  <rect x="183" y="183" width="16" height="8" rx="1" fill="#FEF3C7"/>
-                  <rect x="201" y="183" width="16" height="8" rx="1" fill="#D1FAE5"/>
-                  <rect x="183" y="193" width="34" height="3" rx="1" fill="#F3F4F6"/>
-                  <rect x="183" y="198" width="20" height="2" rx="1" fill="#FBBF24"/>
-                  {/* Laptop base */}
-                  <rect x="170" y="207" width="60" height="4" rx="2" fill="#C7D2FE" stroke="#4F46E5" strokeWidth="1"/>
+                {/* Lemon character face on the stand front */}
+                <circle cx="130" cy="148" r="16" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
+                <circle cx="125" cy="146" r="2.5" fill="#292524"/>
+                <circle cx="135" cy="146" r="2.5" fill="#292524"/>
+                <circle cx="124" cy="145" r="0.8" fill="white"/>
+                <circle cx="134" cy="145" r="0.8" fill="white"/>
+                <path d="M125 153 Q130 157 135 153" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                {/* Cheeks */}
+                <circle cx="121" cy="150" r="2.5" fill="#FBBF24" opacity="0.4"/>
+                <circle cx="139" cy="150" r="2.5" fill="#FBBF24" opacity="0.4"/>
 
-                  {/* Kid character - simple and warm */}
-                  {/* Body */}
-                  <rect x="86" y="195" width="40" height="50" rx="10" fill="#93C5FD" stroke="#1E40AF" strokeWidth="1.5"/>
-                  {/* Head */}
-                  <circle cx="106" cy="186" r="18" fill="#FDDEB5" stroke="#92400E" strokeWidth="1.5"/>
-                  {/* Hair */}
-                  <path d="M88 180 Q88 168 106 168 Q124 168 124 180" fill="#5B21B6" stroke="#5B21B6" strokeWidth="1"/>
-                  <path d="M88 180 Q86 175 90 172" stroke="#5B21B6" strokeWidth="2" strokeLinecap="round"/>
-                  {/* Face */}
-                  <circle cx="100" cy="186" r="2" fill="#292524"/>
-                  <circle cx="112" cy="186" r="2" fill="#292524"/>
-                  <circle cx="99" cy="185" r="0.7" fill="white"/>
-                  <circle cx="111" cy="185" r="0.7" fill="white"/>
-                  <path d="M100 192 Q106 197 112 192" stroke="#292524" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-                  {/* Cheeks */}
-                  <circle cx="94" cy="190" r="3" fill="#FBBF24" opacity="0.3"/>
-                  <circle cx="118" cy="190" r="3" fill="#FBBF24" opacity="0.3"/>
-                  {/* Arms */}
-                  <path d="M86 210 L72 200 L72 190" stroke="#FDDEB5" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M126 210 L142 200 L148 195" stroke="#FDDEB5" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
-                  {/* Hands */}
-                  <circle cx="72" cy="188" r="4" fill="#FDDEB5" stroke="#92400E" strokeWidth="1"/>
-                  <circle cx="149" cy="193" r="4" fill="#FDDEB5" stroke="#92400E" strokeWidth="1"/>
-                  {/* Legs */}
-                  <rect x="92" y="240" width="10" height="24" rx="5" fill="#1E40AF"/>
-                  <rect x="110" y="240" width="10" height="24" rx="5" fill="#1E40AF"/>
-                  {/* Shoes */}
-                  <ellipse cx="97" cy="265" rx="8" ry="5" fill="#F87171" stroke="#92400E" strokeWidth="1"/>
-                  <ellipse cx="115" cy="265" rx="8" ry="5" fill="#F87171" stroke="#92400E" strokeWidth="1"/>
-
-                  {/* Sparkles */}
-                  <path d="M35 120 L38 115 L41 120 L38 125 Z" fill="#FBBF24"/>
-                  <path d="M265 70 L268 65 L271 70 L268 75 Z" fill="#FBBF24"/>
-                  <circle cx="45" cy="65" r="3" fill="#FCD34D"/>
-                  <circle cx="258" cy="130" r="2.5" fill="#FCD34D"/>
-                  <circle cx="30" cy="150" r="2" fill="#FDE68A"/>
-                  <circle cx="275" cy="100" r="2" fill="#FDE68A"/>
-                </svg>
-              </div>
+                {/* Coins */}
+                <circle cx="94" cy="142" r="7" fill="#FBBF24" stroke="#292524" strokeWidth="1.5"/>
+                <text x="94" y="146" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="8" fontWeight="700" fill="#292524">$</text>
+                <circle cx="166" cy="142" r="7" fill="#FBBF24" stroke="#292524" strokeWidth="1.5"/>
+                <text x="166" y="146" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="8" fontWeight="700" fill="#292524">$</text>
+              </svg>
             </FadeIn>
           </div>
 
