@@ -119,63 +119,102 @@ export default function LandingPage() {
               </FadeIn>
             </div>
 
-            {/* Right: Stylized Store Illustration */}
+            {/* Right: Lemonade Stand Illustration */}
             <FadeIn delay={200} className="shrink-0 hidden md:block">
               <div className="relative">
-                <svg width="320" height="280" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 4px 20px rgba(217, 119, 6, 0.1))' }}>
-                  {/* Store card background */}
-                  <rect x="0" y="0" width="320" height="280" rx="20" fill="white" stroke="#F3E8D0" strokeWidth="1.5"/>
-                  {/* Header bar */}
-                  <rect x="0" y="0" width="320" height="72" rx="20" fill="#FEF3C7"/>
-                  <rect x="0" y="40" width="320" height="32" fill="#FEF3C7"/>
-                  {/* Sticker */}
-                  <circle cx="40" cy="36" r="18" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                  <text x="40" y="42" textAnchor="middle" fontSize="18">🌸</text>
-                  {/* Store name */}
-                  <text x="68" y="32" fontFamily="'DynaPuff', cursive" fontSize="15" fontWeight="700" fill="#92400E">Emma's Bracelet Shop</text>
-                  <text x="68" y="50" fontFamily="'Poppins', sans-serif" fontSize="10" fill="#A8896A">Made with love by Emma</text>
-                  {/* Card 1 */}
-                  <rect x="16" y="84" width="136" height="120" rx="12" fill="#FFFBF5" stroke="#F3E8D0" strokeWidth="1"/>
-                  <rect x="24" y="92" width="120" height="56" rx="8" fill="#FEF3C7"/>
-                  <text x="84" y="124" textAnchor="middle" fontSize="24">📿</text>
-                  <text x="24" y="164" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#333">Friendship Bracelet</text>
-                  <text x="24" y="178" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="700" fill="#D97706">$4.50</text>
-                  <rect x="84" y="168" width="60" height="22" rx="11" fill="#FBBF24"/>
-                  <text x="114" y="183" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="9" fontWeight="600" fill="white">Add to cart</text>
-                  {/* Card 2 */}
-                  <rect x="168" y="84" width="136" height="120" rx="12" fill="#FFFBF5" stroke="#F3E8D0" strokeWidth="1"/>
-                  <rect x="176" y="92" width="120" height="56" rx="8" fill="#D1FAE5"/>
-                  <text x="236" y="124" textAnchor="middle" fontSize="24">🎨</text>
-                  <text x="176" y="164" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#333">Custom Painting</text>
-                  <text x="176" y="178" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="700" fill="#D97706">$12.00</text>
-                  <rect x="236" y="168" width="60" height="22" rx="11" fill="#FBBF24"/>
-                  <text x="266" y="183" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="9" fontWeight="600" fill="white">Add to cart</text>
-                  {/* Status bar */}
-                  <rect x="16" y="218" width="288" height="44" rx="12" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1"/>
-                  <circle cx="40" cy="240" r="10" fill="#4ADE80"/>
-                  <text x="40" y="244" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">✓</text>
-                  <text x="58" y="237" fontFamily="'Poppins', sans-serif" fontSize="10" fontWeight="600" fill="#166534">Store is live!</text>
-                  <text x="58" y="251" fontFamily="'Poppins', sans-serif" fontSize="9" fill="#4ADE80">2 products · 3 orders this week</text>
-                </svg>
+                <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Ground */}
+                  <ellipse cx="150" cy="275" rx="130" ry="12" fill="#FEF3C7"/>
 
-                {/* Floating notification */}
-                <div className="absolute -top-3 -right-3 bg-white rounded-xl shadow-lg border border-gray-100 px-3 py-2 flex items-center gap-2" style={{ animation: 'heroFloat 3s ease-in-out infinite' }}>
-                  <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs">🎉</div>
-                  <div>
-                    <p className="text-[10px] font-semibold text-gray-800" style={{ fontFamily: font.heading }}>New order!</p>
-                    <p className="text-[9px] text-gray-400">Friendship Bracelet</p>
-                  </div>
-                </div>
+                  {/* Stand legs */}
+                  <rect x="70" y="160" width="8" height="110" rx="3" fill="#D97706"/>
+                  <rect x="222" y="160" width="8" height="110" rx="3" fill="#D97706"/>
+
+                  {/* Stand counter */}
+                  <rect x="50" y="150" width="200" height="18" rx="6" fill="#FBBF24" stroke="#92400E" strokeWidth="1.5"/>
+
+                  {/* Awning */}
+                  <path d="M40 80 L150 50 L260 80 L260 100 L40 100 Z" fill="#FBBF24" stroke="#92400E" strokeWidth="1.5" strokeLinejoin="round"/>
+                  {/* Awning scallops */}
+                  <path d="M40 100 Q62 115 84 100 Q106 115 128 100 Q150 115 172 100 Q194 115 216 100 Q238 115 260 100" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
+                  {/* Awning poles */}
+                  <rect x="56" y="100" width="5" height="52" rx="2" fill="#92400E"/>
+                  <rect x="239" y="100" width="5" height="52" rx="2" fill="#92400E"/>
+
+                  {/* Sign */}
+                  <rect x="90" y="60" width="120" height="30" rx="8" fill="white" stroke="#92400E" strokeWidth="1.5"/>
+                  <text x="150" y="80" textAnchor="middle" fontFamily="'DynaPuff', cursive" fontSize="11" fontWeight="700" fill="#D97706">OPEN</text>
+
+                  {/* Products on counter */}
+                  {/* Bracelet display */}
+                  <circle cx="100" cy="143" r="12" fill="#EDE9FE" stroke="#7C3AED" strokeWidth="1.2"/>
+                  <path d="M93 143 Q100 137 107 143" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+
+                  {/* Lemonade pitcher */}
+                  <rect x="135" y="125" width="22" height="26" rx="4" fill="#FEF9C3" stroke="#92400E" strokeWidth="1.2"/>
+                  <path d="M157 132 L163 130 L163 138 L157 136" fill="#FEF9C3" stroke="#92400E" strokeWidth="1.2"/>
+                  <rect x="139" y="132" width="14" height="4" rx="1" fill="#FCD34D" opacity="0.6"/>
+
+                  {/* Cookie/baked good */}
+                  <circle cx="196" cy="142" r="10" fill="#FDE68A" stroke="#92400E" strokeWidth="1.2"/>
+                  <circle cx="192" cy="139" r="1.5" fill="#92400E"/>
+                  <circle cx="199" cy="141" r="1.5" fill="#92400E"/>
+                  <circle cx="195" cy="145" r="1.5" fill="#92400E"/>
+
+                  {/* Laptop on side */}
+                  <rect x="175" y="175" width="50" height="32" rx="3" fill="#E0E7FF" stroke="#4F46E5" strokeWidth="1.2"/>
+                  <rect x="180" y="180" width="40" height="22" rx="2" fill="white"/>
+                  {/* Screen content - mini store */}
+                  <rect x="183" y="183" width="16" height="8" rx="1" fill="#FEF3C7"/>
+                  <rect x="201" y="183" width="16" height="8" rx="1" fill="#D1FAE5"/>
+                  <rect x="183" y="193" width="34" height="3" rx="1" fill="#F3F4F6"/>
+                  <rect x="183" y="198" width="20" height="2" rx="1" fill="#FBBF24"/>
+                  {/* Laptop base */}
+                  <rect x="170" y="207" width="60" height="4" rx="2" fill="#C7D2FE" stroke="#4F46E5" strokeWidth="1"/>
+
+                  {/* Kid character - simple and warm */}
+                  {/* Body */}
+                  <rect x="86" y="195" width="40" height="50" rx="10" fill="#93C5FD" stroke="#1E40AF" strokeWidth="1.5"/>
+                  {/* Head */}
+                  <circle cx="106" cy="186" r="18" fill="#FDDEB5" stroke="#92400E" strokeWidth="1.5"/>
+                  {/* Hair */}
+                  <path d="M88 180 Q88 168 106 168 Q124 168 124 180" fill="#5B21B6" stroke="#5B21B6" strokeWidth="1"/>
+                  <path d="M88 180 Q86 175 90 172" stroke="#5B21B6" strokeWidth="2" strokeLinecap="round"/>
+                  {/* Face */}
+                  <circle cx="100" cy="186" r="2" fill="#292524"/>
+                  <circle cx="112" cy="186" r="2" fill="#292524"/>
+                  <circle cx="99" cy="185" r="0.7" fill="white"/>
+                  <circle cx="111" cy="185" r="0.7" fill="white"/>
+                  <path d="M100 192 Q106 197 112 192" stroke="#292524" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                  {/* Cheeks */}
+                  <circle cx="94" cy="190" r="3" fill="#FBBF24" opacity="0.3"/>
+                  <circle cx="118" cy="190" r="3" fill="#FBBF24" opacity="0.3"/>
+                  {/* Arms */}
+                  <path d="M86 210 L72 200 L72 190" stroke="#FDDEB5" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M126 210 L142 200 L148 195" stroke="#FDDEB5" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                  {/* Hands */}
+                  <circle cx="72" cy="188" r="4" fill="#FDDEB5" stroke="#92400E" strokeWidth="1"/>
+                  <circle cx="149" cy="193" r="4" fill="#FDDEB5" stroke="#92400E" strokeWidth="1"/>
+                  {/* Legs */}
+                  <rect x="92" y="240" width="10" height="24" rx="5" fill="#1E40AF"/>
+                  <rect x="110" y="240" width="10" height="24" rx="5" fill="#1E40AF"/>
+                  {/* Shoes */}
+                  <ellipse cx="97" cy="265" rx="8" ry="5" fill="#F87171" stroke="#92400E" strokeWidth="1"/>
+                  <ellipse cx="115" cy="265" rx="8" ry="5" fill="#F87171" stroke="#92400E" strokeWidth="1"/>
+
+                  {/* Sparkles */}
+                  <path d="M35 120 L38 115 L41 120 L38 125 Z" fill="#FBBF24"/>
+                  <path d="M265 70 L268 65 L271 70 L268 75 Z" fill="#FBBF24"/>
+                  <circle cx="45" cy="65" r="3" fill="#FCD34D"/>
+                  <circle cx="258" cy="130" r="2.5" fill="#FCD34D"/>
+                  <circle cx="30" cy="150" r="2" fill="#FDE68A"/>
+                  <circle cx="275" cy="100" r="2" fill="#FDE68A"/>
+                </svg>
               </div>
             </FadeIn>
           </div>
 
-          <style>{`
-            @keyframes heroFloat {
-              0%, 100% { transform: translateY(0px); }
-              50% { transform: translateY(-6px); }
-            }
-          `}</style>
+
         </div>
       </section>
 
