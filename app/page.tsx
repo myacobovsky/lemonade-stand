@@ -300,16 +300,17 @@ export default function LandingPage() {
       <section className="bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight leading-tight" style={{ fontFamily: font.heading }}>
-            Built by a parent who asked every<br className="hidden sm:block" /> "what if" you're thinking right now.
+            Built by a parent who asked every<br className="hidden sm:block" /> safety question you're thinking right now.
           </h2>
 
           <div className="mt-14 space-y-3">
             {[
-              'You own the account. Your child never creates one.',
+              'You own the account and have total control over what they see and who they talk to.',
               'You approve every product before it goes live.',
-              'No photos of children. Product photos only.',
-              'No messaging between users. No contact from strangers.',
-              'No ads. No data sharing. First name only.',
+              'Never any photos of children. We only allow product photos to be posted.',
+              'No messaging between users. All customer messages go to the parent portal.',
+              'First name only. No birthday, last name, school, or location stored.',
+              "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 bg-emerald-50/80 border border-emerald-100/80 rounded-xl px-5 py-4">
                 <div className="w-5 h-5 rounded-md bg-emerald-400 flex items-center justify-center shrink-0 shadow-sm">
