@@ -226,7 +226,7 @@ export default function LandingPage() {
         }} />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-12 sm:py-16 text-center">
           <p className="text-lg sm:text-xl text-white leading-[1.8] tracking-wide" style={{ fontFamily: font.heading, fontWeight: 500 }}>
-            The store is digital. The product is made by hand.<br className="hidden sm:block" /> The customer is real. The lessons last a lifetime.
+            Yes, the store lives on a screen, but the customers are real people. Learning how to talk to them is something many adults still struggle with today.
           </p>
         </div>
       </section>
@@ -235,16 +235,15 @@ export default function LandingPage() {
       <section className="bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
-            This isn't a class. It's an experience.
+            Experience is the best teacher.
           </h2>
 
           <div className="mt-14 space-y-5">
             {[
-              'The pride of making something someone wanted to buy',
-              'The focus that comes from writing about their thing in their words',
-              "The math that clicks because it's their money, not a classroom worksheet",
-              'The confidence to say "I made this and it\'s worth something"',
-              "The resilience when something doesn't sell, and the spark to try again",
+              'Pride in creating something of value and putting it out into the world',
+              'Their first real lessons in earning money and being self-sufficient',
+              'Hands-on digital experience designing and running a real website for their business',
+              "The grit to stick with something that can't be finished in one sitting",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4 group">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-3 shrink-0 group-hover:scale-150 transition-transform" />
