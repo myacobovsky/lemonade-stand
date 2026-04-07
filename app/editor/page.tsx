@@ -159,6 +159,7 @@ export default function EditorPage() {
           {[
             { id: 'theme', label: 'Design' },
             { id: 'products', label: 'My Products' },
+            { id: 'preview', label: 'Preview' },
           ].map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
@@ -651,6 +652,177 @@ export default function EditorPage() {
             )}
           </div>
         )}
+        {/* ============================= */}
+        {/* PREVIEW TAB */}
+        {/* ============================= */}
+        {activeTab === 'preview' && (
+          <div className="animate-fadeIn">
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-400">This is how your store looks to customers right now.</p>
+            </div>
+
+            {/* Store Header Preview */}
+            <div className={`rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-5 ${
+              draftTheme.color === 'blue' ? 'bg-blue-50' : draftTheme.color === 'green' ? 'bg-emerald-50' :
+              draftTheme.color === 'pink' ? 'bg-pink-50' : draftTheme.color === 'purple' ? 'bg-purple-50' :
+              draftTheme.color === 'orange' ? 'bg-orange-50' : 'bg-amber-50'
+            }`}>
+              {/* Banner */}
+              {draftTheme.bannerImage && (
+                <img src={draftTheme.bannerImage} alt="Banner" className="w-full h-28 object-cover" />
+              )}
+
+              {/* Announcement bar */}
+              {draftTheme.announcementOn && draftTheme.announcement && (
+                <div className={`py-2 px-4 text-center text-xs font-medium text-white ${
+                  draftTheme.color === 'blue' ? 'bg-blue-500' : draftTheme.color === 'green' ? 'bg-emerald-500' :
+                  draftTheme.color === 'pink' ? 'bg-pink-500' : draftTheme.color === 'purple' ? 'bg-purple-500' :
+                  draftTheme.color === 'orange' ? 'bg-orange-500' : 'bg-amber-500'
+                }`}>{draftTheme.announcement}</div>
+              )}
+
+              {/* Store info */}
+              <div className="p-6 text-center relative overflow-hidden">
+                {draftTheme.stickerPattern && draftTheme.sticker ? (
+                  <div className="absolute inset-0" style={{ backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><text x='8' y='28' font-size='20' opacity='0.1'>${draftTheme.sticker}</text></svg>`)}")`, backgroundSize: '40px 40px' }} />
+                ) : (
+                  draftTheme.pattern && draftTheme.pattern !== 'none' && <div className="absolute inset-0" style={getPatternStyle(draftTheme.pattern)} />
+                )}
+                <div className="relative">
+                  <div className="text-4xl mb-1">{draftTheme.sticker}</div>
+                  {(draftTheme.accentStickers || []).length > 0 && (
+                    <div className="flex justify-center gap-1.5 mb-2">
+                      {draftTheme.accentStickers.map((s, i) => (
+                        <span key={i} className="text-xl" style={{ transform: `rotate(${(i - 1) * 15}deg)` }}>{s}</span>
+                      ))}
+                    </div>
+                  )}
+                  <h2 className={`text-2xl font-bold ${
+                    draftTheme.color === 'blue' ? 'text-blue-700' : draftTheme.color === 'green' ? 'text-emerald-700' :
+                    draftTheme.color === 'pink' ? 'text-pink-700' : draftTheme.color === 'purple' ? 'text-purple-700' :
+                    draftTheme.color === 'orange' ? 'text-orange-700' : 'text-amber-700'
+                  }`} style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.headerFont)?.family || "'Poppins', sans-serif" }}>
+                    {storeData?.store_name || 'My Store'}
+                  </h2>
+                  {draftBio && (
+                    <p className="text-sm text-gray-600 mt-1 italic" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.bodyFont)?.family || "'Poppins', sans-serif" }}>
+                      "{draftBio}"
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-1">by {kidName}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Cards Preview */}
+            <div className="mb-5">
+              <h3 className="font-bold text-gray-800 text-sm mb-3" style={{ fontFamily: font.accent }}>Products</h3>
+
+              {(!products || products.length === 0) ? (
+                <div className="bg-white rounded-xl p-8 border border-gray-100 text-center">
+                  <p className="text-gray-400 text-sm">No products yet. Add one in the My Products tab!</p>
+                </div>
+              ) : (
+                <>
+                  {/* Grid layout */}
+                  {(!draftTheme.productLayout || draftTheme.productLayout === 'grid') && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {products.slice(0, 4).map((p) => (
+                        <div key={p.id} className={getCardClasses(draftTheme.cardStyle, p.in_stock !== false, draftTheme.color)}>
+                          <div className={`h-24 flex items-center justify-center text-3xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>
+                            {p.image_url || p.image ? <img src={p.image_url || p.image} alt={p.name} className="w-full h-full object-cover" /> : (p.emoji || '🎁')}
+                          </div>
+                          <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-2 pb-1' : 'p-3'}>
+                            <h4 className="font-bold text-gray-800 text-sm mb-0.5" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{p.name}</h4>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-bold text-amber-600">${p.price}</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
+                                draftTheme.color === 'blue' ? 'bg-blue-400' : draftTheme.color === 'green' ? 'bg-emerald-400' :
+                                draftTheme.color === 'pink' ? 'bg-pink-400' : draftTheme.color === 'purple' ? 'bg-purple-400' :
+                                draftTheme.color === 'orange' ? 'bg-orange-400' : 'bg-amber-400'
+                              }`}>Add to cart</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* List layout */}
+                  {draftTheme.productLayout === 'list' && (
+                    <div className="space-y-3">
+                      {products.slice(0, 4).map((p) => (
+                        <div key={p.id} className={`flex gap-3 ${getCardClasses(draftTheme.cardStyle, p.in_stock !== false, draftTheme.color)}`}>
+                          <div className={`w-20 shrink-0 flex items-center justify-center text-2xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>
+                            {p.image_url || p.image ? <img src={p.image_url || p.image} alt={p.name} className="w-full h-full object-cover" /> : (p.emoji || '🎁')}
+                          </div>
+                          <div className="flex-1 py-2 pr-2">
+                            <h4 className="font-bold text-gray-800 text-sm" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{p.name}</h4>
+                            <p className="text-gray-400 text-xs mb-1 truncate">{p.description}</p>
+                            <span className="text-sm font-bold text-amber-600">${p.price}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Featured layout */}
+                  {draftTheme.productLayout === 'featured' && products.length > 0 && (
+                    <div className="space-y-3">
+                      <div className={getCardClasses(draftTheme.cardStyle, products[0].in_stock !== false, draftTheme.color)}>
+                        <div className={`h-36 flex items-center justify-center text-5xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>
+                          {products[0].image_url || products[0].image ? <img src={products[0].image_url || products[0].image} alt={products[0].name} className="w-full h-full object-cover" /> : (products[0].emoji || '🎁')}
+                        </div>
+                        <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-3 pb-1' : 'p-4'}>
+                          <h4 className="font-bold text-gray-800 text-base" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{products[0].name}</h4>
+                          <p className="text-gray-400 text-sm mb-2">{products[0].description}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-amber-600">${products[0].price}</span>
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-medium text-white ${
+                              draftTheme.color === 'blue' ? 'bg-blue-400' : draftTheme.color === 'green' ? 'bg-emerald-400' :
+                              draftTheme.color === 'pink' ? 'bg-pink-400' : draftTheme.color === 'purple' ? 'bg-purple-400' :
+                              draftTheme.color === 'orange' ? 'bg-orange-400' : 'bg-amber-400'
+                            }`}>Add to cart</span>
+                          </div>
+                        </div>
+                      </div>
+                      {products.length > 1 && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {products.slice(1, 3).map((p) => (
+                            <div key={p.id} className={getCardClasses(draftTheme.cardStyle, p.in_stock !== false, draftTheme.color)}>
+                              <div className={`h-16 flex items-center justify-center text-xl ${draftTheme.cardStyle === 'polaroid' ? 'bg-gray-100 rounded-sm' : 'bg-gray-50'}`}>
+                                {p.image_url || p.image ? <img src={p.image_url || p.image} alt={p.name} className="w-full h-full object-cover" /> : (p.emoji || '🎁')}
+                              </div>
+                              <div className={draftTheme.cardStyle === 'polaroid' ? 'px-1 pt-1.5 pb-1' : 'p-2'}>
+                                <h4 className="font-bold text-gray-800 text-xs" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.cardFont)?.family || "'Poppins', sans-serif" }}>{p.name}</h4>
+                                <span className="text-xs font-bold text-amber-600">${p.price}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Save from preview */}
+            <button onClick={handleUpdateStore}
+              className={`w-full py-4 rounded-full font-bold text-lg transition-all active:scale-[0.98] shadow-md ${
+                themeUpdated ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-amber-400 hover:bg-amber-500 text-white shadow-amber-200'
+              }`} style={{ fontFamily: font.accent }}>
+              {themeUpdated ? 'Store Updated!' : 'Save My Design'}
+            </button>
+
+            <button onClick={() => router.push(`/store/${storeData?.id}`)}
+              className="w-full mt-3 py-3 rounded-full border-2 border-amber-200 text-amber-600 font-bold text-sm transition-all hover:bg-amber-50"
+              style={{ fontFamily: font.accent }}>
+              Visit My Live Store →
+            </button>
+          </div>
+        )}
+
       </main>
     </div>
   );
