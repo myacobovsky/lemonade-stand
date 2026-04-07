@@ -85,23 +85,28 @@ export const LearnTip = ({ title, color = 'amber', children }) => {
 // --- NavBar ---
 export const NavBar = ({ active }) => {
   const pathname = usePathname();
-  const { user, signOut, store, stores, switchStore } = useApp();
+  const { user, signOut, store, stores, switchStore, products, orders } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // If store belongs to a school, Shop links to the school marketplace instead of public shop
   const shopHref = store?.school_id ? `/schools/${store.school_slug || 'ps150'}` : '/shop';
 
+  // Count items needing parent attention
+  const pendingProducts = (products || []).filter(p => p.status === 'pending_review').length;
+  const pendingOrders = (orders || []).filter(o => o.status === 'pending' || o.status === 'new').length;
+  const parentBadgeCount = pendingProducts + pendingOrders;
+
   const tabs = store ? [
-    { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪' },
-    { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨' },
-    { id: 'shop', href: shopHref, label: 'Shop', icon: '🛒' },
-    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
-    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫' },
-    { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒' },
+    { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪', badge: 0 },
+    { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨', badge: 0 },
+    { id: 'shop', href: shopHref, label: 'Shop', icon: '🛒', badge: 0 },
+    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚', badge: 0 },
+    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫', badge: 0 },
+    { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒', badge: parentBadgeCount },
   ] : [
-    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒' },
-    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚' },
-    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫' },
+    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒', badge: 0 },
+    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚', badge: 0 },
+    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫', badge: 0 },
   ];
 
   const currentTab = active || pathname?.replace('/', '') || '';
@@ -129,17 +134,27 @@ export const NavBar = ({ active }) => {
         <div className="flex items-center gap-2">
           <nav className="hidden sm:flex gap-1 text-sm">
             {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.href} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-gray-50 text-gray-500'}`}>
+              <Link key={tab.id} href={tab.href} className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-gray-50 text-gray-500'}`}>
                 <span className="text-base">{tab.icon}</span>
                 <span className="hidden md:inline">{tab.label}</span>
+                {tab.badge > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                    {tab.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
           {user && (
             <button onClick={signOut} className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 ml-2">Log out</button>
           )}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-gray-50 active:bg-gray-100">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 relative">
             {menuOpen ? <span className="text-gray-600 text-2xl leading-none">&times;</span> : <><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /></>}
+            {parentBadgeCount > 0 && !menuOpen && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                {parentBadgeCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -148,8 +163,20 @@ export const NavBar = ({ active }) => {
           <div className="max-w-4xl mx-auto py-2 px-4">
             {tabs.map((tab) => (
               <Link key={tab.id} href={tab.href} onClick={() => setMenuOpen(false)} className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-left transition-all active:scale-95 ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
-                <span className="text-xl">{tab.icon}</span>
-                <span className="text-base">{tab.label}</span>
+                <span className="text-xl relative">
+                  {tab.icon}
+                  {tab.badge > 0 && (
+                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                      {tab.badge}
+                    </span>
+                  )}
+                </span>
+                <span className="text-base flex-1">{tab.label}</span>
+                {tab.badge > 0 && (
+                  <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">
+                    {tab.badge} {tab.badge === 1 ? 'item' : 'items'}
+                  </span>
+                )}
               </Link>
             ))}
             {user && (
