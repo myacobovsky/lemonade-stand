@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { NavBar, Confetti, getPatternStyle, getCardClasses } from '../../components';
+import { NavBar, Logo, Confetti, getPatternStyle, getCardClasses } from '../../components';
 import { supabase } from '../../../lib/supabase';
 
 export default function PublicStorePage({ params }) {
@@ -22,60 +22,25 @@ export default function PublicStorePage({ params }) {
 
   useEffect(() => {
     async function loadStore() {
-      // Try to find store by ID first, then by kid name
       let store = null;
-
-      // Check if slug looks like a UUID (store ID)
       if (slug.length > 20 && slug.includes('-')) {
-        const { data } = await supabase
-          .from('stores')
-          .select('*')
-          .eq('id', slug)
-          .single();
+        const { data } = await supabase.from('stores').select('*').eq('id', slug).single();
         if (data) store = data;
       }
-
-      // Fall back to kid name lookup
       if (!store) {
-        const { data: stores } = await supabase
-          .from('stores')
-          .select('*')
-          .ilike('kid_name', decodeURIComponent(slug).replace(/-/g, ' '));
+        const { data: stores } = await supabase.from('stores').select('*').ilike('kid_name', decodeURIComponent(slug).replace(/-/g, ' '));
         if (stores && stores.length > 0) store = stores[0];
       }
-
-      // Also try with hyphens as spaces
       if (!store) {
-        const { data: stores } = await supabase
-          .from('stores')
-          .select('*')
-          .ilike('kid_name', slug);
+        const { data: stores } = await supabase.from('stores').select('*').ilike('kid_name', slug);
         if (stores && stores.length > 0) store = stores[0];
       }
-
-      if (!store) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
+      if (!store) { setNotFound(true); setLoading(false); return; }
       setStoreData(store);
-
-      // Load theme
-      const { data: theme } = await supabase
-        .from('store_themes')
-        .select('*')
-        .eq('store_id', store.id)
-        .single();
+      const { data: theme } = await supabase.from('store_themes').select('*').eq('store_id', store.id).single();
       if (theme) setStoreTheme(theme);
-
-      // Load products
-      const { data: prods } = await supabase
-        .from('products')
-        .select('*')
-        .eq('store_id', store.id)
-        .order('sort_order', { ascending: true });
+      const { data: prods } = await supabase.from('products').select('*').eq('store_id', store.id).order('sort_order', { ascending: true });
       if (prods) setProducts(prods.filter(p => p.status === 'approved' || !p.status));
-
       setLoading(false);
     }
     loadStore();
@@ -92,43 +57,32 @@ export default function PublicStorePage({ params }) {
       return [...prev, { product, quantity: 1 }];
     });
   };
-
-  const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
+  const removeFromCart = (productId) => { setCart((prev) => prev.filter((item) => item.product.id !== productId)); };
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const handlePlaceOrder = async () => {
     if (!buyerInfo.name || !buyerInfo.contact) return;
     await supabase.from('orders').insert({
-      store_id: storeData.id,
-      buyer_name: buyerInfo.name,
-      buyer_contact: buyerInfo.contact,
+      store_id: storeData.id, buyer_name: buyerInfo.name, buyer_contact: buyerInfo.contact,
       buyer_note: buyerInfo.note,
       items: cart.map((item) => ({ name: item.product.name, price: item.product.price, quantity: item.quantity })),
-      total_amount: cartTotal,
-      status: 'pending',
+      total_amount: cartTotal, status: 'pending',
     });
-    setOrderSubmitted(true);
-    setShowConfetti(true);
+    setOrderSubmitted(true); setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
-  // Color helpers
   const accentBg = storeTheme?.color === 'blue' ? 'bg-blue-400 hover:bg-blue-500' :
     storeTheme?.color === 'green' ? 'bg-emerald-400 hover:bg-emerald-500' :
     storeTheme?.color === 'pink' ? 'bg-pink-400 hover:bg-pink-500' :
     storeTheme?.color === 'purple' ? 'bg-purple-400 hover:bg-purple-500' :
     storeTheme?.color === 'orange' ? 'bg-orange-400 hover:bg-orange-500' : 'bg-amber-400 hover:bg-amber-500';
-
   const accentText = storeTheme?.color === 'blue' ? 'text-blue-600' :
     storeTheme?.color === 'green' ? 'text-emerald-600' :
     storeTheme?.color === 'pink' ? 'text-pink-600' :
     storeTheme?.color === 'purple' ? 'text-purple-600' :
     storeTheme?.color === 'orange' ? 'text-orange-600' : 'text-amber-600';
-
   const pageBg = storeTheme?.color === 'blue' ? 'from-blue-50' :
     storeTheme?.color === 'green' ? 'from-emerald-50' :
     storeTheme?.color === 'pink' ? 'from-pink-50' :
@@ -137,14 +91,14 @@ export default function PublicStorePage({ params }) {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center"><div className="text-4xl mb-3">🍋</div><p className="text-gray-500">Loading store...</p></div>
+      <div className="text-center"><Logo size="lg" /><p className="text-gray-400 mt-3 text-sm">Loading store...</p></div>
     </div>
   );
 
   if (notFound) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
-        <div className="text-5xl mb-4">🔍</div>
+        <Logo size="lg" />
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Store not found</h1>
         <p className="text-gray-500 mb-4">We couldn't find a store for "{slug}"</p>
         <button onClick={() => router.push('/shop')} className="bg-amber-400 hover:bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg">Browse all stores</button>
@@ -156,11 +110,11 @@ export default function PublicStorePage({ params }) {
     <div className={`min-h-screen bg-gradient-to-b ${pageBg} to-white`}>
       {showConfetti && <Confetti />}
 
-      {/* Simple nav for public visitors */}
       <header className="bg-white border-b border-gray-100 px-4 sm:px-8 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button onClick={() => router.push('/')} className="flex items-center gap-2">
-            <span className="font-semibold text-gray-900">🍋 Lemonade Stand</span>
+            <Logo size="sm" />
+            <span className="font-bold text-gray-900" style={{ fontFamily: "'DynaPuff', cursive" }}>Lemonade Stand</span>
           </button>
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/shop')} className="text-sm text-gray-500 hover:text-gray-700">Browse stores</button>
@@ -173,13 +127,10 @@ export default function PublicStorePage({ params }) {
         </div>
       </header>
 
-      {/* Announcement bar */}
       {storeTheme?.announcement_on && storeTheme?.announcement && (
         <div className={`py-2 px-4 text-center text-sm font-medium text-white ${
-          storeTheme?.color === 'blue' ? 'bg-blue-500' :
-          storeTheme?.color === 'green' ? 'bg-emerald-500' :
-          storeTheme?.color === 'pink' ? 'bg-pink-500' :
-          storeTheme?.color === 'purple' ? 'bg-purple-500' :
+          storeTheme?.color === 'blue' ? 'bg-blue-500' : storeTheme?.color === 'green' ? 'bg-emerald-500' :
+          storeTheme?.color === 'pink' ? 'bg-pink-500' : storeTheme?.color === 'purple' ? 'bg-purple-500' :
           storeTheme?.color === 'orange' ? 'bg-orange-500' : 'bg-amber-500'
         }`} style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>
           {storeTheme.announcement}
@@ -187,19 +138,15 @@ export default function PublicStorePage({ params }) {
       )}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
-        {/* Banner */}
         {storeTheme?.banner_image_url && (
           <div className="mb-6 rounded-2xl overflow-hidden shadow-sm">
             <img src={storeTheme.banner_image_url} alt="Store banner" className="w-full h-48 sm:h-64 object-cover" />
           </div>
         )}
 
-        {/* Store header */}
         <div className={`text-center mb-8 rounded-2xl p-8 relative overflow-hidden ${
-          storeTheme?.color === 'blue' ? 'bg-blue-50' :
-          storeTheme?.color === 'green' ? 'bg-emerald-50' :
-          storeTheme?.color === 'pink' ? 'bg-pink-50' :
-          storeTheme?.color === 'purple' ? 'bg-purple-50' :
+          storeTheme?.color === 'blue' ? 'bg-blue-50' : storeTheme?.color === 'green' ? 'bg-emerald-50' :
+          storeTheme?.color === 'pink' ? 'bg-pink-50' : storeTheme?.color === 'purple' ? 'bg-purple-50' :
           storeTheme?.color === 'orange' ? 'bg-orange-50' : 'bg-amber-50'
         }`}>
           {storeTheme?.sticker_pattern && storeTheme?.sticker ? (
@@ -217,19 +164,16 @@ export default function PublicStorePage({ params }) {
               </div>
             )}
             <h1 className={`text-3xl sm:text-4xl mb-2 font-bold ${
-              storeTheme?.color === 'blue' ? 'text-blue-800' :
-              storeTheme?.color === 'green' ? 'text-emerald-800' :
-              storeTheme?.color === 'pink' ? 'text-pink-800' :
-              storeTheme?.color === 'purple' ? 'text-purple-800' :
+              storeTheme?.color === 'blue' ? 'text-blue-800' : storeTheme?.color === 'green' ? 'text-emerald-800' :
+              storeTheme?.color === 'pink' ? 'text-pink-800' : storeTheme?.color === 'purple' ? 'text-purple-800' :
               storeTheme?.color === 'orange' ? 'text-orange-800' : 'text-amber-800'
             }`} style={{ fontFamily: storeTheme?.header_font ? `'${storeTheme.header_font}', cursive` : "'Poppins', sans-serif" }}>{storeName}</h1>
-            <p className="text-gray-600" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>Made with ❤️ by {kidName}</p>
+            <p className="text-gray-600" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>by {kidName}</p>
             {storeBio && <p className="text-gray-600 text-sm mt-2 max-w-md mx-auto italic" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>&quot;{storeBio}&quot;</p>}
-            <div className="inline-block mt-3 px-3 py-1 bg-white bg-opacity-70 text-gray-600 rounded-full text-sm font-medium">Parent-supervised shop</div>
+            <div className="inline-block mt-3 px-3 py-1 bg-white bg-opacity-70 text-gray-500 rounded-full text-xs font-medium">Parent-supervised shop</div>
           </div>
         </div>
 
-        {/* Products */}
         {products.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <div className="text-4xl mb-3">📦</div>
@@ -278,7 +222,6 @@ export default function PublicStorePage({ params }) {
         )}
       </main>
 
-      {/* Cart Modal */}
       {showCart && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
           <div className="bg-white rounded-t-2xl sm:rounded-2xl p-6 w-full sm:max-w-md max-h-[80vh] overflow-y-auto">
@@ -328,3 +271,4 @@ export default function PublicStorePage({ params }) {
     </div>
   );
 }
+
