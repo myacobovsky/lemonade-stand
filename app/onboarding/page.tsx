@@ -425,6 +425,17 @@ export default function OnboardingPage() {
               </div>
             )}
 
+            {/* Parent approval reminder */}
+            {productName && productPrice && (
+              <div className="mt-4 bg-purple-50 rounded-xl p-4 border border-purple-100 flex items-start gap-3 text-left animate-fadeIn">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center shrink-0 text-sm">🔒</div>
+                <div>
+                  <p className="text-sm font-bold text-purple-800" style={{ fontFamily: font.accent }}>One more step!</p>
+                  <p className="text-xs text-purple-600 mt-0.5">Ask your parent to approve your product on the Parent Dashboard. It won't show up in your store until they say it's good to go.</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-3 mt-8">
               <button onClick={() => setStep(5)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
               <button onClick={handleComplete}
@@ -439,4 +450,3 @@ export default function OnboardingPage() {
     </div>
   );
 }
-
