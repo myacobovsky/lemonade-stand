@@ -44,6 +44,7 @@ export default function OnboardingPage() {
   const [color, setColor] = useState(storeTheme?.color || 'amber');
   const [sticker, setSticker] = useState(storeTheme?.sticker || '🌈');
   const [headerFont, setHeaderFont] = useState(storeTheme?.header_font || 'Poppins');
+  const [bodyFont, setBodyFont] = useState(storeTheme?.body_font || 'Poppins');
   const [bio, setBio] = useState(store?.bio || '');
 
   // First product
@@ -66,6 +67,7 @@ export default function OnboardingPage() {
       color,
       sticker,
       header_font: headerFont,
+      body_font: bodyFont,
     });
     if (bio) await updateStore({ bio });
   };
@@ -248,25 +250,47 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* ===== STEP 3: Pick your font ===== */}
+        {/* ===== STEP 3: Pick your fonts ===== */}
         {step === 3 && (
           <div className="animate-fadeIn text-center">
             <Logo size="lg" />
             <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Pick your store font!
+              Pick your fonts!
             </h1>
-            <p className="text-gray-500 mt-2">This is how your store name will look.</p>
+            <p className="text-gray-500 mt-2">Two fonts. One for personality, one for reading.</p>
 
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              {fontOpts.map((f) => (
-                <button key={f.value} onClick={() => setHeaderFont(f.value)}
-                  className={`p-4 rounded-2xl border-2 text-center transition-all active:scale-95 ${
-                    headerFont === f.value ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
-                  }`}>
-                  <div className="text-xl mb-1" style={{ fontFamily: f.family }}>{storeName}</div>
-                  <div className="text-xs text-gray-400">{f.name}</div>
-                </button>
-              ))}
+            {/* Headline font */}
+            <div className="mt-8 text-left">
+              <h3 className="font-bold text-amber-700 text-sm mb-1" style={{ fontFamily: font.accent }}>Headline font</h3>
+              <p className="text-xs text-gray-400 mb-3">This is where you show off your personality. Go bold, go fun!</p>
+              <div className="grid grid-cols-2 gap-2">
+                {fontOpts.map((f) => (
+                  <button key={f.value} onClick={() => setHeaderFont(f.value)}
+                    className={`p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
+                      headerFont === f.value ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
+                    }`}>
+                    <div className="text-lg mb-0.5" style={{ fontFamily: f.family }}>{storeName}</div>
+                    <div className="text-xs text-gray-400">{f.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Description font */}
+            <div className="mt-6 text-left">
+              <h3 className="font-bold text-amber-700 text-sm mb-1" style={{ fontFamily: font.accent }}>Description font</h3>
+              <p className="text-xs text-gray-400 mb-3">This is where all the info about what you sell will appear. Pick something easy to read!</p>
+              <div className="grid grid-cols-2 gap-2">
+                {fontOpts.map((f) => (
+                  <button key={f.value} onClick={() => setBodyFont(f.value)}
+                    className={`p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
+                      bodyFont === f.value ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
+                    }`}>
+                    <div className="text-sm mb-0.5" style={{ fontFamily: f.family }}>Handmade with love by {kidName}</div>
+                    <div className="text-xs text-gray-400">{f.name}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex gap-3 mt-8">
