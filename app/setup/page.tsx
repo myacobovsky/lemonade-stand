@@ -72,7 +72,7 @@ export default function SetupPage() {
       school_id: formData.schoolId || null, public_listing: formData.schoolId ? false : true,
     });
     setShowConfetti(true);
-    setTimeout(() => router.push('/biz'), 3500);
+    setTimeout(() => router.push('/onboarding'), 3500);
   };
 
   const ageTiers = [
