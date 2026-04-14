@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { NavBar, Logo, LearnTip, getPatternStyle, getCardClasses, stickerSets } from '../components';
+import SloganGenerator from '../components/SloganGenerator';
 import { useApp } from '../../lib/context';
 
 const font = {
@@ -35,6 +36,7 @@ export default function EditorPage() {
     return { color: 'amber', sticker: '🌈', accentStickers: [], stickerPattern: false, headerFont: 'Poppins', bodyFont: 'Poppins', cardFont: 'Poppins', pattern: 'none', announcement: '', announcementOn: false, bannerImage: null, cardStyle: 'rounded', productLayout: 'grid' };
   });
   const [draftBio, setDraftBio] = useState(storeBio || '');
+  const [draftSlogan, setDraftSlogan] = useState(storeData?.slogan || '');
   const [themeUpdated, setThemeUpdated] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -52,7 +54,9 @@ export default function EditorPage() {
       product_layout: draftTheme.productLayout || 'grid', announcement: draftTheme.announcement || '',
       announcement_on: draftTheme.announcementOn || false, banner_image_url: draftTheme.bannerImage || null,
     });
-    if (draftBio !== storeBio) await updateStore({ bio: draftBio });
+    if (draftBio !== storeBio || draftSlogan !== (storeData?.slogan || '')) {
+      await updateStore({ bio: draftBio, slogan: draftSlogan });
+    }
     setThemeUpdated(true);
     setTimeout(() => setThemeUpdated(false), 2000);
   };
@@ -326,6 +330,31 @@ export default function EditorPage() {
                 placeholder={`Hi! I'm ${kidName} and I love making things by hand...`} rows={3}
                 className="w-full px-3 py-2.5 rounded-xl border-2 border-amber-100 focus:border-amber-400 focus:outline-none text-sm resize-none" />
               <div className="text-right text-xs text-gray-400 mt-1">{draftBio.length}/150</div>
+            </div>
+
+            {/* Slogan Generator */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-100/50">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-gray-800" style={{ fontFamily: font.accent }}>Your store slogan</h3>
+                <LearnTip title="What's a slogan?" color="purple">
+                  <p>A slogan is a short, catchy phrase that says what makes your store special.</p>
+                  <p>Think of "Just Do It" (Nike) or "I'm Lovin' It" (McDonald's). Short. Memorable. Sticks in your head.</p>
+                  <p>Stuck? Use the AI brainstorming tool below to get 5 ideas in seconds. Pick your favorite!</p>
+                </LearnTip>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">A short catchy phrase that shows up on your store</p>
+              {draftSlogan && (
+                <div className="bg-purple-50 rounded-xl p-3 mb-3 flex items-center justify-between border border-purple-100">
+                  <span className="text-sm font-semibold text-purple-800" style={{ fontFamily: font.accent }}>"{draftSlogan}"</span>
+                  <button onClick={() => setDraftSlogan('')} className="text-purple-400 hover:text-purple-600 text-xs">Clear</button>
+                </div>
+              )}
+              <SloganGenerator
+                storeName={storeData?.store_name}
+                category={storeData?.category}
+                currentSlogan={draftSlogan}
+                onSelectSlogan={(s) => setDraftSlogan(s)}
+              />
             </div>
 
             {/* Bio Font */}
@@ -704,6 +733,16 @@ export default function EditorPage() {
                   }`} style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.headerFont)?.family || "'Poppins', sans-serif" }}>
                     {storeData?.store_name || 'My Store'}
                   </h2>
+                  {draftSlogan && (
+                    <p className="text-sm font-semibold mt-1" style={{
+                      fontFamily: fontOpts.find(f => f.value === draftTheme.bodyFont)?.family || "'Poppins', sans-serif",
+                      color: draftTheme.color === 'blue' ? '#1E40AF' : draftTheme.color === 'green' ? '#065F46' :
+                        draftTheme.color === 'pink' ? '#BE185D' : draftTheme.color === 'purple' ? '#5B21B6' :
+                        draftTheme.color === 'orange' ? '#C2410C' : '#92400E'
+                    }}>
+                      {draftSlogan}
+                    </p>
+                  )}
                   {draftBio && (
                     <p className="text-sm text-gray-600 mt-1 italic" style={{ fontFamily: fontOpts.find(f => f.value === draftTheme.bodyFont)?.family || "'Poppins', sans-serif" }}>
                       "{draftBio}"
