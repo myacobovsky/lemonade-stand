@@ -168,7 +168,18 @@ export default function PublicStorePage({ params }) {
               storeTheme?.color === 'pink' ? 'text-pink-800' : storeTheme?.color === 'purple' ? 'text-purple-800' :
               storeTheme?.color === 'orange' ? 'text-orange-800' : 'text-amber-800'
             }`} style={{ fontFamily: storeTheme?.header_font ? `'${storeTheme.header_font}', cursive` : "'Poppins', sans-serif" }}>{storeName}</h1>
-            <p className="text-gray-600" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>by {kidName}</p>
+            {storeData?.slogan && (
+              <p className={`text-base font-semibold mt-1 ${
+                storeTheme?.color === 'blue' ? 'text-blue-700' :
+                storeTheme?.color === 'green' ? 'text-emerald-700' :
+                storeTheme?.color === 'pink' ? 'text-pink-700' :
+                storeTheme?.color === 'purple' ? 'text-purple-700' :
+                storeTheme?.color === 'orange' ? 'text-orange-700' : 'text-amber-700'
+              }`} style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>
+                {storeData.slogan}
+              </p>
+            )}
+            <p className="text-gray-600 text-sm mt-2" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>by {kidName}</p>
             {storeBio && <p className="text-gray-600 text-sm mt-2 max-w-md mx-auto italic" style={{ fontFamily: storeTheme?.body_font ? `'${storeTheme.body_font}', sans-serif` : "'Poppins', sans-serif" }}>&quot;{storeBio}&quot;</p>}
             <div className="inline-block mt-3 px-3 py-1 bg-white bg-opacity-70 text-gray-500 rounded-full text-xs font-medium">Parent-supervised shop</div>
           </div>
