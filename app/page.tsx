@@ -74,7 +74,7 @@ export default function LandingPage() {
             ) : (
               <div className="flex items-center gap-3">
                 <Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">Log in</Link>
-                <Link href="/login" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md hover:shadow-amber-200">Get Started</Link>
+                <Link href="/login?mode=signup" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md hover:shadow-amber-200">Get Started</Link>
               </div>
             )}
           </div>
@@ -106,7 +106,7 @@ export default function LandingPage() {
               </FadeIn>
               <FadeIn delay={300}>
                 <div className="mt-8 flex flex-col sm:flex-row items-center md:items-start gap-3">
-                  <Link href="/login" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
+                  <Link href="/login?mode=signup" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
                     Get Started — Free
                   </Link>
                   <Link href="/shop" className="px-6 py-4 text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
@@ -435,7 +435,7 @@ export default function LandingPage() {
             Your kid already makes<br className="hidden sm:block" /> things worth selling.
           </h2>
           <div className="mt-8">
-            <Link href="/login" className="inline-block px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-400/20 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
+            <Link href="/login?mode=signup" className="inline-block px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-400/20 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
               Get Started — Free
             </Link>
           </div>
