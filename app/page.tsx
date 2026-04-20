@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useApp } from '../lib/context';
@@ -26,23 +26,85 @@ function Logo({ size = 'md' }) {
   );
 }
 
-function FadeIn({ children, className = '', delay = 0 }) {
+// ScrollReveal — fades in + slides up when the element enters the viewport. One-shot, mobile-safe.
+function ScrollReveal({ children, className = '', delay = 0 }) {
+  const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(t);
+    if (typeof window === 'undefined' || !ref.current) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) { setVisible(true); return; }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => setVisible(true), delay);
+        observer.disconnect();
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    observer.observe(ref.current);
+    return () => observer.disconnect();
   }, [delay]);
+
   return (
-    <div className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} ${className}`}>
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'opacity 0.7s ease-out, transform 0.7s ease-out',
+      }}
+    >
       {children}
     </div>
   );
 }
 
+// Small squiggle accent used under key words
+function SquiggleUnderline({ children }) {
+  return (
+    <span style={{ display: 'inline-block', position: 'relative' }}>
+      {children}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 120 8"
+        preserveAspectRatio="none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: '-0.15em',
+          width: '100%',
+          height: '0.35em',
+        }}
+      >
+        <path d="M2 5 Q 15 1 30 4 T 60 4 T 90 4 T 118 4" stroke="#D97706" strokeWidth="3" fill="none" strokeLinecap="round"/>
+      </svg>
+    </span>
+  );
+}
+
+// ====================== DESIGN TOKENS ======================
+const C = {
+  cream: '#FEF3C7',          // primary brand cream (hero background)
+  creamWarm: '#FEF0B8',      // slightly warmer for section variation
+  creamCool: '#FDF8E1',      // slightly cooler for section variation
+  creamDeep: '#F3E7A1',      // deeper highlight
+  ink: '#1C1917',            // text + borders
+  inkMuted: '#57534E',       // muted text
+  inkFaint: '#78716C',       // faint text
+  cardBg: '#FFFBEB',         // card fill, slight lift
+  cardBorder: '#1C191722',   // 13% opacity ink
+  amberBtn: '#FCD34D',       // button fill
+  amberBtnHover: '#F59E0B',  // button hover
+  amberAccent: '#D97706',    // accent color (deep amber)
+};
+
 const font = {
-  heading: "'Poppins', sans-serif",
-  body: "'Poppins', sans-serif",
-  accent: "'DynaPuff', cursive",
+  sans: "'Poppins', sans-serif",
+  brand: "'DynaPuff', cursive", // ONLY for literal string "Lemonade Stand"
 };
 
 export default function LandingPage() {
@@ -53,98 +115,121 @@ export default function LandingPage() {
     if (user && store) router.push('/biz');
   }, [user, store]);
 
-  return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: font.body }}>
-      {/* Accent bar */}
-      <div className="h-1.5 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500" />
+  // Shared button styles
+  const btnPrimary = {
+    backgroundColor: C.amberBtn,
+    color: C.ink,
+    border: `1.5px solid ${C.ink}`,
+    boxShadow: `3px 3px 0 ${C.ink}`,
+    borderRadius: '12px',
+    fontWeight: 700,
+    transition: 'all 0.15s ease',
+  };
 
-      {/* Nav */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}>
+
+      {/* ============ NAV ============ */}
+      <header className="sticky top-0 z-50 backdrop-blur-md" style={{ backgroundColor: `${C.cream}EE`, borderBottom: `1px solid ${C.ink}14` }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Logo size="sm" />
-            <span className="font-bold text-gray-900 text-lg" style={{ fontFamily: font.accent }}>Lemonade Stand</span>
+            <span className="font-bold text-lg" style={{ fontFamily: font.brand, color: C.ink }}>Lemonade Stand</span>
           </div>
-          <div className="flex items-center gap-5">
-            <Link href="/schools" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block" style={{ fontFamily: font.body }}>Schools</Link>
-            <Link href="/shop" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Shop</Link>
-            <Link href="/learn" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Learn</Link>
+          <div className="flex items-center gap-6">
+            <Link href="/schools" className="text-sm hidden sm:block transition-colors hover:opacity-70" style={{ color: C.inkFaint }}>Schools</Link>
+            <Link href="/shop" className="text-sm hidden sm:block transition-colors hover:opacity-70" style={{ color: C.inkFaint }}>Shop</Link>
+            <Link href="/learn" className="text-sm hidden sm:block transition-colors hover:opacity-70" style={{ color: C.inkFaint }}>Learn</Link>
             {user ? (
-              <Link href="/biz" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md">My Store</Link>
+              <Link href="/biz" className="px-5 py-2 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0" style={btnPrimary}>
+                My Store
+              </Link>
             ) : (
-              <div className="flex items-center gap-3">
-                <Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">Log in</Link>
-                <Link href="/login?mode=signup" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md hover:shadow-amber-200">Get Started</Link>
+              <div className="flex items-center gap-4">
+                <Link href="/login" className="text-sm transition-colors hover:opacity-70" style={{ color: C.inkFaint }}>Log in</Link>
+                <Link
+                  href="/login?mode=signup"
+                  className="px-5 py-2 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+                  style={btnPrimary}
+                >
+                  Get Started
+                </Link>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      {/* ============ HERO (FIXED BACKGROUND) ============ */}
-      <section className="relative overflow-hidden bg-[#FEF3C7]">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'radial-gradient(circle, #D97706 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }} />
+      {/* ============ HERO ============ */}
+      {/* Sticky mascot: grid where the right column sticks within the hero section height */}
+      <section className="relative overflow-hidden" style={{ backgroundColor: C.cream }}>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-24">
+          <div className="flex flex-col md:grid md:grid-cols-2 items-center gap-8 md:gap-12">
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-20">
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-            {/* Left: Copy */}
-            <div className="flex-1 text-center md:text-left order-2 md:order-1">
-              <FadeIn delay={100}>
-                <h1 className="mt-0 leading-[1.15] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
-                  <span className="text-3xl sm:text-4xl md:text-5xl block">Your kid already makes things.</span>
-                  <span className="text-3xl sm:text-4xl md:text-5xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
-                </h1>
-              </FadeIn>
-              <FadeIn delay={200}>
-                <p className="text-base sm:text-lg text-gray-700 mt-4 max-w-lg mx-auto md:mx-0" style={{ fontFamily: font.heading }}>
-                  <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
-                </p>
-              </FadeIn>
-              <FadeIn delay={300}>
-                <div className="mt-8 flex flex-col sm:flex-row items-center md:items-start gap-3">
-                  <Link href="/login?mode=signup" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
-                    Get Started — Free
-                  </Link>
-                  <Link href="/shop" className="px-6 py-4 text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
-                    Browse kid stores →
-                  </Link>
-                </div>
-              </FadeIn>
+            {/* Copy */}
+            <div className="text-center md:text-left order-2 md:order-1">
+              <h1 className="tracking-[-0.025em] leading-[1.02]" style={{ fontWeight: 800, color: C.ink }}>
+                <span className="block text-[36px] sm:text-[48px] md:text-[60px]">Your kid already makes things.</span>
+                <span className="block text-[36px] sm:text-[48px] md:text-[60px] mt-1">
+                  <SquiggleUnderline>Now they'll</SquiggleUnderline>{' '}
+                  <span style={{ color: C.amberAccent }}>sell them.</span>
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-lg mx-auto md:mx-0 leading-relaxed text-base sm:text-lg" style={{ color: C.inkMuted }}>
+                <span className="font-bold" style={{ fontFamily: font.brand, color: C.amberAccent }}>Lemonade Stand</span> is where kids learn business by running one.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center md:items-start gap-3">
+                <Link
+                  href="/login?mode=signup"
+                  className="px-8 py-4 text-base transition-all hover:-translate-y-0.5 active:translate-y-0"
+                  style={{ ...btnPrimary, boxShadow: `4px 4px 0 ${C.ink}`, fontSize: '17px' }}
+                >
+                  Get Started — Free
+                </Link>
+                <Link href="/shop" className="px-4 py-4 text-sm font-medium transition-colors hover:opacity-70" style={{ color: C.inkMuted }}>
+                  Browse kid stores →
+                </Link>
+              </div>
             </div>
 
-            {/* Right: Hero illustration */}
-            <FadeIn delay={200} className="flex-1 order-1 md:order-2">
-              <img
-                src="/hero-mascot-phone.png"
-                alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
-                className="w-full max-w-md md:max-w-none mx-auto"
-              />
-            </FadeIn>
+            {/* Sticky mascot column */}
+            <div className="order-1 md:order-2 w-full">
+              <div className="md:sticky md:top-24">
+                <img
+                  src="/hero-mascot-phone.png"
+                  alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
+                  className="w-full max-w-md md:max-w-none mx-auto"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ============ 1-2-3 HOW IT WORKS ============ */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
-          <div className="text-center mb-12">
-            <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-amber-600 font-semibold mb-3" style={{ fontFamily: font.heading }}>
-              How it works
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: font.heading }}>
-              From zero to their first sale in three steps.
-            </h2>
-          </div>
+      {/* Slightly warmer cream for gentle section variation */}
+      <section style={{ backgroundColor: C.creamWarm }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <ScrollReveal>
+            <div className="text-center mb-14 sm:mb-16">
+              <p className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3" style={{ color: C.amberAccent }}>
+                How it works
+              </p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-[-0.02em] leading-[1.05] max-w-3xl mx-auto" style={{ fontWeight: 800, color: C.ink }}>
+                From zero to their first sale <span style={{ color: C.amberAccent }}>in three steps.</span>
+              </h2>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             {[
               {
                 num: '1',
                 title: 'Sign up together',
-                desc: 'Three minutes, one parent account. You stay in control.',
+                desc: 'Three minutes, one parent account. You stay in control the whole way.',
               },
               {
                 num: '2',
@@ -157,52 +242,75 @@ export default function LandingPage() {
                 desc: 'Nothing goes live without your OK. Then real customers show up.',
               },
             ].map((step, i) => (
-              <FadeIn key={i} delay={100 + i * 100}>
-                <div className="relative flex flex-col items-center text-center px-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-400 text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md shadow-amber-200/60 mb-5" style={{ fontFamily: font.heading }}>
+              <ScrollReveal key={i} delay={i * 120}>
+                <div
+                  className="p-6 sm:p-7 h-full"
+                  style={{
+                    backgroundColor: C.cardBg,
+                    border: `1px solid ${C.cardBorder}`,
+                    borderRadius: '20px',
+                    boxShadow: `2px 2px 0 ${C.ink}14`,
+                  }}
+                >
+                  <div
+                    className="inline-flex items-center justify-center mb-5"
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      backgroundColor: C.amberBtn,
+                      border: `1.5px solid ${C.ink}`,
+                      fontWeight: 800,
+                      fontSize: '18px',
+                      color: C.ink,
+                    }}
+                  >
                     {step.num}
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: font.heading }}>
+                  <h3 className="text-xl sm:text-[22px] mb-2 tracking-[-0.01em]" style={{ fontWeight: 800, color: C.ink }}>
                     {step.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-500 leading-relaxed max-w-xs">
+                  <p className="text-[15px] leading-relaxed" style={{ color: C.inkMuted }}>
                     {step.desc}
                   </p>
                 </div>
-              </FadeIn>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* ============ BRIDGE ============ */}
-      <section className="bg-amber-50/70 border-y border-amber-100/50">
-        <div className="max-w-2xl mx-auto px-6 sm:px-8 py-14 sm:py-20 text-center">
-          <p className="text-lg sm:text-xl text-gray-700 leading-[1.8]" style={{ fontFamily: font.body }}>
-            Every kid who set up a card table with a lemonade pitcher and a hand-drawn sign learned something no classroom could teach. We're bringing that same scrappiness and pride online.
-          </p>
-          <p className="text-lg sm:text-xl text-gray-700 leading-[1.8] mt-6" style={{ fontFamily: font.body }}>
-            <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is for a generation that finds joy in creating real products and knows that today's commerce happens on a screen.
-          </p>
+      <section style={{ backgroundColor: C.creamCool }}>
+        <div className="max-w-2xl mx-auto px-6 sm:px-8 py-20 sm:py-28 text-center">
+          <ScrollReveal>
+            <p className="text-lg sm:text-xl leading-[1.7]" style={{ color: C.ink }}>
+              Every kid who set up a card table with a lemonade pitcher and a hand-drawn sign learned something no classroom could teach. We're bringing that same scrappiness and pride online.
+            </p>
+            <p className="text-lg sm:text-xl leading-[1.7] mt-6" style={{ color: C.ink }}>
+              <span className="font-bold" style={{ fontFamily: font.brand, color: C.amberAccent }}>Lemonade Stand</span> is for a generation that finds joy in creating real products and knows that today's commerce happens on a screen.
+            </p>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ============ WHAT THEY'LL DO ============ */}
-      <section className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
-            Their store. Their rules.
-          </h2>
+      <section style={{ backgroundColor: C.cream }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
+          <ScrollReveal>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl text-center tracking-[-0.02em] leading-[1.05]" style={{ fontWeight: 800, color: C.ink }}>
+              Their store. <span style={{ color: C.amberAccent }}>Their rules.</span>
+            </h2>
+          </ScrollReveal>
 
           <div className="mt-14">
             {[
               {
                 title: 'They pick what to sell.',
                 desc: 'Bracelets, baked goods, painted rocks, stickers. Whatever they already enjoy making.',
-                color: '#92400E',
                 bg: '#FEF3C7',
                 icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                     <circle cx="16" cy="16" r="12" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
                     <path d="M10 16 L14 12 L18 18 L22 14" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <circle cx="10" cy="16" r="2" fill="#92400E"/>
@@ -213,10 +321,9 @@ export default function LandingPage() {
               {
                 title: 'They build their own shop.',
                 desc: 'Name it, design it, push it live. Every action belongs to them.',
-                color: '#065F46',
                 bg: '#D1FAE5',
                 icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                     <rect x="6" y="10" width="20" height="14" rx="2" fill="#6EE7B7" stroke="#065F46" strokeWidth="1.5"/>
                     <rect x="10" y="14" width="5" height="3" rx="1" fill="#065F46"/>
                     <rect x="17" y="14" width="5" height="3" rx="1" fill="#065F46"/>
@@ -228,10 +335,9 @@ export default function LandingPage() {
               {
                 title: 'They learn the economics.',
                 desc: 'And discover what it costs to make something, what profit feels like, and how to make business decisions strategically.',
-                color: '#1E40AF',
                 bg: '#DBEAFE',
                 icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                     <circle cx="16" cy="16" r="10" fill="#93C5FD" stroke="#1E40AF" strokeWidth="1.5"/>
                     <text x="16" y="21" textAnchor="middle" fontFamily="'Poppins', sans-serif" fontSize="14" fontWeight="700" fill="#1E40AF">$</text>
                   </svg>
@@ -240,10 +346,9 @@ export default function LandingPage() {
               {
                 title: 'They open for business.',
                 desc: "Real orders from real people who want what they made and come back for more!",
-                color: '#5B21B6',
                 bg: '#EDE9FE',
                 icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
                     <rect x="7" y="8" width="18" height="16" rx="2" fill="#C4B5FD" stroke="#5B21B6" strokeWidth="1.5"/>
                     <path d="M12 16 L15 19 L21 13" stroke="#5B21B6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <circle cx="22" cy="8" r="4" fill="#F87171" stroke="#5B21B6" strokeWidth="1.5"/>
@@ -251,32 +356,40 @@ export default function LandingPage() {
                   </svg>
                 ),
               },
-            ].map((step, i, arr) => (
-              <div key={i}>
-                <div className="flex items-start gap-5">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ background: step.bg }}>
+            ].map((step, i) => (
+              <ScrollReveal key={i} delay={i * 100}>
+                <div className="flex items-start gap-5 py-5" style={i < 3 ? { borderBottom: `1px dashed ${C.ink}22` } : {}}>
+                  <div
+                    className="flex items-center justify-center shrink-0"
+                    style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '14px',
+                      backgroundColor: step.bg,
+                      border: `1px solid ${C.ink}18`,
+                    }}
+                  >
                     {step.icon}
                   </div>
                   <div className="flex-1 pt-1">
-                    <h3 className="font-bold text-lg" style={{ fontFamily: font.accent, color: step.color }}>{step.title}</h3>
-                    <p className="text-gray-500 mt-1 leading-relaxed text-[15px]">{step.desc}</p>
+                    <h3 className="text-lg sm:text-xl tracking-[-0.01em]" style={{ fontWeight: 700, color: C.ink }}>{step.title}</h3>
+                    <p className="mt-1.5 leading-relaxed text-[15px]" style={{ color: C.inkMuted }}>{step.desc}</p>
                   </div>
                 </div>
-                {i < arr.length - 1 && (
-                  <div className="ml-8 h-8 border-l-2 border-dashed" style={{ borderColor: '#E5DDD0' }} />
-                )}
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ============ WHAT STAYS WITH THEM ============ */}
-      <section className="bg-amber-50/60 border-y border-amber-100/50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
-            Experience is the best teacher.
-          </h2>
+      {/* ============ EXPERIENCE IS THE BEST TEACHER ============ */}
+      <section style={{ backgroundColor: C.creamCool }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
+          <ScrollReveal>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl text-center tracking-[-0.02em] leading-[1.05]" style={{ fontWeight: 800, color: C.ink }}>
+              Experience is the <span style={{ color: C.amberAccent }}>best teacher.</span>
+            </h2>
+          </ScrollReveal>
 
           <div className="mt-14 space-y-5">
             {[
@@ -285,95 +398,55 @@ export default function LandingPage() {
               'Hands-on digital experience designing and running a real website for their business',
               "The grit to stick with something that can't be finished in one sitting",
             ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4 group">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-3 shrink-0 group-hover:scale-150 transition-transform" />
-                <p className="text-gray-700 text-lg leading-relaxed">{item}</p>
-              </div>
+              <ScrollReveal key={i} delay={i * 80}>
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 mt-3" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: C.amberAccent }} />
+                  <p className="text-lg sm:text-xl leading-[1.7]" style={{ color: C.ink }}>{item}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* ============ SAFETY ============ */}
-      <section className="relative bg-gray-900 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
+      {/* The one dark section — kept as requested for contrast */}
+      <section className="relative overflow-hidden" style={{ backgroundColor: '#1C1917' }}>
+        <div className="absolute inset-0 opacity-[0.05]" style={{
           backgroundImage: 'radial-gradient(circle, #FBBF24 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }} />
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white text-center tracking-tight leading-tight" style={{ fontFamily: font.heading }}>
-            Built by a parent who asked every<br className="hidden sm:block" /> safety question you're thinking right now.
-          </h2>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
+          <ScrollReveal>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl text-center tracking-[-0.02em] leading-[1.05] text-white" style={{ fontWeight: 800 }}>
+              Built by a parent who asked every<br className="hidden sm:block" />{' '}
+              <span style={{ color: '#FBBF24' }}>safety question</span> you're thinking right now.
+            </h2>
+          </ScrollReveal>
 
-          <div className="mt-14 space-y-4">
+          <div className="mt-14 space-y-3">
             {[
-              {
-                text: 'You own the account and have total control over what they see and who they talk to.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="#FBBF24" strokeWidth="1.5"/>
-                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
-                    <circle cx="12" cy="16" r="1.5" fill="#FBBF24"/>
-                  </svg>
-                ),
-              },
-              {
-                text: 'You approve every product before it goes live.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              'You own the account and have total control over what they see and who they talk to.',
+              'You approve every product before it goes live.',
+              'Never any photos of children. We only allow product photos to be posted.',
+              'No messaging between users. All customer messages go to the parent portal.',
+              'First name only. No personal details like birthdays, last names, or addresses are ever collected.',
+              "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
+            ].map((text, i) => (
+              <ScrollReveal key={i} delay={i * 60}>
+                <div className="flex items-start gap-4 rounded-xl px-5 py-4" style={{ backgroundColor: '#FFFFFF0A', border: '1px solid #FFFFFF14' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="9" stroke="#FBBF24" strokeWidth="1.5"/>
                     <path d="M8 12l3 3 5-5" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                ),
-              },
-              {
-                text: 'Never any photos of children. We only allow product photos to be posted.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="#FBBF24" strokeWidth="1.5"/>
-                    <circle cx="12" cy="12" r="3" stroke="#FBBF24" strokeWidth="1.5"/>
-                    <path d="M4 20L20 4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                ),
-              },
-              {
-                text: 'No messaging between users. All customer messages go to the parent portal.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 6h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="#FBBF24" strokeWidth="1.5"/>
-                    <path d="M4 6l8 6 8-6" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14 13h4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                ),
-              },
-              {
-                text: 'First name only. No personal details like birthdays, last names, or addresses are ever collected.',
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="8" r="4" stroke="#FBBF24" strokeWidth="1.5"/>
-                    <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                ),
-              },
-              {
-                text: "No ads. No data sharing. We don't advertise to kids or share family data with anyone.",
-                icon: (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#FBBF24" strokeWidth="1.5" strokeLinejoin="round"/>
-                    <path d="M9 12l2 2 4-4" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ),
-              },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4 bg-white/[0.06] border border-white/[0.08] rounded-xl px-5 py-4">
-                <div className="shrink-0 mt-0.5">{item.icon}</div>
-                <p className="text-gray-300 text-[15px] leading-relaxed">{item.text}</p>
-              </div>
+                  <p className="text-[15px] leading-relaxed text-gray-200">{text}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
 
           <div className="text-center mt-10">
-            <Link href="/privacy" className="text-sm text-amber-400/60 hover:text-amber-400 transition-colors">
+            <Link href="/privacy" className="text-sm transition-colors hover:text-yellow-400" style={{ color: '#FBBF24CC' }}>
               Read our full privacy policy →
             </Link>
           </div>
@@ -381,36 +454,39 @@ export default function LandingPage() {
       </section>
 
       {/* ============ FINAL CTA ============ */}
-      <section className="relative bg-gray-900 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.06]" style={{
-          backgroundImage: 'radial-gradient(circle, #FBBF24 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }} />
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24 text-center">
-          <div className="flex justify-center"><Logo size="xl" /></div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-6 tracking-tight" style={{ fontFamily: font.heading }}>
-            Your kid already makes<br className="hidden sm:block" /> things worth selling.
-          </h2>
-          <div className="mt-8">
-            <Link href="/login?mode=signup" className="inline-block px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-400/20 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
-              Get Started — Free
-            </Link>
-          </div>
+      <section style={{ backgroundColor: C.creamWarm }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-28 text-center">
+          <ScrollReveal>
+            <div className="flex justify-center mb-8"><Logo size="xl" /></div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-[-0.02em] leading-[1.05]" style={{ fontWeight: 800, color: C.ink }}>
+              Your kid already makes<br className="hidden sm:block" />{' '}
+              <span style={{ color: C.amberAccent }}>things worth selling.</span>
+            </h2>
+            <div className="mt-10">
+              <Link
+                href="/login?mode=signup"
+                className="inline-block px-8 py-4 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                style={{ ...btnPrimary, boxShadow: `4px 4px 0 ${C.ink}`, fontSize: '17px' }}
+              >
+                Get Started — Free
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ============ FOOTER ============ */}
-      <footer className="bg-white border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer style={{ backgroundColor: C.cream, borderTop: `1px solid ${C.ink}14` }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Logo size="sm" />
-            <span className="text-sm text-gray-400" style={{ fontFamily: font.body }}>Lemonade Stand</span>
+            <span className="text-sm" style={{ fontFamily: font.brand, color: C.inkMuted }}>Lemonade Stand</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-gray-400">
-            <Link href="/schools" className="hover:text-gray-600 transition-colors">Schools</Link>
-            <Link href="/shop" className="hover:text-gray-600 transition-colors">Shop</Link>
-            <Link href="/learn" className="hover:text-gray-600 transition-colors">Learn</Link>
-            <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy</Link>
+          <div className="flex items-center gap-6 text-sm" style={{ color: C.inkFaint }}>
+            <Link href="/schools" className="transition-colors hover:opacity-70">Schools</Link>
+            <Link href="/shop" className="transition-colors hover:opacity-70">Shop</Link>
+            <Link href="/learn" className="transition-colors hover:opacity-70">Learn</Link>
+            <Link href="/privacy" className="transition-colors hover:opacity-70">Privacy</Link>
           </div>
         </div>
       </footer>
