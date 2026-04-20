@@ -1,21 +1,29 @@
 // @ts-nocheck
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Logo } from '../components';
 import { useApp } from '../../lib/context';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn, signUp, user, stores, loading: appLoading } = useApp();
-  const [isSignUp, setIsSignUp] = useState(false);
+
+  // Read ?mode=signup from URL so "Get Started" buttons land on signup form
+  const initialMode = searchParams?.get('mode') === 'signup';
+  const [isSignUp, setIsSignUp] = useState(initialMode);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
 
-  
+  // Keep form in sync if the URL param changes (e.g. client-side nav between login / get started)
+  useEffect(() => {
+    setIsSignUp(searchParams?.get('mode') === 'signup');
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,5 +103,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-amber-50" />}>
+      <LoginPageInner />
+    </Suspense>
   );
 }
