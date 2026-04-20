@@ -81,7 +81,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ============ HERO ============ */}
+      {/* ============ HERO (NEW IMAGE) ============ */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-amber-50/80 via-amber-50/30 to-white" />
         <div className="absolute inset-0 opacity-[0.025]" style={{
@@ -89,18 +89,18 @@ export default function LandingPage() {
           backgroundSize: '40px 40px',
         }} />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-8 pt-16 sm:pt-24 pb-14 sm:pb-20">
-          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-20">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Left: Copy */}
-            <div className="flex-1 text-center md:text-left">
-<FadeIn delay={100}>
+            <div className="flex-1 text-center md:text-left order-2 md:order-1">
+              <FadeIn delay={100}>
                 <h1 className="mt-0 leading-[1.15] tracking-tight text-gray-900" style={{ fontFamily: font.heading, fontWeight: 700 }}>
-                  <span className="text-3xl sm:text-4xl block">Your kid already makes things.</span>
-                  <span className="text-3xl sm:text-4xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl block">Your kid already makes things.</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl block mt-1">Now they'll learn to <span style={{ fontFamily: font.accent, color: '#D97706' }}>sell them</span>.</span>
                 </h1>
               </FadeIn>
               <FadeIn delay={200}>
-                <p className="text-base sm:text-lg text-gray-600 mt-4 max-w-lg" style={{ fontFamily: font.heading }}>
+                <p className="text-base sm:text-lg text-gray-600 mt-4 max-w-lg mx-auto md:mx-0" style={{ fontFamily: font.heading }}>
                   <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
                 </p>
               </FadeIn>
@@ -116,13 +116,15 @@ export default function LandingPage() {
               </FadeIn>
             </div>
 
-            {/* Right: Lemon Character */}
-            <FadeIn delay={200} className="shrink-0 hidden md:block">
-              <Logo size="xl" />
+            {/* Right: Hero illustration */}
+            <FadeIn delay={200} className="flex-1 order-1 md:order-2">
+              <img
+                src="/hero-mascot-phone.png"
+                alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
+                className="w-full max-w-md md:max-w-none mx-auto"
+              />
             </FadeIn>
           </div>
-
-
         </div>
       </section>
 
