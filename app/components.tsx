@@ -96,6 +96,36 @@ export const NavBar = ({ active }) => {
   const pendingOrders = (orders || []).filter(o => o.status === 'pending' || o.status === 'new').length;
   const parentBadgeCount = pendingProducts + pendingOrders;
 
+  // ============================================================
+  // LOGGED-OUT VIEW: Clean text nav matching the landing page
+  // Visitors need to see Log in / Get Started CTAs on every page
+  // ============================================================
+  if (!user) {
+    return (
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100/80">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <Logo size="sm" />
+            <span className="font-bold text-gray-900 text-lg" style={{ fontFamily: "'DynaPuff', cursive" }}>Lemonade Stand</span>
+          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/schools" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Schools</Link>
+            <Link href="/shop" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Shop</Link>
+            <Link href="/learn" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Learn</Link>
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">Log in</Link>
+              <Link href="/login?mode=signup" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md hover:shadow-amber-200">Get Started</Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  // ============================================================
+  // LOGGED-IN VIEW: Full app nav with emoji icons for scannability
+  // (unchanged — icons aid recognition across 6 tabs)
+  // ============================================================
   const tabs = store ? [
     { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪', badge: 0 },
     { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨', badge: 0 },
@@ -145,9 +175,7 @@ export const NavBar = ({ active }) => {
               </Link>
             ))}
           </nav>
-          {user && (
-            <button onClick={signOut} className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 ml-2">Log out</button>
-          )}
+          <button onClick={signOut} className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 ml-2">Log out</button>
           <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 relative">
             {menuOpen ? <span className="text-gray-600 text-2xl leading-none">&times;</span> : <><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /></>}
             {parentBadgeCount > 0 && !menuOpen && (
@@ -179,9 +207,7 @@ export const NavBar = ({ active }) => {
                 )}
               </Link>
             ))}
-            {user && (
-              <button onClick={() => { signOut(); setMenuOpen(false); }} className="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 rounded-lg">Log out</button>
-            )}
+            <button onClick={() => { signOut(); setMenuOpen(false); }} className="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 rounded-lg">Log out</button>
           </div>
         </div>
       )}
