@@ -171,8 +171,7 @@ export default function LandingPage() {
               <h1 className="tracking-[-0.025em] leading-[1.02]" style={{ fontWeight: 800, color: C.ink }}>
                 <span className="block text-[36px] sm:text-[48px] md:text-[60px]">Your kid already makes things.</span>
                 <span className="block text-[36px] sm:text-[48px] md:text-[60px] mt-1">
-                  <SquiggleUnderline>Now they'll</SquiggleUnderline>{' '}
-                  <span style={{ color: C.amberAccent }}>sell them.</span>
+                  Now they'll <span style={{ color: C.amberAccent }}>sell them.</span>
                 </span>
               </h1>
 
@@ -201,6 +200,7 @@ export default function LandingPage() {
                   src="/hero-mascot-phone.png"
                   alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
                   className="w-full max-w-md md:max-w-none mx-auto"
+                  style={{ mixBlendMode: 'multiply' }}
                 />
               </div>
             </div>
