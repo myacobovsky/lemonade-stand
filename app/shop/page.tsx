@@ -2,6 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { NavBar, Logo } from '../components';
 import { useApp } from '../../lib/context';
 import { supabase } from '../../lib/supabase';
@@ -66,13 +67,17 @@ export default function ShopPage() {
     return matchesSearch && matchesNeighborhood;
   });
 
+  // Distinguish "no stores exist anywhere" vs "filters returned no matches"
+  const noStoresAtAll = allStores.length === 0;
+  const filtersActive = searchQuery.trim() !== '' || selectedNeighborhood !== 'all';
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
       <NavBar active="marketplace" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
         <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">🛍️ Shop Kids' Stores</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">Shop Kids' Stores</h1>
           <p className="text-gray-500">Browse and buy from young entrepreneurs near you</p>
         </div>
 
@@ -104,8 +109,10 @@ export default function ShopPage() {
           ))}
         </div>
 
-        {/* Results count */}
-        <p className="text-sm text-gray-400 mb-4">{filteredStores.length} store{filteredStores.length !== 1 ? 's' : ''} found</p>
+        {/* Results count - only show when there are stores */}
+        {!noStoresAtAll && (
+          <p className="text-sm text-gray-400 mb-4">{filteredStores.length} store{filteredStores.length !== 1 ? 's' : ''} found</p>
+        )}
 
         {/* Store Cards */}
         <div className="grid sm:grid-cols-2 gap-4">
@@ -143,11 +150,28 @@ export default function ShopPage() {
           ))}
         </div>
 
-        {/* Empty state */}
-        {filteredStores.length === 0 && (
+        {/* === Empty State A: No stores exist yet anywhere === */}
+        {noStoresAtAll && (
+          <div className="text-center py-12 px-4">
+            <div className="flex justify-center mb-4"><Logo size="lg" /></div>
+            <h3 className="font-bold text-gray-800 text-xl mb-2">We're just getting started!</h3>
+            <p className="text-gray-500 mb-6 max-w-md mx-auto leading-relaxed">
+              The first wave of kid entrepreneurs is setting up their shops right now. Check back soon — or be one of them.
+            </p>
+            <Link
+              href="/login?mode=signup"
+              className="inline-block px-6 py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-full font-semibold transition-all hover:shadow-md hover:shadow-amber-200"
+            >
+              Start your own store →
+            </Link>
+          </div>
+        )}
+
+        {/* === Empty State B: Stores exist, but the user's filter returned nothing === */}
+        {!noStoresAtAll && filteredStores.length === 0 && (
           <div className="text-center py-12">
             <div className="text-5xl mb-3">🔍</div>
-            <h3 className="font-bold text-gray-800 mb-2">No stores found</h3>
+            <h3 className="font-bold text-gray-800 mb-2">No stores match that</h3>
             <p className="text-gray-500 mb-4">Try a different search or neighborhood</p>
             <button
               onClick={() => { setSearchQuery(''); setSelectedNeighborhood('all'); }}
