@@ -81,10 +81,10 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ============ HERO (NEW IMAGE) ============ */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/80 via-amber-50/30 to-white" />
-        <div className="absolute inset-0 opacity-[0.025]" style={{
+      {/* ============ HERO (FIXED BACKGROUND) ============ */}
+      {/* Cream solid background bleeds through the image's cream box — no more visible "inserted asset" rectangle */}
+      <section className="relative overflow-hidden bg-[#FEF3C7]">
+        <div className="absolute inset-0 opacity-[0.04]" style={{
           backgroundImage: 'radial-gradient(circle, #D97706 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }} />
@@ -100,7 +100,7 @@ export default function LandingPage() {
                 </h1>
               </FadeIn>
               <FadeIn delay={200}>
-                <p className="text-base sm:text-lg text-gray-600 mt-4 max-w-lg mx-auto md:mx-0" style={{ fontFamily: font.heading }}>
+                <p className="text-base sm:text-lg text-gray-700 mt-4 max-w-lg mx-auto md:mx-0" style={{ fontFamily: font.heading }}>
                   <span className="font-bold" style={{ fontFamily: font.accent, color: '#D97706' }}>Lemonade Stand</span> is where kids learn business by running one.
                 </p>
               </FadeIn>
@@ -109,7 +109,7 @@ export default function LandingPage() {
                   <Link href="/login?mode=signup" className="px-8 py-4 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-lg font-bold transition-all hover:shadow-xl hover:shadow-amber-200/50 active:scale-[0.97]" style={{ fontFamily: font.heading }}>
                     Get Started — Free
                   </Link>
-                  <Link href="/shop" className="px-6 py-4 text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors">
+                  <Link href="/shop" className="px-6 py-4 text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
                     Browse kid stores →
                   </Link>
                 </div>
@@ -124,6 +124,56 @@ export default function LandingPage() {
                 className="w-full max-w-md md:max-w-none mx-auto"
               />
             </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ NEW: 1-2-3 HOW IT WORKS ============ */}
+      {/* Directly below hero, white background, scannable at a glance */}
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
+          <div className="text-center mb-12">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-amber-600 font-semibold mb-3" style={{ fontFamily: font.heading }}>
+              How it works
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight" style={{ fontFamily: font.heading }}>
+              From zero to their first sale in three steps.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              {
+                num: '1',
+                title: 'Sign up together',
+                desc: 'Three minutes, one parent account. You stay in control.',
+              },
+              {
+                num: '2',
+                title: 'They build their store',
+                desc: 'Name it, design it, add products they already love making.',
+              },
+              {
+                num: '3',
+                title: 'You approve, they open',
+                desc: 'Nothing goes live without your OK. Then real customers show up.',
+              },
+            ].map((step, i) => (
+              <FadeIn key={i} delay={100 + i * 100}>
+                <div className="relative flex flex-col items-center text-center px-4">
+                  {/* Numbered circle */}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-400 text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md shadow-amber-200/60 mb-5" style={{ fontFamily: font.heading }}>
+                    {step.num}
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: font.heading }}>
+                    {step.title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-500 leading-relaxed max-w-xs">
+                    {step.desc}
+                  </p>
+                </div>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
@@ -224,21 +274,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ============ STANDALONE LINE ============ */}
-      <section className="relative bg-gray-900 overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'radial-gradient(circle, #FBBF24 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }} />
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-8 py-12 sm:py-16 text-center">
-          <p className="text-lg sm:text-xl text-white leading-[1.8] tracking-wide" style={{ fontFamily: font.heading, fontWeight: 500 }}>
-            Yes, the store lives on a screen, but the customers are real people. Learning how to talk to them is something many adults still struggle with today.
-          </p>
-        </div>
-      </section>
-
       {/* ============ WHAT STAYS WITH THEM ============ */}
-      <section className="bg-white">
+      <section className="bg-amber-50/60 border-y border-amber-100/50">
         <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
             Experience is the best teacher.
@@ -252,90 +289,11 @@ export default function LandingPage() {
               "The grit to stick with something that can't be finished in one sitting",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4 group">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-3 shrink-0 group-hover:scale-150 transition-transform" />
-                <p className="text-gray-600 text-lg leading-relaxed">{item}</p>
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-3 shrink-0 group-hover:scale-150 transition-transform" />
+                <p className="text-gray-700 text-lg leading-relaxed">{item}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ============ HOW IT WORKS FOR PARENTS ============ */}
-      <section className="bg-amber-50/60 border-y border-amber-100/50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-20 sm:py-24">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center tracking-tight" style={{ fontFamily: font.heading }}>
-            How it works for parents
-          </h2>
-          <p className="text-center text-gray-400 mt-2 text-sm">(spoiler: your part takes about 3 minutes)</p>
-
-          <div className="mt-14">
-            {[
-              {
-                title: 'Create an account together',
-                desc: 'Takes 3 minutes to get started.',
-                color: '#92400E',
-                bg: '#FEF3C7',
-                icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <circle cx="12" cy="12" r="5" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                    <circle cx="20" cy="12" r="5" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                    <path d="M6 26 C6 21 9 18 12 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M26 26 C26 21 23 18 20 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M12 18 C14 20 18 20 20 18" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                ),
-              },
-              {
-                title: 'They build their store',
-                desc: 'They use the kid-editor to design their store, add products, and make it their own.',
-                color: '#92400E',
-                bg: '#FEF3C7',
-                icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect x="4" y="8" width="24" height="18" rx="2" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                    <rect x="8" y="12" width="7" height="5" rx="1" fill="#92400E" opacity="0.8"/>
-                    <rect x="17" y="12" width="7" height="5" rx="1" fill="#92400E" opacity="0.4"/>
-                    <rect x="8" y="19" width="16" height="2" rx="1" fill="#92400E" opacity="0.2"/>
-                    <circle cx="26" cy="8" r="4" fill="#92400E"/>
-                    <path d="M24.5 8 L25.5 9 L27.5 7" stroke="#FEF3C7" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ),
-              },
-              {
-                title: 'You approve what goes live',
-                desc: 'Approval lives on the parent portal. Nothing goes public without your say.',
-                color: '#92400E',
-                bg: '#FEF3C7',
-                icon: (
-                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect x="6" y="4" width="20" height="24" rx="2" fill="#FCD34D" stroke="#92400E" strokeWidth="1.5"/>
-                    <path d="M11 12 L14 15 L21 8" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <rect x="11" y="18" width="10" height="1.5" rx="0.75" fill="#92400E" opacity="0.3"/>
-                    <rect x="11" y="21" width="7" height="1.5" rx="0.75" fill="#92400E" opacity="0.3"/>
-                  </svg>
-                ),
-              },
-            ].map((step, i, arr) => (
-              <div key={i}>
-                <div className="flex items-start gap-5">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ background: step.bg }}>
-                    {step.icon}
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <h3 className="font-bold text-lg" style={{ fontFamily: font.accent, color: step.color }}>{step.title}</h3>
-                    <p className="text-gray-500 mt-1 leading-relaxed text-[15px]">{step.desc}</p>
-                  </div>
-                </div>
-                {i < arr.length - 1 && (
-                  <div className="ml-8 h-8 border-l-2 border-dashed" style={{ borderColor: '#E5DDD0' }} />
-                )}
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center mt-12 text-gray-500 text-sm">
-            Total parent time: about 10 minutes. Total kid pride: <span className="text-amber-600 font-bold">immeasurable</span>.
-          </p>
         </div>
       </section>
 
@@ -449,13 +407,13 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Logo size="sm" />
-            <span className="text-sm text-gray-300" style={{ fontFamily: font.body }}>Lemonade Stand</span>
+            <span className="text-sm text-gray-400" style={{ fontFamily: font.body }}>Lemonade Stand</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-gray-300">
-            <Link href="/schools" className="hover:text-gray-500 transition-colors">Schools</Link>
-            <Link href="/shop" className="hover:text-gray-500 transition-colors">Shop</Link>
-            <Link href="/learn" className="hover:text-gray-500 transition-colors">Learn</Link>
-            <Link href="/privacy" className="hover:text-gray-500 transition-colors">Privacy</Link>
+          <div className="flex items-center gap-6 text-sm text-gray-400">
+            <Link href="/schools" className="hover:text-gray-600 transition-colors">Schools</Link>
+            <Link href="/shop" className="hover:text-gray-600 transition-colors">Shop</Link>
+            <Link href="/learn" className="hover:text-gray-600 transition-colors">Learn</Link>
+            <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy</Link>
           </div>
         </div>
       </footer>
