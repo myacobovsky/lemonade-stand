@@ -162,8 +162,8 @@ export default function LandingPage() {
 
       {/* ============ HERO ============ */}
       {/* Sticky mascot: grid where the right column sticks within the hero section height */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: C.cream }}>
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-24">
+      <section className="relative" style={{ backgroundColor: C.cream }}>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-24 md:min-h-[110vh]">
           <div className="flex flex-col md:grid md:grid-cols-2 items-center gap-8 md:gap-12">
 
             {/* Copy */}
