@@ -77,13 +77,13 @@ const themeFor = (color) => {
   switch (color) {
     case 'amber':
       return {
-        headBg: '#FEF3C7',
-        headBorder: '#F59E0B33',
+        headBg: '#FDE68A',
+        headBorder: '#F59E0B44',
         numBg: '#FCD34D',
         chipText: '#92400E',
-        chipBg: '#FDE68A',
-        chipBorder: '#F59E0B22',
-        line: '#F59E0B55',
+        chipBg: '#FEF3C7',
+        chipBorder: '#F59E0B33',
+        line: '#F59E0B66',
         dot: '#F59E0B',
       };
     case 'blue':
