@@ -155,15 +155,28 @@ function ProductRail() {
         </h2>
       </div>
 
-      {/* Track wrapper: edge fade via CSS mask, no overflow scrollbar */}
-      <div
-        className="w-full"
-        style={{
-          maskImage: 'linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%)',
-        }}
-      >
-        <div className="ls-marquee-track inline-flex gap-4 sm:gap-5 pl-4">
+      {/* Track wrapper: edge fade via overlay divs (mask-image breaks animation on iOS Safari) */}
+      <div className="relative w-full overflow-hidden">
+        {/* Left fade overlay */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-10"
+          style={{
+            width: '8%',
+            background: 'linear-gradient(to right, #FEF0B8 0%, rgba(254, 240, 184, 0) 100%)',
+          }}
+          aria-hidden="true"
+        />
+        {/* Right fade overlay */}
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-10"
+          style={{
+            width: '8%',
+            background: 'linear-gradient(to left, #FEF0B8 0%, rgba(254, 240, 184, 0) 100%)',
+          }}
+          aria-hidden="true"
+        />
+
+        <div className="ls-marquee-track inline-flex gap-4 sm:gap-5 pl-4" style={{ willChange: 'transform' }}>
           {loop.map((p, i) => (
             <div
               key={i}
