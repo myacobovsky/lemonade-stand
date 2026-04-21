@@ -107,6 +107,115 @@ const font = {
   brand: "'DynaPuff', cursive", // ONLY for literal string "Lemonade Stand"
 };
 
+// ====================== PRODUCT RAIL ======================
+// Horizontal auto-scrolling marquee of product categories.
+// Pauses on hover. Uses CSS animation for performance.
+// Swap in real kid stores later by editing the PRODUCTS array.
+
+const PRODUCTS = [
+  { img: '/product-bracelets.png',    cat: 'Jewelry',     title: 'Bracelets',        desc: 'Beaded, friendship, custom orders.', price: 'From $3' },
+  { img: '/product-baked-goods.png',  cat: 'Treats',      title: 'Baked goods',      desc: 'Cookies, brownies, banana bread.',   price: 'From $5' },
+  { img: '/product-stickers.png',     cat: 'Art',         title: 'Stickers',         desc: 'Hand-drawn, printed packs of 5.',    price: 'From $2' },
+  { img: '/product-cards.png',        cat: 'Paper',       title: 'Greeting cards',   desc: 'Handmade for any occasion.',         price: 'From $4' },
+  { img: '/product-lemonade.png',     cat: 'Drinks',      title: 'Lemonade',         desc: 'Classic + seasonal flavors.',        price: 'From $2' },
+  { img: '/product-slime.png',        cat: 'Toys',        title: 'Slime',            desc: 'Custom colors, charms, scents.',     price: 'From $4' },
+  { img: '/product-herbs.png',        cat: 'Garden',      title: 'Fresh herbs',      desc: 'Basil, mint, rosemary bundles.',     price: 'From $5' },
+  { img: '/product-bedazzled.png',    cat: 'Fashion',     title: 'Bedazzled items',  desc: 'Hats, bags, jackets with sparkle.',  price: 'From $6' },
+];
+
+function ProductRail() {
+  // Duplicate the product list so the marquee can loop seamlessly.
+  const loop = [...PRODUCTS, ...PRODUCTS];
+
+  return (
+    <section style={{ backgroundColor: '#FEF0B8' }} className="py-14 sm:py-20 overflow-hidden">
+      {/* Inline keyframe styles — one-off, kept here for portability */}
+      <style>{`
+        @keyframes ls-marquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .ls-marquee-track {
+          animation: ls-marquee 60s linear infinite;
+        }
+        .ls-marquee-track:hover {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ls-marquee-track { animation: none; }
+        }
+      `}</style>
+
+      <div className="text-center mb-8 sm:mb-12 px-4">
+        <p className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3" style={{ color: '#D97706' }}>
+          Real kids, real businesses
+        </p>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl tracking-[-0.02em] leading-[1.05] max-w-3xl mx-auto" style={{ fontWeight: 800, color: '#1C1917' }}>
+          Built for what <span style={{ color: '#D97706' }}>kids actually make.</span>
+        </h2>
+      </div>
+
+      {/* Track wrapper: edge fade via CSS mask, no overflow scrollbar */}
+      <div
+        className="w-full"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%)',
+        }}
+      >
+        <div className="ls-marquee-track inline-flex gap-4 sm:gap-5 pl-4">
+          {loop.map((p, i) => (
+            <div
+              key={i}
+              className="shrink-0"
+              style={{
+                width: '240px',
+                backgroundColor: '#FFFBEB',
+                border: '1px solid #1C19171F',
+                borderRadius: '20px',
+                boxShadow: '2px 2px 0 #1C191712',
+                padding: '14px',
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  aspectRatio: '1 / 1',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  marginBottom: '14px',
+                  backgroundColor: '#FEF3C7',
+                }}
+              >
+                <img
+                  src={p.img}
+                  alt={p.title}
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </div>
+              <div className="px-1">
+                <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700, color: '#78716C', marginBottom: '4px' }}>
+                  {p.cat}
+                </div>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#1C1917', margin: '0 0 6px', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                  {p.title}
+                </h3>
+                <p style={{ fontSize: '13px', color: '#57534E', lineHeight: 1.45, margin: '0 0 10px' }}>
+                  {p.desc}
+                </p>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#D97706' }}>
+                  {p.price}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   const router = useRouter();
   const { user, store } = useApp();
@@ -163,7 +272,7 @@ export default function LandingPage() {
       {/* ============ HERO ============ */}
       {/* Sticky mascot: grid where the right column sticks within the hero section height */}
       <section className="relative" style={{ backgroundColor: C.cream }}>
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-24 md:min-h-[110vh]">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-14 sm:pb-24">
           <div className="flex flex-col md:grid md:grid-cols-2 items-center gap-8 md:gap-12">
 
             {/* Copy */}
@@ -193,24 +302,25 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Sticky mascot column */}
+            {/* Mascot column */}
             <div className="order-1 md:order-2 w-full">
-              <div className="md:sticky md:top-24">
-                <img
-                  src="/hero-mascot-phone.png"
-                  alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
-                  className="w-full max-w-md md:max-w-none mx-auto"
-                  style={{ mixBlendMode: 'multiply' }}
-                />
-              </div>
+              <img
+                src="/hero-mascot-phone.png"
+                alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
+                className="w-full max-w-md md:max-w-none mx-auto"
+                style={{ mixBlendMode: 'multiply' }}
+              />
             </div>
           </div>
         </div>
       </section>
 
+      {/* ============ PRODUCT MARQUEE RAIL ============ */}
+      <ProductRail />
+
       {/* ============ 1-2-3 HOW IT WORKS ============ */}
-      {/* Slightly warmer cream for gentle section variation */}
-      <section style={{ backgroundColor: C.creamWarm }}>
+      {/* Cooler cream — rail above uses warmer, so the contrast separates them */}
+      <section style={{ backgroundColor: C.creamCool }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-20 sm:py-28">
 
           <ScrollReveal>
