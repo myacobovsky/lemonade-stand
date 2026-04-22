@@ -128,29 +128,6 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        {/* ============ PLACEHOLDER NOTICE ============ */}
-        <div
-          className="mb-10"
-          style={{
-            backgroundColor: C.creamWarm,
-            border: `1px solid ${C.ink}22`,
-            borderRadius: '14px',
-            padding: '16px 20px',
-            fontSize: '14px',
-            color: C.ink,
-            lineHeight: 1.55,
-          }}
-        >
-          <strong style={{ fontWeight: 700 }}>A note on this page:</strong> This is a plain-language summary of our practices. A full legal privacy policy is being prepared with legal counsel and will be published here when complete. Questions in the meantime:{' '}
-          <a
-            href="mailto:privacy@getlemonadestand.com"
-            style={{ color: C.amberAccent, fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: '2px' }}
-          >
-            privacy@getlemonadestand.com
-          </a>
-          .
-        </div>
-
         {/* ============ WHAT WE COLLECT ============ */}
         <Section title="What we" titleAccent="collect.">
           <LabeledRow
@@ -343,6 +320,24 @@ export default function PrivacyPage() {
             </a>
           </div>
         </section>
+
+        {/* ============ LEGAL NOTICE (footnote) ============ */}
+        {/* Understated, small text so it reads as a footnote rather than a prominent caveat. */}
+        <div
+          className="text-center mb-8 px-4"
+          style={{
+            fontSize: '12px',
+            color: C.inkFaint,
+            lineHeight: 1.6,
+            maxWidth: '520px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          <em>
+            This is a plain-language summary of our practices. A full legal privacy policy is being prepared with legal counsel and will be published here when complete.
+          </em>
+        </div>
 
         {/* ============ GO BACK ============ */}
         <div className="text-center">
