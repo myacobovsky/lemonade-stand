@@ -176,7 +176,7 @@ function ProductRail() {
           aria-hidden="true"
         />
 
-        <div className="ls-marquee-track inline-flex gap-4 sm:gap-5 pl-4" style={{ willChange: 'transform' }}>
+        <div className="ls-marquee-track flex w-max gap-4 sm:gap-5 pl-4" style={{ willChange: 'transform' }}>
           {loop.map((p, i) => (
             <div
               key={i}
