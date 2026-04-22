@@ -200,7 +200,7 @@ export default function PrivacyPage() {
             }}
           >
             {[
-              "Your child's age, birthday, last name, or school",
+              "Your child's age, birthday, or last name",
               'Location data or GPS coordinates',
               'Photos of children (strictly prohibited)',
               'Cookies for advertising or tracking',
