@@ -372,10 +372,9 @@ export default function LandingPage() {
             {/* Mascot column */}
             <div className="order-1 md:order-2 w-full">
               <img
-                src="/hero-mascot-phone.png"
+                src="/hero-mascot-phone.webp"
                 alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
                 className="w-full max-w-md md:max-w-none mx-auto"
-                style={{ mixBlendMode: 'multiply' }}
                 width={600}
                 height={600}
                 fetchPriority="high"
