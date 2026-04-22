@@ -113,14 +113,14 @@ const font = {
 // Swap in real kid stores later by editing the PRODUCTS array.
 
 const PRODUCTS = [
-  { img: '/product-bracelets.png',    cat: 'Jewelry',     title: 'Bracelets',        desc: 'Beaded, friendship, custom orders.', price: 'From $3' },
-  { img: '/product-baked-goods.png',  cat: 'Treats',      title: 'Baked goods',      desc: 'Cookies, brownies, banana bread.',   price: 'From $5' },
-  { img: '/product-stickers.png',     cat: 'Art',         title: 'Stickers',         desc: 'Hand-drawn, printed packs of 5.',    price: 'From $2' },
-  { img: '/product-cards.png',        cat: 'Paper',       title: 'Greeting cards',   desc: 'Handmade for any occasion.',         price: 'From $4' },
-  { img: '/product-lemonade.png',     cat: 'Drinks',      title: 'Lemonade',         desc: 'Classic + seasonal flavors.',        price: 'From $2' },
-  { img: '/product-slime.png',        cat: 'Toys',        title: 'Slime',            desc: 'Custom colors, charms, scents.',     price: 'From $4' },
-  { img: '/product-herbs.png',        cat: 'Garden',      title: 'Fresh herbs',      desc: 'Basil, mint, rosemary bundles.',     price: 'From $5' },
-  { img: '/product-bedazzled.png',    cat: 'Fashion',     title: 'Bedazzled items',  desc: 'Hats, bags, jackets with sparkle.',  price: 'From $6' },
+  { img: '/product-bracelets.webp',    cat: 'Jewelry',     title: 'Bracelets',        desc: 'Beaded, friendship, custom orders.', price: 'From $3' },
+  { img: '/product-baked-goods.webp',  cat: 'Treats',      title: 'Baked goods',      desc: 'Cookies, brownies, banana bread.',   price: 'From $5' },
+  { img: '/product-stickers.webp',     cat: 'Art',         title: 'Stickers',         desc: 'Hand-drawn, printed packs of 5.',    price: 'From $2' },
+  { img: '/product-cards.webp',        cat: 'Paper',       title: 'Greeting cards',   desc: 'Handmade for any occasion.',         price: 'From $4' },
+  { img: '/product-lemonade.webp',     cat: 'Drinks',      title: 'Lemonade',         desc: 'Classic + seasonal flavors.',        price: 'From $2' },
+  { img: '/product-slime.webp',        cat: 'Toys',        title: 'Slime',            desc: 'Custom colors, charms, scents.',     price: 'From $4' },
+  { img: '/product-herbs.webp',        cat: 'Garden',      title: 'Fresh herbs',      desc: 'Basil, mint, rosemary bundles.',     price: 'From $5' },
+  { img: '/product-bedazzled.webp',    cat: 'Fashion',     title: 'Bedazzled items',  desc: 'Hats, bags, jackets with sparkle.',  price: 'From $6' },
 ];
 
 function ProductRail() {
@@ -204,6 +204,8 @@ function ProductRail() {
                   src={p.img}
                   alt={p.title}
                   loading="lazy"
+                  width={800}
+                  height={800}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
               </div>
@@ -322,6 +324,10 @@ export default function LandingPage() {
                 alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
                 className="w-full max-w-md md:max-w-none mx-auto"
                 style={{ mixBlendMode: 'multiply' }}
+                width={600}
+                height={600}
+                fetchPriority="high"
+                decoding="async"
               />
             </div>
           </div>
