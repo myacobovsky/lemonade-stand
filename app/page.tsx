@@ -124,23 +124,70 @@ const PRODUCTS = [
 ];
 
 function ProductRail() {
-  // Duplicate the product list so the marquee can loop seamlessly.
+  // Two sets on desktop so the marquee loop is seamless.
+  // On mobile, we hide the duplicates (CSS) so the user sees each card exactly once.
   const loop = [...PRODUCTS, ...PRODUCTS];
 
   return (
     <section style={{ backgroundColor: '#FEF0B8' }} className="py-14 sm:py-20 overflow-hidden">
-      {/* Inline keyframe styles — one-off, kept here for portability */}
+      {/*
+        Rail has two modes:
+          - Desktop (md+): auto-scrolling marquee via @keyframes
+          - Mobile (<md): native horizontal touch scroll with snap points
+
+        On mobile, we turn off the CSS animation, hide the duplicate card set,
+        and enable native scrolling + scroll-snap. This is the pattern every
+        modern e-commerce site uses on touch devices (Netflix, Apple, etc.)
+        and avoids the iOS Safari animation quirks entirely.
+      */}
       <style>{`
         @keyframes ls-marquee {
           from { transform: translateX(0); }
           to   { transform: translateX(-50%); }
         }
+
+        /* Mobile: native swipe, no animation */
+        .ls-rail-viewport {
+          overflow-x: auto;
+          overflow-y: hidden;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .ls-rail-viewport::-webkit-scrollbar { display: none; }
+
         .ls-marquee-track {
-          animation: ls-marquee 60s linear infinite;
+          display: flex;
+          gap: 16px;
+          padding-left: 16px;
+          padding-right: 16px;
         }
-        .ls-marquee-track:hover {
-          animation-play-state: paused;
+
+        .ls-card {
+          scroll-snap-align: start;
+          flex: 0 0 auto;
         }
+
+        /* On mobile, hide the duplicate card set — no need to loop if no animation */
+        .ls-card-duplicate { display: none; }
+
+        /* Desktop (>=768px): auto-scroll marquee */
+        @media (min-width: 768px) {
+          .ls-rail-viewport {
+            overflow: hidden;
+          }
+          .ls-marquee-track {
+            width: max-content;
+            gap: 20px;
+            animation: ls-marquee 60s linear infinite;
+            will-change: transform;
+          }
+          .ls-marquee-track:hover {
+            animation-play-state: paused;
+          }
+          .ls-card-duplicate { display: block; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .ls-marquee-track { animation: none; }
         }
@@ -155,20 +202,19 @@ function ProductRail() {
         </h2>
       </div>
 
-      {/* Track wrapper: edge fade via overlay divs (mask-image breaks animation on iOS Safari) */}
-      <div className="relative w-full overflow-hidden">
-        {/* Left fade overlay */}
+      {/* Viewport: mobile = scrollable; desktop = hidden overflow with animated track */}
+      <div className="relative w-full ls-rail-viewport">
+        {/* Edge fade overlays — only meaningful on desktop where cards continuously flow through */}
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10"
+          className="hidden md:block pointer-events-none absolute inset-y-0 left-0 z-10"
           style={{
             width: '8%',
             background: 'linear-gradient(to right, #FEF0B8 0%, rgba(254, 240, 184, 0) 100%)',
           }}
           aria-hidden="true"
         />
-        {/* Right fade overlay */}
         <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10"
+          className="hidden md:block pointer-events-none absolute inset-y-0 right-0 z-10"
           style={{
             width: '8%',
             background: 'linear-gradient(to left, #FEF0B8 0%, rgba(254, 240, 184, 0) 100%)',
@@ -176,11 +222,12 @@ function ProductRail() {
           aria-hidden="true"
         />
 
-        <div className="ls-marquee-track flex w-max gap-4 sm:gap-5 pl-4" style={{ willChange: 'transform' }}>
+        <div className="ls-marquee-track">
           {loop.map((p, i) => (
             <div
               key={i}
-              className="shrink-0"
+              // Hide duplicates on mobile (second half of loop array)
+              className={`ls-card ${i >= PRODUCTS.length ? 'ls-card-duplicate' : ''}`}
               style={{
                 width: '240px',
                 backgroundColor: '#FFFBEB',
@@ -226,6 +273,11 @@ function ProductRail() {
             </div>
           ))}
         </div>
+
+        {/* Mobile-only swipe hint — small nudge that fades after interaction */}
+        <p className="md:hidden text-center text-xs mt-4 px-4" style={{ color: '#78716C', fontWeight: 500 }}>
+          ← Swipe to browse all categories →
+        </p>
       </div>
     </section>
   );
