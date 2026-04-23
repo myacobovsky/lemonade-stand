@@ -220,6 +220,11 @@ export default function SchoolsLandingPage() {
           SECTION 2 — WHAT THIS ACTUALLY IS
           Serves cold arrivers (parents, admins) who land here
           without context and need to understand the program.
+
+          On desktop: 2-column layout with text left, mascot right.
+          On mobile: stacks with text first, mascot below (so the
+          explanation still reads top-down without the mascot stealing
+          the headline's thunder).
           ========================================================= */}
       <section
         style={{
@@ -228,30 +233,56 @@ export default function SchoolsLandingPage() {
         }}
         className="px-4 sm:px-8 py-16 sm:py-20"
       >
-        <div className="max-w-2xl mx-auto text-center">
-          <p
-            className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3"
-            style={{ color: C.amberAccent }}
-          >
-            What is this?
-          </p>
-          <h2
-            className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
-            style={{ fontWeight: 800, color: C.ink }}
-          >
-            Entrepreneurship education,{' '}
-            <span style={{ color: C.amberAccent }}>in real practice.</span>
-          </h2>
-          <p
-            className="mt-5 leading-relaxed max-w-xl mx-auto"
-            style={{ fontSize: '16px', color: C.inkMuted, lineHeight: 1.65 }}
-          >
-            Lemonade Stand for Schools lets kids run real businesses as part
-            of their school's entrepreneurship programming. Each participating
-            school gets a private marketplace where students list products,
-            handle orders, and learn business fundamentals by actually doing
-            the work.
-          </p>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+
+            {/* Text column */}
+            <div className="flex-1 text-center md:text-left">
+              <p
+                className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3"
+                style={{ color: C.amberAccent }}
+              >
+                What is this?
+              </p>
+              <h2
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                Entrepreneurship education,{' '}
+                <span style={{ color: C.amberAccent }}>in real practice.</span>
+              </h2>
+              <p
+                className="mt-5 leading-relaxed"
+                style={{ fontSize: '16px', color: C.inkMuted, lineHeight: 1.65 }}
+              >
+                Lemonade Stand for Schools lets kids run real businesses as
+                part of their school's entrepreneurship programming. Each
+                participating school gets a private marketplace where
+                students list products, handle orders, and learn business
+                fundamentals by actually doing the work.
+              </p>
+            </div>
+
+            {/*
+              Mascot column. Reuses the hero mascot file that's already
+              optimized and cached for homepage visitors — zero additional
+              network cost for most users.
+              Explicit width/height matches the file (800×533) to prevent
+              layout shift. lazy loading since this is below the fold.
+            */}
+            <div className="w-full md:w-5/12 flex justify-center">
+              <img
+                src="/hero-mascot-phone.webp"
+                alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
+                className="w-full max-w-[280px] md:max-w-none h-auto"
+                width={800}
+                height={533}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+
+          </div>
         </div>
       </section>
 
