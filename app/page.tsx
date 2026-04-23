@@ -388,8 +388,8 @@ export default function LandingPage() {
                 src="/hero-mascot-phone.webp"
                 alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
                 className="w-full max-w-md md:max-w-none mx-auto"
-                width={1000}
-                height={667}
+                width={800}
+                height={533}
                 fetchPriority="high"
                 decoding="async"
               />
