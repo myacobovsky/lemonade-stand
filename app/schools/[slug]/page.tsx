@@ -7,22 +7,58 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { NavBar } from '../../components';
 
-function Logo({ size = 'md' }) {
-  const sizes = { sm: 'w-7 h-7', md: 'w-10 h-10', lg: 'w-14 h-14' };
+// ====================== DESIGN TOKENS ======================
+const C = {
+  cream: '#FEF3C7',
+  creamWarm: '#FEF0B8',
+  creamCool: '#FDF8E1',
+  cardBg: '#FFFBEB',
+  ink: '#1C1917',
+  inkMuted: '#57534E',
+  inkFaint: '#78716C',
+  inkGhost: '#A8A29E',
+  border: '#1C19171F',
+  borderFaint: '#1C191714',
+  amberAccent: '#D97706',
+  amberBtn: '#FCD34D',
+};
+const font = {
+  sans: "'Poppins', sans-serif",
+};
+
+// ====================== DEFAULT LOGO SVG ======================
+// Used when a store has no banner image — colored tile based on store theme.
+function DefaultStoreTile({ themeColor = 'amber' }) {
+  const tileColor = {
+    amber: '#FEF3C7',
+    blue: '#DBEAFE',
+    green: '#D1FAE5',
+    pink: '#FCE7F3',
+    purple: '#EDE9FE',
+    orange: '#FFEDD5',
+  }[themeColor] || '#FEF3C7';
+
   return (
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={sizes[size]}>
-      <circle cx="16" cy="16" r="15" fill="#FEF3C7"/>
-      <ellipse cx="16" cy="17" rx="11" ry="9" fill="#FCD34D" stroke="#292524" strokeWidth="2"/>
-      <circle cx="12" cy="16" r="2" fill="#292524"/>
-      <circle cx="20" cy="16" r="2" fill="#292524"/>
-      <circle cx="11" cy="15" r="0.75" fill="white"/>
-      <circle cx="19" cy="15" r="0.75" fill="white"/>
-      <path d="M12 20 Q16 24 20 20" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round"/>
-      <path d="M16 8 Q20 4 22 8 Q20 10 16 8" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round"/>
-      <circle cx="9" cy="19" r="1.5" fill="#FBBF24"/>
-      <circle cx="23" cy="19" r="1.5" fill="#FBBF24"/>
-    </svg>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: tileColor,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '40%', height: '40%' }}>
+        <ellipse cx="16" cy="17" rx="11" ry="9" fill="#FCD34D" stroke="#292524" strokeWidth="2" />
+        <circle cx="12" cy="16" r="2" fill="#292524" />
+        <circle cx="20" cy="16" r="2" fill="#292524" />
+        <path d="M12 20 Q16 24 20 20" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round" />
+        <path d="M16 8 Q20 4 22 8 Q20 10 16 8" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round" />
+      </svg>
+    </div>
   );
 }
 
@@ -35,14 +71,18 @@ export default function SchoolPage() {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!slug) return;
     loadSchool();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
+  // ====================== LOAD + AUTH CHECK ======================
+  // 1. Look up the school by slug
+  // 2. Check localStorage for stored password
+  // 3. If missing or wrong: redirect to /schools so user goes through unified gate
+  // 4. If correct: load stores for this school and render
   async function loadSchool() {
     const { data: schoolData, error: schoolError } = await supabase
       .from('schools')
@@ -52,20 +92,31 @@ export default function SchoolPage() {
       .single();
 
     if (schoolError || !schoolData) {
+      // School genuinely doesn't exist — show a real not-found state below.
       setLoading(false);
       return;
     }
 
     setSchool(schoolData);
 
-    const storedKey = `school_access_${schoolData.id}`;
-    const storedPassword = typeof window !== 'undefined' ? localStorage.getItem(storedKey) : null;
-
-    if (storedPassword === schoolData.password) {
-      setAuthenticated(true);
-      await loadStores(schoolData.id);
+    // Check access via localStorage. If missing/invalid, bounce to /schools
+    // so the user goes through the unified (code + password) form. This keeps
+    // the "one gate" UX — the [slug] page never shows its own password form.
+    let hasAccess = false;
+    try {
+      const storedPassword = localStorage.getItem(`school_access_${schoolData.id}`);
+      hasAccess = storedPassword === schoolData.password;
+    } catch {
+      hasAccess = false;
     }
 
+    if (!hasAccess) {
+      router.replace('/schools');
+      return;
+    }
+
+    setAuthenticated(true);
+    await loadStores(schoolData.id);
     setLoading(false);
   }
 
@@ -91,208 +142,258 @@ export default function SchoolPage() {
     }
   }
 
-  async function handlePasswordSubmit(e) {
-    e.preventDefault();
-    if (!school) return;
-
-    if (password === school.password) {
-      const storedKey = `school_access_${school.id}`;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storedKey, password);
-      }
-      setAuthenticated(true);
-      setError('');
-      await loadStores(school.id);
-    } else {
-      setError('That password is not correct. Check with your club leader.');
-    }
-  }
-
-  // Loading
+  // ====================== LOADING STATE ======================
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <Logo size="lg" />
-          <p className="mt-4 text-gray-400 text-sm">Loading...</p>
-        </div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans }}
+      >
+        <p style={{ color: C.inkFaint, fontSize: '14px' }}>Loading…</p>
       </div>
     );
   }
 
-  // School not found
+  // ====================== SCHOOL NOT FOUND ======================
   if (!school) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <Logo size="lg" />
-          <h1 className="text-2xl font-bold text-gray-800 mt-6">School not found</h1>
-          <p className="text-gray-500 mt-2 text-sm">
-            We could not find a school club at this address. Double check the link you were given.
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+      >
+        <NavBar active="" />
+        <main className="max-w-md mx-auto px-4 sm:px-8 pt-20 pb-16 text-center">
+          <p
+            className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
+            style={{ color: C.amberAccent }}
+          >
+            404
           </p>
-          <Link href="/" className="inline-block mt-6 px-6 py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-full font-semibold transition-colors text-sm">
-            Go to Lemonade Stand
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Password gate
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
-        {/* Lemon accent bar */}
-        <div className="fixed top-0 left-0 right-0 h-1 bg-amber-400 z-50" />
-
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <Logo size="lg" />
-            <h1 className="text-2xl font-bold text-gray-800 mt-4">{school.name}</h1>
-            <div className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
-              Business Club
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="bg-amber-50 rounded-xl p-4 mb-5">
-              <p className="text-sm text-gray-600 text-center">
-                This is a private marketplace for {school.name} families.
-                Enter the password shared by your club leader.
-              </p>
-            </div>
-
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Club password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                  placeholder="Enter password"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-400 focus:outline-none text-lg text-center"
-                  autoFocus
-                />
-                {error && (
-                  <p className="text-red-500 text-xs mt-2 text-center">{error}</p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-white rounded-full font-semibold transition-colors"
-              >
-                Enter Marketplace
-              </button>
-            </form>
-          </div>
-
-          <p className="mt-6 text-center text-xs text-gray-300">
-            Powered by <Link href="/" className="text-amber-400 hover:text-amber-500">Lemonade Stand</Link>
+          <h1
+            className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02]"
+            style={{ fontWeight: 800, color: C.ink }}
+          >
+            School <span style={{ color: C.amberAccent }}>not found.</span>
+          </h1>
+          <p
+            className="mt-4 text-base leading-relaxed"
+            style={{ color: C.inkMuted }}
+          >
+            We couldn't find a school club at this address. Double-check the link you were given.
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Authenticated — marketplace
-  const getStoreAccent = (theme) => {
-    const colors = {
-      blue: { bg: 'bg-blue-50', icon: 'bg-blue-100 text-blue-600', badge: 'text-blue-600' },
-      green: { bg: 'bg-emerald-50', icon: 'bg-emerald-100 text-emerald-600', badge: 'text-emerald-600' },
-      pink: { bg: 'bg-pink-50', icon: 'bg-pink-100 text-pink-600', badge: 'text-pink-600' },
-      purple: { bg: 'bg-purple-50', icon: 'bg-purple-100 text-purple-600', badge: 'text-purple-600' },
-      orange: { bg: 'bg-orange-50', icon: 'bg-orange-100 text-orange-600', badge: 'text-orange-600' },
-    };
-    return colors[theme?.color] || { bg: 'bg-amber-50', icon: 'bg-amber-100 text-amber-600', badge: 'text-amber-600' };
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      {/* Lemon accent bar */}
-      <div className="h-1 bg-amber-400" />
-
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Logo size="sm" />
-            <div>
-              <h1 className="font-bold text-gray-800 text-sm leading-tight">{school.name}</h1>
-              <p className="text-xs text-gray-400">Business Club Marketplace</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
-              Private
-            </div>
-            <Link href="/" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600">
-              <Logo size="sm" />
+          <div className="mt-8">
+            <Link
+              href="/schools"
+              className="inline-block px-6 py-3 transition-all hover:-translate-y-0.5"
+              style={{
+                backgroundColor: C.amberBtn,
+                color: C.ink,
+                border: `1.5px solid ${C.ink}`,
+                boxShadow: `3px 3px 0 ${C.ink}`,
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '14px',
+                textDecoration: 'none',
+              }}
+            >
+              ← Back to schools
             </Link>
           </div>
-        </div>
-      </header>
+        </main>
+      </div>
+    );
+  }
 
-      {/* Hero */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
-            {school.name} Marketplace
-          </h2>
-          <p className="text-gray-500 mt-1 text-sm">
-            Browse and buy from our Business Club members
+  // ====================== AUTHENTICATED — MARKETPLACE ======================
+
+  // While the redirect is in-flight for unauthenticated users, render nothing
+  // to avoid a flash of protected content.
+  if (!authenticated) return null;
+
+  return (
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+    >
+      <NavBar active="schools" />
+
+      {/* ============ HERO ============ */}
+      <section className="px-4 sm:px-8 pt-12 sm:pt-16 pb-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <p
+            className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3"
+            style={{ color: C.amberAccent }}
+          >
+            Private marketplace
           </p>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
+          <h1
+            className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02]"
+            style={{ fontWeight: 800, color: C.ink }}
+          >
+            {school.name}{' '}
+            <span style={{ color: C.amberAccent }}>marketplace.</span>
+          </h1>
+          <p
+            className="mt-4 text-base leading-relaxed max-w-md mx-auto"
+            style={{ color: C.inkMuted }}
+          >
+            Browse and buy from our Business Club members.
+          </p>
+
+          {/* Status pills */}
+          <div className="mt-5 flex items-center justify-center gap-2 flex-wrap">
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: '#065F46',
+                backgroundColor: '#D1FAE5',
+                border: '1px solid #10B98122',
+                padding: '4px 12px',
+                borderRadius: '999px',
+              }}
+            >
               {stores.length} {stores.length === 1 ? 'store' : 'stores'}
             </span>
-            <span className="inline-block px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-medium">
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: '#92400E',
+                backgroundColor: '#FEF3C7',
+                border: '1px solid #F59E0B22',
+                padding: '4px 12px',
+                borderRadius: '999px',
+              }}
+            >
               {school.name} families only
             </span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Store Grid */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
+      {/* ============ STORE GRID ============ */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-8 pb-16">
         {stores.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
-              🏗️
-            </div>
-            <h3 className="text-lg font-bold text-gray-800">Stores are coming soon!</h3>
-            <p className="text-gray-500 mt-1 text-sm max-w-sm mx-auto">
-              Club members are building their stores. Check back soon to see what they are selling.
+          /* Empty state — stores not created yet */
+          <div
+            className="text-center py-16 mt-6 mx-auto"
+            style={{
+              maxWidth: '520px',
+              padding: '40px 28px',
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              borderRadius: '20px',
+              boxShadow: `2px 2px 0 ${C.ink}12`,
+            }}
+          >
+            <p
+              className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
+              style={{ color: C.amberAccent }}
+            >
+              Coming soon
+            </p>
+            <h3
+              style={{
+                fontSize: '22px',
+                fontWeight: 800,
+                color: C.ink,
+                margin: '0 0 8px',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Stores are being built.
+            </h3>
+            <p
+              style={{
+                fontSize: '14px',
+                color: C.inkMuted,
+                margin: 0,
+                lineHeight: 1.55,
+              }}
+            >
+              Club members are designing their stores. Check back soon to see what they are selling.
             </p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {stores.map((store) => {
               const theme = store.store_themes?.[0] || store.store_themes;
-              const sticker = theme?.sticker || '🍋';
-              const accent = getStoreAccent(theme);
-
               return (
                 <Link
                   key={store.id}
                   href={`/store/${store.id}`}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-amber-200 transition-all group"
+                  className="block transition-all hover:-translate-y-0.5"
+                  style={{
+                    backgroundColor: C.cardBg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    boxShadow: `2px 2px 0 ${C.ink}12`,
+                    textDecoration: 'none',
+                  }}
                 >
-                  <div className="text-center">
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mx-auto overflow-hidden ${accent.icon}`}>
-                      {theme?.banner_image_url ? (
-                        <img src={theme.banner_image_url} alt="" className="w-full h-full object-cover rounded-xl" />
-                      ) : (
-                        sticker
-                      )}
-                    </div>
-                    <h3 className="font-bold text-gray-800 mt-3 group-hover:text-amber-600 transition-colors">
+                  {/* Banner / avatar tile */}
+                  <div
+                    style={{
+                      width: '100%',
+                      aspectRatio: '1 / 1',
+                      overflow: 'hidden',
+                      backgroundColor: C.cream,
+                    }}
+                  >
+                    {theme?.banner_image_url ? (
+                      <img
+                        src={theme.banner_image_url}
+                        alt=""
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <DefaultStoreTile themeColor={theme?.color} />
+                    )}
+                  </div>
+
+                  {/* Card body */}
+                  <div style={{ padding: '16px 18px' }}>
+                    <h3
+                      style={{
+                        fontSize: '17px',
+                        fontWeight: 800,
+                        color: C.ink,
+                        margin: '0 0 4px',
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
                       {store.store_name}
                     </h3>
-                    <p className="text-gray-400 text-sm mt-0.5">
+                    <p
+                      style={{
+                        fontSize: '13px',
+                        color: C.inkMuted,
+                        margin: '0 0 8px',
+                      }}
+                    >
                       by {store.kid_name}
                     </p>
                     {store.productCount > 0 && (
-                      <p className="text-xs text-gray-300 mt-2">
+                      <p
+                        style={{
+                          fontSize: '11px',
+                          color: C.inkFaint,
+                          margin: 0,
+                          fontWeight: 500,
+                        }}
+                      >
                         {store.productCount} {store.productCount === 1 ? 'product' : 'products'}
                       </p>
                     )}
@@ -303,19 +404,6 @@ export default function SchoolPage() {
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Logo size="sm" />
-            <span className="text-xs text-gray-400">Lemonade Stand</span>
-          </div>
-          <Link href="/privacy" className="text-xs text-gray-300 hover:text-gray-500">
-            Privacy
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }
