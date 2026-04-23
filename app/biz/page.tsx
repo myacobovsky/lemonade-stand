@@ -419,7 +419,8 @@ export default function BizPage() {
 
           {/* View store */}
           <button
-            onClick={() => router.push('/store')}
+            onClick={() => storeData?.id && router.push(`/store/${storeData.id}`)}
+            disabled={!storeData?.id}
             style={actionCardStyle}
             onMouseEnter={(e) => onActionHover(e, true)}
             onMouseLeave={(e) => onActionHover(e, false)}
