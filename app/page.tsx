@@ -304,6 +304,19 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}>
+      {/*
+        Preload hint: tells the browser to start fetching the hero image
+        immediately, before it finishes parsing CSS/JS. Next.js 15 / React 19
+        hoist <link> tags from client components into <head>.
+        This directly helps LCP since the hero is what Lighthouse measures as
+        the Largest Contentful Paint on mobile.
+      */}
+      <link
+        rel="preload"
+        as="image"
+        href="/hero-mascot-phone.webp"
+        fetchPriority="high"
+      />
 
       {/* ============ NAV ============ */}
       <header className="sticky top-0 z-50 backdrop-blur-md" style={{ backgroundColor: `${C.cream}EE`, borderBottom: `1px solid ${C.ink}14` }}>
@@ -375,8 +388,8 @@ export default function LandingPage() {
                 src="/hero-mascot-phone.webp"
                 alt="Lemonade Stand mascot holding up a smartphone showing a kid's online store"
                 className="w-full max-w-md md:max-w-none mx-auto"
-                width={600}
-                height={600}
+                width={1000}
+                height={667}
                 fetchPriority="high"
                 decoding="async"
               />
