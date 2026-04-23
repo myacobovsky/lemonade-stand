@@ -290,37 +290,77 @@ export const NavBar = ({ active }) => {
   }
 
   // ============================================================
-  // LOGGED-IN VIEW: Full app nav with emoji icons for scannability
-  // (unchanged — icons aid recognition across 6 tabs)
+  // LOGGED-IN VIEW: App-style nav with pill navigation
+  // Cream background matching the rest of the site.
+  // Active tab = chunky cream pill with offset shadow (matches button/card
+  // aesthetic across the site). Inactive tabs = muted text that hover-lifts.
+  // No emojis — typography carries scannability.
   // ============================================================
   const tabs = store ? [
-    { id: 'biz', href: '/biz', label: 'My Biz', icon: '🏪', badge: 0 },
-    { id: 'editor', href: '/editor', label: 'Editor', icon: '🎨', badge: 0 },
-    { id: 'shop', href: shopHref, label: 'Shop', icon: '🛒', badge: 0 },
-    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚', badge: 0 },
-    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫', badge: 0 },
-    { id: 'dashboard', href: '/dashboard', label: 'Parent', icon: '🔒', badge: parentBadgeCount },
+    { id: 'biz',       href: '/biz',       label: 'My Biz',  badge: 0 },
+    { id: 'editor',    href: '/editor',    label: 'Editor',  badge: 0 },
+    { id: 'shop',      href: shopHref,     label: 'Shop',    badge: 0 },
+    { id: 'learn',     href: '/learn',     label: 'Learn',   badge: 0 },
+    { id: 'schools',   href: '/schools',   label: 'Schools', badge: 0 },
+    { id: 'dashboard', href: '/dashboard', label: 'Parent',  badge: parentBadgeCount },
   ] : [
-    { id: 'shop', href: '/shop', label: 'Shop', icon: '🛒', badge: 0 },
-    { id: 'learn', href: '/learn', label: 'Learn', icon: '📚', badge: 0 },
-    { id: 'schools', href: '/schools', label: 'Schools', icon: '🏫', badge: 0 },
+    { id: 'shop',    href: '/shop',    label: 'Shop',    badge: 0 },
+    { id: 'learn',   href: '/learn',   label: 'Learn',   badge: 0 },
+    { id: 'schools', href: '/schools', label: 'Schools', badge: 0 },
   ];
 
   const currentTab = active || pathname?.replace('/', '') || '';
 
+  // Shared style tokens for this nav
+  const navStyles = {
+    cream: '#FEF3C7',
+    cardBg: '#FFFBEB',
+    ink: '#1C1917',
+    inkMuted: '#57534E',
+    inkFaint: '#78716C',
+    inkGhost: '#A8A29E',
+    border: '#1C191720',
+    borderFaint: '#1C191714',
+  };
+
   return (
-    <header className="bg-white border-b border-gray-100 px-4 sm:px-8 py-3 relative">
-      <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+    <header
+      className="sticky top-0 z-50 backdrop-blur-md relative"
+      style={{
+        backgroundColor: `${navStyles.cream}EE`,
+        borderBottom: `1px solid ${navStyles.ink}14`,
+        fontFamily: "'Poppins', sans-serif",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3">
+
+        {/* === Left: brand + store switcher === */}
+        <div className="flex items-center gap-3 min-w-0">
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <Logo size="sm" />
-            <span className="font-bold text-gray-900" style={{ fontFamily: "'DynaPuff', cursive" }}>Lemonade Stand</span>
+            <span
+              className="font-bold text-lg whitespace-nowrap"
+              style={{ fontFamily: "'DynaPuff', cursive", color: navStyles.ink }}
+            >
+              Lemonade Stand
+            </span>
           </Link>
           {stores.length > 1 && (
             <select
               value={store?.id || ''}
               onChange={(e) => switchStore(e.target.value)}
-              className="ml-2 text-sm bg-amber-50 border border-amber-200 text-amber-700 rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-amber-400"
+              className="text-sm focus:outline-none transition-colors shrink-0"
+              style={{
+                backgroundColor: navStyles.cardBg,
+                border: `1.5px solid ${navStyles.ink}2B`,
+                color: navStyles.ink,
+                borderRadius: '10px',
+                padding: '6px 10px',
+                fontWeight: 700,
+                boxShadow: `1px 1px 0 ${navStyles.ink}14`,
+                fontFamily: 'inherit',
+                cursor: 'pointer',
+              }}
             >
               {stores.map(s => (
                 <option key={s.id} value={s.id}>{s.store_name}</option>
@@ -328,55 +368,206 @@ export const NavBar = ({ active }) => {
             </select>
           )}
         </div>
+
+        {/* === Right: desktop pills + logout, or mobile hamburger === */}
         <div className="flex items-center gap-2">
-          <nav className="hidden sm:flex gap-1 text-sm">
-            {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.href} className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'hover:bg-gray-50 text-gray-500'}`}>
-                <span className="text-base">{tab.icon}</span>
-                <span className="hidden md:inline">{tab.label}</span>
-                {tab.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
-                    {tab.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+          <nav className="hidden sm:flex items-center gap-1">
+            {tabs.map((tab) => {
+              const isActive = currentTab === tab.id;
+              return (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  className="relative transition-all whitespace-nowrap"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? navStyles.ink : navStyles.inkMuted,
+                    padding: isActive ? '6px 13px' : '7px 14px',
+                    borderRadius: '10px',
+                    backgroundColor: isActive ? navStyles.cardBg : 'transparent',
+                    border: isActive ? `1px solid ${navStyles.border}` : '1px solid transparent',
+                    boxShadow: isActive ? `1px 1px 0 ${navStyles.ink}14` : 'none',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = navStyles.cardBg;
+                      e.currentTarget.style.color = navStyles.ink;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = navStyles.inkMuted;
+                    }
+                  }}
+                >
+                  {tab.label}
+                  {tab.badge > 0 && (
+                    <span
+                      className="absolute animate-pulse"
+                      style={{
+                        top: '-4px',
+                        right: '-4px',
+                        backgroundColor: '#DC2626',
+                        color: 'white',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: `1.5px solid ${navStyles.cream}`,
+                      }}
+                    >
+                      {tab.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
-          <button onClick={signOut} className="hidden sm:block text-xs text-gray-400 hover:text-gray-600 ml-2">Log out</button>
-          <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 relative">
-            {menuOpen ? <span className="text-gray-600 text-2xl leading-none">&times;</span> : <><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /><div className="w-5 h-0.5 bg-gray-600 rounded-full" /></>}
+
+          <button
+            onClick={signOut}
+            className="hidden sm:block transition-colors"
+            style={{
+              fontSize: '12px',
+              color: navStyles.inkGhost,
+              fontWeight: 500,
+              padding: '6px 10px',
+              marginLeft: '4px',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = navStyles.inkMuted; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = navStyles.inkGhost; }}
+          >
+            Log out
+          </button>
+
+          {/* Mobile hamburger — matches logged-out nav hamburger style */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-[5px] rounded-xl transition-colors active:bg-black/5 relative"
+          >
+            {menuOpen ? (
+              <span style={{ fontSize: '26px', lineHeight: 1, color: navStyles.ink, fontWeight: 700 }}>×</span>
+            ) : (
+              <>
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: navStyles.ink, borderRadius: '2px' }} />
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: navStyles.ink, borderRadius: '2px' }} />
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: navStyles.ink, borderRadius: '2px' }} />
+              </>
+            )}
             {parentBadgeCount > 0 && !menuOpen && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              <span
+                className="absolute animate-pulse"
+                style={{
+                  top: '2px',
+                  right: '2px',
+                  backgroundColor: '#DC2626',
+                  color: 'white',
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: `1.5px solid ${navStyles.cream}`,
+                }}
+              >
                 {parentBadgeCount}
               </span>
             )}
           </button>
         </div>
       </div>
+
+      {/* === Mobile menu dropdown === */}
       {menuOpen && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
-          <div className="max-w-4xl mx-auto py-2 px-4">
-            {tabs.map((tab) => (
-              <Link key={tab.id} href={tab.href} onClick={() => setMenuOpen(false)} className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-left transition-all active:scale-95 ${currentTab === tab.id ? 'bg-amber-50 text-amber-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
-                <span className="text-xl relative">
-                  {tab.icon}
-                  {tab.badge > 0 && (
-                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
-                      {tab.badge}
-                    </span>
-                  )}
-                </span>
-                <span className="text-base flex-1">{tab.label}</span>
-                {tab.badge > 0 && (
-                  <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">
-                    {tab.badge} {tab.badge === 1 ? 'item' : 'items'}
-                  </span>
-                )}
-              </Link>
-            ))}
-            <button onClick={() => { signOut(); setMenuOpen(false); }} className="w-full px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50 rounded-lg">Log out</button>
+        <>
+          <div
+            className="sm:hidden fixed inset-0 bg-black/20 z-40"
+            style={{ top: '64px' }}
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="sm:hidden absolute top-full left-0 right-0 border-b z-50"
+            style={{
+              backgroundColor: navStyles.cream,
+              borderBottomColor: navStyles.borderFaint,
+              boxShadow: `0 4px 16px ${navStyles.ink}1A`,
+            }}
+          >
+            <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col gap-1.5">
+              {tabs.map((tab) => {
+                const isActive = currentTab === tab.id;
+                return (
+                  <Link
+                    key={tab.id}
+                    href={tab.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between px-4 py-3.5 rounded-xl transition-all active:scale-[0.98]"
+                    style={{
+                      backgroundColor: isActive ? navStyles.cardBg : 'transparent',
+                      border: isActive ? `1px solid ${navStyles.border}` : '1px solid transparent',
+                      color: navStyles.ink,
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: '16px',
+                      letterSpacing: '-0.005em',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <span>{tab.label}</span>
+                    {tab.badge > 0 && (
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: '#991B1B',
+                          backgroundColor: '#FEE2E2',
+                          padding: '3px 10px',
+                          borderRadius: '999px',
+                          border: '1px solid #FCA5A5',
+                        }}
+                      >
+                        {tab.badge} {tab.badge === 1 ? 'item' : 'items'}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+
+              {/* Divider */}
+              <div style={{ height: '1px', backgroundColor: navStyles.borderFaint, margin: '8px 4px' }} />
+
+              <button
+                onClick={() => { signOut(); setMenuOpen(false); }}
+                className="w-full px-4 py-3 text-left transition-colors"
+                style={{
+                  fontSize: '14px',
+                  color: navStyles.inkMuted,
+                  fontWeight: 500,
+                  fontFamily: 'inherit',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Log out
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );
