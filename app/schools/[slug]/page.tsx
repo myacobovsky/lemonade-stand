@@ -28,14 +28,17 @@ const font = {
   sans: "'Poppins', sans-serif",
 };
 
-// ====================== DEFAULT LOGO SVG ======================
-// Used when a store has no banner image — colored tile based on store theme.
-function DefaultStoreTile({ themeColor = 'amber' }) {
+// ====================== KID-THEMED TILE ======================
+// When a store doesn't have a banner image uploaded, we still want to show
+// the kid's chosen identity — their picked sticker (emoji) and theme color.
+// This component renders exactly that: tinted background from theme.color,
+// large sticker from theme.sticker, falling back to a lemon if unset.
+function KidThemedTile({ themeColor = 'amber', sticker = '🍋' }) {
   const tileColor = {
-    amber: '#FEF3C7',
-    blue: '#DBEAFE',
-    green: '#D1FAE5',
-    pink: '#FCE7F3',
+    amber:  '#FEF3C7',
+    blue:   '#DBEAFE',
+    green:  '#D1FAE5',
+    pink:   '#FCE7F3',
     purple: '#EDE9FE',
     orange: '#FFEDD5',
   }[themeColor] || '#FEF3C7';
@@ -49,15 +52,12 @@ function DefaultStoreTile({ themeColor = 'amber' }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        fontSize: '64px',
+        lineHeight: 1,
       }}
+      aria-hidden="true"
     >
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '40%', height: '40%' }}>
-        <ellipse cx="16" cy="17" rx="11" ry="9" fill="#FCD34D" stroke="#292524" strokeWidth="2" />
-        <circle cx="12" cy="16" r="2" fill="#292524" />
-        <circle cx="20" cy="16" r="2" fill="#292524" />
-        <path d="M12 20 Q16 24 20 20" stroke="#292524" strokeWidth="2" fill="none" strokeLinecap="round" />
-        <path d="M16 8 Q20 4 22 8 Q20 10 16 8" fill="#10B981" stroke="#292524" strokeWidth="1.5" strokeLinejoin="round" />
-      </svg>
+      {sticker}
     </div>
   );
 }
@@ -359,7 +359,10 @@ export default function SchoolPage() {
                         loading="lazy"
                       />
                     ) : (
-                      <DefaultStoreTile themeColor={theme?.color} />
+                      <KidThemedTile
+                        themeColor={theme?.color}
+                        sticker={theme?.sticker}
+                      />
                     )}
                   </div>
 
