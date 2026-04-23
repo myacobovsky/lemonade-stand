@@ -31,8 +31,6 @@ const font = {
 };
 
 // ====================== PILOT CTA EMAIL ======================
-// Pre-fills the email with subject + body so school contacts don't have to
-// think about what to write. Just fill in the blanks and send.
 const PILOT_EMAIL = 'hello@getlemonadestand.com';
 const PILOT_SUBJECT = 'Pilot interest — Lemonade Stand for Schools';
 const PILOT_BODY = `Hi Lemonade Stand team,
@@ -51,35 +49,63 @@ const pilotMailto = `mailto:${PILOT_EMAIL}?subject=${encodeURIComponent(PILOT_SU
 export default function SchoolsLandingPage() {
   const router = useRouter();
   const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [checking, setChecking] = useState(false);
 
-  // ====================== CODE LOOKUP (preserved from original) ======================
+  // ====================== SUBMIT HANDLER ======================
+  // Validates BOTH the school code (slug) and password in one flow.
+  // On success: stores access in localStorage, then routes to the marketplace.
+  // The /schools/[slug] page checks localStorage on mount and skips its own
+  // gate if the stored password matches — so users experience a single form.
   async function handleSubmit(e) {
     e.preventDefault();
-    const trimmed = code.trim().toLowerCase();
-    if (!trimmed) return;
+    const trimmedCode = code.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+    if (!trimmedCode || !trimmedPassword) return;
 
     setChecking(true);
     setError('');
 
-    const { data } = await supabase
+    // Step 1: Does a school with this slug exist and is it active?
+    const { data: school } = await supabase
       .from('schools')
-      .select('slug')
-      .eq('slug', trimmed)
+      .select('id, slug, password')
+      .eq('slug', trimmedCode)
       .eq('is_active', true)
       .single();
 
-    setChecking(false);
-
-    if (data) {
-      router.push(`/schools/${data.slug}`);
-    } else {
-      setError('No club found with that code. Check with your club leader and try again.');
+    if (!school) {
+      setChecking(false);
+      setError(
+        "We couldn't find a club with that code. Check with your club leader."
+      );
+      return;
     }
+
+    // Step 2: Does the password match?
+    if (trimmedPassword !== school.password) {
+      setChecking(false);
+      setError(
+        'That password is not correct. Check with your club leader.'
+      );
+      return;
+    }
+
+    // Step 3: Store access in localStorage so /schools/[slug] recognizes us
+    // and skips its own gate. Same key pattern the [slug] page already uses.
+    try {
+      localStorage.setItem(`school_access_${school.id}`, school.password);
+    } catch {
+      // localStorage can fail in some browser modes — the [slug] page will
+      // handle this by redirecting back here if it can't read the key.
+    }
+
+    // Step 4: Route into the marketplace
+    router.push(`/schools/${school.slug}`);
   }
 
-  // ====================== BUTTON STYLES (shared) ======================
+  // ====================== SHARED STYLES ======================
   const btnPrimary = {
     backgroundColor: C.amberBtn,
     color: C.ink,
@@ -90,6 +116,30 @@ export default function SchoolsLandingPage() {
     transition: 'all 0.15s ease',
   };
 
+  const inputStyle = {
+    padding: '14px 16px',
+    borderRadius: '12px',
+    border: `1.5px solid ${C.ink}2B`,
+    backgroundColor: C.amberInputBg,
+    fontSize: '15px',
+    textAlign: 'center',
+    fontWeight: 700,
+    color: C.ink,
+    letterSpacing: '0.01em',
+    fontFamily: 'inherit',
+    // Force cream input background even when Chrome autofill overrides
+    WebkitBoxShadow: `0 0 0 1000px ${C.amberInputBg} inset`,
+    WebkitTextFillColor: C.ink,
+  };
+
+  const labelStyle = {
+    fontSize: '11px',
+    letterSpacing: '0.14em',
+    textTransform: 'uppercase',
+    color: C.inkFaint,
+    fontWeight: 700,
+  };
+
   return (
     <div
       className="min-h-screen"
@@ -98,7 +148,9 @@ export default function SchoolsLandingPage() {
       <NavBar active="schools" />
 
       {/* =========================================================
-          SECTION 1 — HERO + CODE ENTRY (primary purpose of the page)
+          SECTION 1 — HERO + TWO-FIELD FORM (primary purpose)
+          Single form with both code + password. One submit handles both
+          checks so users experience it as one gate.
           ========================================================= */}
       <section className="px-4 sm:px-8 pt-14 sm:pt-20 pb-16 sm:pb-24">
         <div className="max-w-md mx-auto text-center">
@@ -119,10 +171,10 @@ export default function SchoolsLandingPage() {
             className="mt-4 text-base leading-relaxed"
             style={{ color: C.inkMuted }}
           >
-            Enter your school's club code to access your private marketplace.
+            Enter your school's code and password to access your private marketplace.
           </p>
 
-          {/* Code entry card */}
+          {/* Code + password entry card */}
           <div
             className="mt-8"
             style={{
@@ -133,56 +185,61 @@ export default function SchoolsLandingPage() {
               boxShadow: `2px 2px 0 ${C.ink}12`,
             }}
           >
-            <form onSubmit={handleSubmit}>
-              <label
-                className="block text-left mb-2.5"
-                style={{
-                  fontSize: '11px',
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: C.inkFaint,
-                  fontWeight: 700,
-                }}
-              >
-                Club code
-              </label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                  setError('');
-                }}
-                placeholder="Enter your club code"
-                autoFocus
-                className="w-full focus:outline-none"
-                style={{
-                  padding: '14px 16px',
-                  borderRadius: '12px',
-                  border: `1.5px solid ${C.ink}2B`,
-                  backgroundColor: C.amberInputBg,
-                  fontSize: '17px',
-                  textAlign: 'center',
-                  fontWeight: 700,
-                  color: C.ink,
-                  letterSpacing: '0.02em',
-                  fontFamily: 'inherit',
-                  // Force cream input background even when Chrome autofill overrides
-                  WebkitBoxShadow: `0 0 0 1000px ${C.amberInputBg} inset`,
-                  WebkitTextFillColor: C.ink,
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = C.ink;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = `${C.ink}2B`;
-                }}
-              />
+            <form onSubmit={handleSubmit} className="space-y-4">
 
+              {/* School code */}
+              <div>
+                <label className="block text-left mb-2.5" style={labelStyle}>
+                  School code
+                </label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setError('');
+                  }}
+                  placeholder="Enter your school code"
+                  autoFocus
+                  autoComplete="off"
+                  className="w-full focus:outline-none"
+                  style={inputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = `${C.ink}2B`; }}
+                />
+              </div>
+
+              {/* Club password */}
+              <div>
+                <label className="block text-left mb-2.5" style={labelStyle}>
+                  Club password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError('');
+                  }}
+                  placeholder="Enter password"
+                  autoComplete="off"
+                  className="w-full focus:outline-none"
+                  style={inputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = `${C.ink}2B`; }}
+                />
+              </div>
+
+              {/* Single error slot — appears for either wrong code or wrong password */}
               {error && (
                 <p
-                  className="mt-3 text-center"
-                  style={{ fontSize: '13px', color: C.danger, fontWeight: 500 }}
+                  className="text-center"
+                  style={{
+                    fontSize: '13px',
+                    color: C.danger,
+                    fontWeight: 500,
+                    margin: 0,
+                  }}
                 >
                   {error}
                 </p>
@@ -190,8 +247,8 @@ export default function SchoolsLandingPage() {
 
               <button
                 type="submit"
-                disabled={!code.trim() || checking}
-                className="w-full mt-4 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                disabled={!code.trim() || !password.trim() || checking}
+                className="w-full transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 style={{
                   ...btnPrimary,
                   padding: '14px',
@@ -199,7 +256,7 @@ export default function SchoolsLandingPage() {
                   letterSpacing: '-0.005em',
                 }}
               >
-                {checking ? 'Looking up…' : 'Go to my school →'}
+                {checking ? 'Checking…' : 'Go to my school →'}
               </button>
             </form>
           </div>
@@ -209,22 +266,15 @@ export default function SchoolsLandingPage() {
             className="mt-5 px-3 leading-relaxed"
             style={{ fontSize: '12px', color: C.inkFaint }}
           >
-            Your club leader will share your school's code during the first
-            club session. If you do not have a code yet, check with your
-            club leader.
+            Your club leader will share your school's code and password during
+            the first club session. If you do not have them yet, check with
+            your club leader.
           </p>
         </div>
       </section>
 
       {/* =========================================================
           SECTION 2 — WHAT THIS ACTUALLY IS
-          Serves cold arrivers (parents, admins) who land here
-          without context and need to understand the program.
-
-          On desktop: 2-column layout with text left, mascot right.
-          On mobile: stacks with text first, mascot below (so the
-          explanation still reads top-down without the mascot stealing
-          the headline's thunder).
           ========================================================= */}
       <section
         style={{
@@ -236,7 +286,6 @@ export default function SchoolsLandingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
 
-            {/* Text column */}
             <div className="flex-1 text-center md:text-left">
               <p
                 className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3"
@@ -263,13 +312,6 @@ export default function SchoolsLandingPage() {
               </p>
             </div>
 
-            {/*
-              Mascot column. Reuses the hero mascot file that's already
-              optimized and cached for homepage visitors — zero additional
-              network cost for most users.
-              Explicit width/height matches the file (800×533) to prevent
-              layout shift. lazy loading since this is below the fold.
-            */}
             <div className="w-full md:w-5/12 flex justify-center">
               <img
                 src="/hero-mascot-phone.webp"
@@ -288,7 +330,6 @@ export default function SchoolsLandingPage() {
 
       {/* =========================================================
           SECTION 3 — BRING IT TO YOUR SCHOOL
-          B2B pilot CTA. Honest about pre-launch stage.
           ========================================================= */}
       <section
         style={{ borderTop: `1px solid ${C.borderFaint}` }}
@@ -296,7 +337,6 @@ export default function SchoolsLandingPage() {
       >
         <div className="max-w-2xl mx-auto">
 
-          {/* Section header */}
           <div className="text-center mb-10">
             <p
               className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3"
@@ -313,7 +353,6 @@ export default function SchoolsLandingPage() {
             </h2>
           </div>
 
-          {/* Pilot card */}
           <div
             style={{
               backgroundColor: C.cardBg,
@@ -350,21 +389,11 @@ export default function SchoolsLandingPage() {
               engage with, we'd love to hear from you.
             </p>
 
-            {/* Three pilot feature blocks */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-7 mb-7">
               {[
-                {
-                  title: 'Free pilot',
-                  desc: 'No cost during the pilot program.',
-                },
-                {
-                  title: 'Small groups OK',
-                  desc: 'Start with one class or one after-school club.',
-                },
-                {
-                  title: 'Private to your school',
-                  desc: "Students only see their school's marketplace.",
-                },
+                { title: 'Free pilot', desc: 'No cost during the pilot program.' },
+                { title: 'Small groups OK', desc: 'Start with one class or one after-school club.' },
+                { title: 'Private to your school', desc: "Students only see their school's marketplace." },
               ].map((item) => (
                 <div
                   key={item.title}
@@ -400,7 +429,6 @@ export default function SchoolsLandingPage() {
               ))}
             </div>
 
-            {/* CTA */}
             <div className="text-center mt-6">
               <a
                 href={pilotMailto}
@@ -428,7 +456,6 @@ export default function SchoolsLandingPage() {
             </div>
           </div>
 
-          {/* Footnote */}
           <p
             className="mt-8 text-center mx-auto leading-relaxed"
             style={{
@@ -438,7 +465,7 @@ export default function SchoolsLandingPage() {
               maxWidth: '520px',
             }}
           >
-            Lemonade Stand for Schools is currently in pilot. The code entry
+            Lemonade Stand for Schools is currently in pilot. The code + password entry
             above is for students in active pilot programs only.
           </p>
         </div>
