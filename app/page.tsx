@@ -305,12 +305,20 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}>
       {/*
-        Preload hint: tells the browser to start fetching the hero image
-        immediately, before it finishes parsing CSS/JS. Next.js 15 / React 19
-        hoist <link> tags from client components into <head>.
-        This directly helps LCP since the hero is what Lighthouse measures as
-        the Largest Contentful Paint on mobile.
+        Resource hints for the browser — Next.js 15 / React 19 hoist <link>
+        tags from client components into <head>.
+
+        preconnect: tells the browser to warm up the TCP connection to fonts
+        servers immediately, saving ~150-300ms per origin on first font fetch.
+        We need two separate preconnects because Google Fonts uses a CSS file
+        from one origin and the actual font files from another.
+
+        preload: tells the browser to start fetching the hero image now,
+        before it finishes parsing CSS/JS. This helps LCP directly since
+        the hero is the Largest Contentful Paint on mobile.
       */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link
         rel="preload"
         as="image"
