@@ -153,7 +153,7 @@ export default function SchoolsLandingPage() {
                   setCode(e.target.value);
                   setError('');
                 }}
-                placeholder="e.g. ps150"
+                placeholder="Enter your club code"
                 autoFocus
                 className="w-full focus:outline-none"
                 style={{
