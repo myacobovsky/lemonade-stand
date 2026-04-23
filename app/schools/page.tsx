@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -52,6 +52,62 @@ export default function SchoolsLandingPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [checking, setChecking] = useState(false);
+  // While we're checking for prior access, show nothing instead of flashing
+  // the login form. Once resolved (either no access, or redirect started),
+  // we render normally.
+  const [resolvingAccess, setResolvingAccess] = useState(true);
+
+  // ====================== AUTO-RESUME ON MOUNT ======================
+  // If the user has already authenticated in this browser, localStorage
+  // holds their access. We don't want to re-prompt just because they clicked
+  // "Schools" in the nav — that feels like being logged out. Instead, we
+  // detect prior access here and redirect them to the marketplace.
+  //
+  // We store the slug alongside the access key (`school_last_slug`) so the
+  // lookup is instant — no Supabase round-trip, no flash of the login form.
+  useEffect(() => {
+    async function tryAutoResume() {
+      try {
+        const lastSlug = localStorage.getItem('school_last_slug');
+        if (!lastSlug) {
+          setResolvingAccess(false);
+          return;
+        }
+
+        // Verify the stored access is still valid against Supabase (in case
+        // the password changed on the admin side — rare, but worth checking).
+        const { data: school } = await supabase
+          .from('schools')
+          .select('id, slug, password')
+          .eq('slug', lastSlug)
+          .eq('is_active', true)
+          .single();
+
+        if (!school) {
+          // School no longer exists or isn't active — clear the stale key
+          // and show the login form.
+          localStorage.removeItem('school_last_slug');
+          setResolvingAccess(false);
+          return;
+        }
+
+        const storedPassword = localStorage.getItem(`school_access_${school.id}`);
+        if (storedPassword === school.password) {
+          router.replace(`/schools/${school.slug}`);
+          return;
+        }
+
+        // Password on file doesn't match (got rotated) — clear and reset.
+        localStorage.removeItem('school_last_slug');
+        localStorage.removeItem(`school_access_${school.id}`);
+        setResolvingAccess(false);
+      } catch {
+        // localStorage blocked or other error — fall through to login form.
+        setResolvingAccess(false);
+      }
+    }
+    tryAutoResume();
+  }, [router]);
 
   // ====================== SUBMIT HANDLER ======================
   // Validates BOTH the school code (slug) and password in one flow.
@@ -93,9 +149,11 @@ export default function SchoolsLandingPage() {
     }
 
     // Step 3: Store access in localStorage so /schools/[slug] recognizes us
-    // and skips its own gate. Same key pattern the [slug] page already uses.
+    // and so the auto-resume effect above can bring them straight in next
+    // time they land on /schools.
     try {
       localStorage.setItem(`school_access_${school.id}`, school.password);
+      localStorage.setItem('school_last_slug', school.slug);
     } catch {
       // localStorage can fail in some browser modes — the [slug] page will
       // handle this by redirecting back here if it can't read the key.
@@ -139,6 +197,20 @@ export default function SchoolsLandingPage() {
     color: C.inkFaint,
     fontWeight: 700,
   };
+
+  // While we're resolving prior access (brief moment on mount), render a
+  // minimal page so we don't flash the login form right before redirecting
+  // a returning user.
+  if (resolvingAccess) {
+    return (
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans }}
+      >
+        <NavBar active="schools" />
+      </div>
+    );
+  }
 
   return (
     <div
