@@ -67,11 +67,12 @@ export default function MarketingPage() {
   const hasAnnouncement = storeTheme?.announcementOn && storeTheme?.announcement;
   const announcementText = hasAnnouncement ? storeTheme.announcement : null;
 
+  // ====================== SHARE HANDLERS ======================
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(storeUrlWithProtocol);
       setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
+      setTimeout(() => setCopiedLink(false), 2500);
     } catch (err) {
       try {
         window.prompt('Copy this link:', storeUrlWithProtocol);
@@ -99,12 +100,14 @@ export default function MarketingPage() {
     }, 100);
   }
 
+  // ====================== SHARED STYLES ======================
+  // Section labels are now AMBER uppercase — warmer than gray
   const sectionLabel = {
     fontSize: '11px',
     letterSpacing: '0.14em',
     textTransform: 'uppercase',
-    color: C.inkFaint,
-    fontWeight: 700,
+    color: C.amberAccent,
+    fontWeight: 800,
     paddingLeft: '4px',
     marginBottom: '10px',
   };
@@ -130,8 +133,30 @@ export default function MarketingPage() {
     width: '100%',
   });
 
+  // ====================== TIPS CONTENT ======================
+  // Grouped into "with parent's help" and "on your own"
+  const tipsGroups = [
+    {
+      label: "With your parent's help",
+      tips: [
+        "Post on your building's online community (with permission)",
+        'Ask your parent to text their friends about your store',
+        'Ask grandparents to share with their friends',
+      ],
+    },
+    {
+      label: 'On your own',
+      tips: [
+        'Tell friends at the park or after school',
+        'Tell neighbors in the elevator or hallway',
+        'Put a flyer in the lobby or mailroom',
+      ],
+    },
+  ];
+
   return (
     <>
+      {/* Print-only CSS */}
       <style jsx global>{`
         @media print {
           body > * { visibility: hidden; }
@@ -157,6 +182,7 @@ export default function MarketingPage() {
         </div>
 
         <main className="max-w-2xl mx-auto px-4 sm:px-8 pt-8 pb-16">
+          {/* Back link */}
           <Link
             href="/biz"
             className="no-print inline-flex items-center gap-1.5 mb-4 transition-colors"
@@ -166,33 +192,74 @@ export default function MarketingPage() {
           </Link>
 
           <div className="no-print">
-            <p
-              className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
-              style={{ color: C.amberAccent }}
-            >
-              Marketing
-            </p>
-            <h1
-              className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02] mb-3"
-              style={{ fontWeight: 800, color: C.ink }}
-            >
-              Tell people{' '}
-              <span style={{ color: C.amberAccent }}>your store is open.</span>
-            </h1>
-            <p
-              className="mb-8"
-              style={{
-                fontSize: '15px',
-                color: C.inkMuted,
-                lineHeight: 1.6,
-                maxWidth: '460px',
-              }}
-            >
-              The fastest way to your first sale is to share your store link with people you know. Start with friends and family.
-            </p>
+            {/* =============================== */}
+            {/* HEADER WITH MASCOT              */}
+            {/* Text on left, mascot on right.  */}
+            {/* Mascot hidden on very narrow    */}
+            {/* screens to protect the copy.    */}
+            {/* =============================== */}
+            <div className="flex gap-4 sm:gap-6 items-start mb-8">
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
+                  style={{ color: C.amberAccent }}
+                >
+                  Marketing
+                </p>
+                <h1
+                  className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02] mb-3"
+                  style={{ fontWeight: 800, color: C.ink }}
+                >
+                  Tell the world{' '}
+                  <span style={{ color: C.amberAccent }}>you're open.</span>
+                </h1>
+                <p
+                  style={{
+                    fontSize: '15px',
+                    color: C.inkMuted,
+                    lineHeight: 1.55,
+                    maxWidth: '440px',
+                  }}
+                >
+                  The fastest way to your first sale?{' '}
+                  <strong style={{ color: C.ink, fontWeight: 700 }}>
+                    Share your store link
+                  </strong>{' '}
+                  with people you know.{' '}
+                  <span style={{ color: C.amberAccent, fontWeight: 700 }}>
+                    Start with friends and family.
+                  </span>
+                </p>
+              </div>
 
+              {/* Mascot — hidden on smallest screens so the copy breathes */}
+              <div
+                className="hidden sm:flex flex-shrink-0 justify-center items-start"
+                style={{ width: '140px' }}
+              >
+                <img
+                  src="/hero-mascot-phone.webp"
+                  alt=""
+                  width={800}
+                  height={533}
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    width: '140px',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+
+            {/* =============================== */}
+            {/* SHARE BUTTONS                   */}
+            {/* =============================== */}
             <div style={sectionLabel}>Share your store</div>
             <div className="grid grid-cols-3 gap-2.5 mb-4">
+              {/* Copy Link with celebration state */}
               <button
                 onClick={handleCopyLink}
                 className="transition-all hover:-translate-y-0.5"
@@ -226,18 +293,44 @@ export default function MarketingPage() {
                     </svg>
                   )}
                 </div>
-                <div
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 800,
-                    color: copiedLink ? C.successInk : C.ink,
-                    letterSpacing: '-0.005em',
-                  }}
-                >
-                  {copiedLink ? 'Copied!' : 'Copy link'}
-                </div>
+                {copiedLink ? (
+                  <>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: C.successInk,
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      Copied!
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: C.successInk,
+                        marginTop: '2px',
+                      }}
+                    >
+                      Now share it {'\u2192'}
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      color: C.ink,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    Copy link
+                  </div>
+                )}
               </button>
 
+              {/* Text */}
               <button
                 onClick={handleShareText}
                 className="transition-all hover:-translate-y-0.5"
@@ -268,6 +361,7 @@ export default function MarketingPage() {
                 </div>
               </button>
 
+              {/* Email */}
               <button
                 onClick={handleShareEmail}
                 className="transition-all hover:-translate-y-0.5"
@@ -300,6 +394,7 @@ export default function MarketingPage() {
               </button>
             </div>
 
+            {/* Store URL display */}
             <div style={{ ...chunkyCardStyle, marginBottom: '32px' }}>
               <div
                 style={{
@@ -330,6 +425,9 @@ export default function MarketingPage() {
               </div>
             </div>
 
+            {/* =============================== */}
+            {/* ANNOUNCEMENT SHORTCUT           */}
+            {/* =============================== */}
             <div style={sectionLabel}>Announcement on your store</div>
             <div style={{ ...chunkyCardStyle, marginBottom: '32px' }}>
               <div
@@ -341,7 +439,8 @@ export default function MarketingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Top banner message
+                Your top{' '}
+                <span style={{ color: C.amberAccent }}>banner message</span>
               </div>
               <div
                 style={{
@@ -352,7 +451,9 @@ export default function MarketingPage() {
                   marginBottom: '12px',
                 }}
               >
-                {hasAnnouncement ? `"${announcementText}"` : 'No announcement set.'}
+                {hasAnnouncement
+                  ? `"${announcementText}"`
+                  : 'No announcement set.'}
               </div>
               <button
                 onClick={() => router.push('/editor')}
@@ -376,6 +477,9 @@ export default function MarketingPage() {
               </button>
             </div>
 
+            {/* =============================== */}
+            {/* FLYER SECTION (collapsible)     */}
+            {/* =============================== */}
             <div style={sectionLabel}>Print a flyer</div>
             <button
               onClick={() => setShowFlyer(!showFlyer)}
@@ -404,7 +508,8 @@ export default function MarketingPage() {
                     marginBottom: '2px',
                   }}
                 >
-                  Make a flyer for your lobby
+                  Make a flyer{' '}
+                  <span style={{ color: C.amberAccent }}>for your lobby</span>
                 </div>
                 <div style={{ fontSize: '12px', color: C.inkMuted }}>
                   Print and post in your building or neighborhood.
@@ -426,6 +531,7 @@ export default function MarketingPage() {
             </button>
           </div>
 
+          {/* Flyer preview (printable) */}
           {showFlyer && (
             <div
               id="flyer-printable"
@@ -563,12 +669,15 @@ export default function MarketingPage() {
                     fontFamily: 'inherit',
                   }}
                 >
-                  Print this flyer \u2192
+                  Print this flyer {'\u2192'}
                 </button>
               </div>
             </div>
           )}
 
+          {/* =============================== */}
+          {/* TIPS — with mascot framing      */}
+          {/* =============================== */}
           <div className="no-print">
             <div
               style={{
@@ -578,48 +687,92 @@ export default function MarketingPage() {
                 padding: '20px 22px',
               }}
             >
-              <div
-                style={{
-                  fontSize: '11px',
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: C.amberDeep,
-                  fontWeight: 800,
-                  marginBottom: '12px',
-                }}
-              >
-                Sharing ideas
-              </div>
-              {[
-                "Post on your building's group chat or Slack",
-                'Ask grandparents to share with their friends',
-                'Put a flyer in the lobby or mailroom',
-                'Tell neighbors in the elevator',
-              ].map((tip, i) => (
+              {/* Head with mini logo + title */}
+              <div className="flex items-center gap-3 mb-5">
                 <div
-                  key={i}
-                  className="flex items-start gap-2.5"
-                  style={{ marginBottom: i < 3 ? '10px' : 0 }}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: C.amberBtn,
+                    border: `1.5px solid ${C.ink}`,
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
+                  <Logo size="sm" />
+                </div>
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      width: '5px',
-                      height: '5px',
-                      backgroundColor: C.amberAccent,
-                      borderRadius: '50%',
-                      flexShrink: 0,
-                      marginTop: '8px',
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '13px',
-                      color: C.ink,
-                      lineHeight: 1.5,
+                      fontSize: '10px',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: C.amberAccent,
+                      fontWeight: 800,
+                      marginBottom: '2px',
                     }}
                   >
-                    {tip}
-                  </span>
+                    Pro tips from the lemon
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: C.ink,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    Where to{' '}
+                    <span style={{ color: C.amberAccent }}>start sharing</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Grouped tips */}
+              {tipsGroups.map((group, gi) => (
+                <div key={gi} style={{ marginBottom: gi === 0 ? '18px' : 0 }}>
+                  <div
+                    style={{
+                      fontSize: '10px',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: C.amberDeep,
+                      fontWeight: 800,
+                      marginBottom: '10px',
+                    }}
+                  >
+                    {group.label}
+                  </div>
+                  {group.tips.map((tip, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2.5"
+                      style={{ marginBottom: i < group.tips.length - 1 ? '9px' : 0 }}
+                    >
+                      <div
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          backgroundColor: C.amberAccent,
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          marginTop: '8px',
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          color: C.ink,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {tip}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -629,4 +782,3 @@ export default function MarketingPage() {
     </>
   );
 }
-
