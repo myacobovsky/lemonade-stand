@@ -115,6 +115,14 @@ export default function SchoolPage() {
       return;
     }
 
+    // Remember which slug this user is signed into, so /schools can
+    // auto-resume them here next time instead of showing the login form.
+    try {
+      localStorage.setItem('school_last_slug', schoolData.slug);
+    } catch {
+      // Not critical if this fails — the access key is still set.
+    }
+
     setAuthenticated(true);
     await loadStores(schoolData.id);
     setLoading(false);
