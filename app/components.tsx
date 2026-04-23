@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useApp } from '../lib/context';
@@ -87,6 +87,9 @@ export const NavBar = ({ active }) => {
   const pathname = usePathname();
   const { user, signOut, store, stores, switchStore, products, orders } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Separate state for the logged-out mobile menu so it doesn't collide with
+  // the logged-in menu state above.
+  const [publicMenuOpen, setPublicMenuOpen] = useState(false);
 
   // If store belongs to a school, Shop links to the school marketplace instead of public shop
   const shopHref = store?.school_id ? `/schools/${store.school_slug || 'ps150'}` : '/shop';
@@ -96,11 +99,39 @@ export const NavBar = ({ active }) => {
   const pendingOrders = (orders || []).filter(o => o.status === 'pending' || o.status === 'new').length;
   const parentBadgeCount = pendingProducts + pendingOrders;
 
+  // Close mobile menus when the route changes (user tapped a link)
+  useEffect(() => {
+    setPublicMenuOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Close on Escape key — standard accessibility affordance
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        setPublicMenuOpen(false);
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   // ============================================================
   // LOGGED-OUT VIEW: Clean text nav matching the landing page
   // Visitors need to see Log in / Get Started CTAs on every page
+  //
+  // Mobile (<sm): hamburger menu (Get Started moves inside the panel)
+  // Desktop (≥sm): full horizontal nav (unchanged behavior)
   // ============================================================
   if (!user) {
+    const publicLinks = [
+      { href: '/schools', label: 'Schools', key: 'schools' },
+      { href: '/shop',    label: 'Shop',    key: 'shop' },
+      { href: '/learn',   label: 'Learn',   key: 'learn' },
+    ];
+    const activeKey = active || '';
+
     return (
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
@@ -108,16 +139,152 @@ export const NavBar = ({ active }) => {
             <Logo size="sm" />
             <span className="font-bold text-gray-900 text-lg" style={{ fontFamily: "'DynaPuff', cursive" }}>Lemonade Stand</span>
           </Link>
-          <div className="flex items-center gap-5">
-            <Link href="/schools" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Schools</Link>
-            <Link href="/shop" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Shop</Link>
-            <Link href="/learn" className="text-sm text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">Learn</Link>
+
+          {/* Desktop nav (≥sm) — unchanged behavior from the original */}
+          <div className="hidden sm:flex items-center gap-5">
+            {publicLinks.map(l => (
+              <Link
+                key={l.key}
+                href={l.href}
+                className={`text-sm transition-colors ${
+                  activeKey === l.key
+                    ? 'text-gray-900 font-semibold'
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
             <div className="flex items-center gap-3">
               <Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">Log in</Link>
-              <Link href="/login?mode=signup" className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition-all hover:shadow-md hover:shadow-amber-200">Get Started</Link>
+              <Link
+                href="/login?mode=signup"
+                className="px-5 py-2 text-sm font-bold rounded-xl transition-all hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: '#FCD34D',
+                  color: '#1C1917',
+                  border: '1.5px solid #1C1917',
+                  boxShadow: '2px 2px 0 #1C1917',
+                }}
+              >
+                Get Started
+              </Link>
             </div>
           </div>
+
+          {/* Mobile hamburger trigger (shown only below sm) */}
+          <button
+            type="button"
+            onClick={() => setPublicMenuOpen(v => !v)}
+            aria-label={publicMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={publicMenuOpen}
+            className="sm:hidden w-11 h-11 flex flex-col items-center justify-center gap-[5px] rounded-xl transition-colors active:bg-gray-100"
+          >
+            {publicMenuOpen ? (
+              <span
+                style={{
+                  fontSize: '26px',
+                  lineHeight: 1,
+                  color: '#1C1917',
+                  fontWeight: 700,
+                }}
+              >×</span>
+            ) : (
+              <>
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: '#1C1917', borderRadius: '2px' }} />
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: '#1C1917', borderRadius: '2px' }} />
+                <div style={{ width: '22px', height: '2.5px', backgroundColor: '#1C1917', borderRadius: '2px' }} />
+              </>
+            )}
+          </button>
         </div>
+
+        {/*
+          Mobile menu panel.
+          Drops down below the sticky header when the hamburger is open.
+          Links are large + tappable. "Get Started" moves inside as the
+          prominent final CTA (per product direction).
+        */}
+        {publicMenuOpen && (
+          <>
+            {/* Backdrop tap-to-close layer */}
+            <div
+              className="sm:hidden fixed inset-0 bg-black/20 z-40"
+              style={{ top: '64px' }}
+              onClick={() => setPublicMenuOpen(false)}
+              aria-hidden="true"
+            />
+
+            <div
+              className="sm:hidden absolute top-full left-0 right-0 border-b z-50"
+              style={{
+                backgroundColor: '#FEF3C7',
+                borderBottomColor: '#1C191714',
+                boxShadow: '0 4px 16px #1C19171A',
+              }}
+            >
+              <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col gap-1.5">
+                {publicLinks.map(l => {
+                  const isActive = activeKey === l.key;
+                  return (
+                    <Link
+                      key={l.key}
+                      href={l.href}
+                      onClick={() => setPublicMenuOpen(false)}
+                      className="px-4 py-3.5 rounded-xl transition-all active:scale-[0.98]"
+                      style={{
+                        backgroundColor: isActive ? '#FFFBEB' : 'transparent',
+                        border: isActive ? '1px solid #1C191720' : '1px solid transparent',
+                        color: '#1C1917',
+                        fontWeight: isActive ? 700 : 500,
+                        fontSize: '16px',
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
+
+                {/* Divider */}
+                <div style={{ height: '1px', backgroundColor: '#1C191714', margin: '8px 4px' }} />
+
+                {/* Log in — secondary style (text link) */}
+                <Link
+                  href="/login"
+                  onClick={() => setPublicMenuOpen(false)}
+                  className="px-4 py-3 transition-colors"
+                  style={{
+                    color: '#57534E',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                  }}
+                >
+                  Log in
+                </Link>
+
+                {/* Get Started — primary chunky CTA, matches site aesthetic */}
+                <Link
+                  href="/login?mode=signup"
+                  onClick={() => setPublicMenuOpen(false)}
+                  className="mt-2 mx-1 px-5 py-3.5 text-center transition-all active:translate-y-0.5"
+                  style={{
+                    backgroundColor: '#FCD34D',
+                    color: '#1C1917',
+                    border: '1.5px solid #1C1917',
+                    boxShadow: '3px 3px 0 #1C1917',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    fontSize: '15px',
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  Get Started — Free
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
       </header>
     );
   }
