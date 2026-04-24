@@ -95,13 +95,6 @@ const PATTERN_OPTIONS = [
   { name: 'Poop',     value: 'poop' },
 ];
 
-const CARD_STYLES = [
-  { name: 'Rounded',  value: 'rounded' },
-  { name: 'Flat',     value: 'flat' },
-  { name: 'Bordered', value: 'bordered' },
-  { name: 'Polaroid', value: 'polaroid' },
-];
-
 const LAYOUT_OPTIONS = [
   { name: 'Grid',     value: 'grid' },
   { name: 'List',     value: 'list' },
@@ -139,7 +132,6 @@ export default function EditorPage() {
     cardFont: storeTheme?.card_font || 'Poppins',
     announcement: storeTheme?.announcement || '',
     announcementOn: storeTheme?.announcement_on || false,
-    cardStyle: storeTheme?.card_style || 'rounded',
     productLayout: storeTheme?.product_layout || 'grid',
   }));
   const [draftBio, setDraftBio] = useState(storeData?.bio || '');
@@ -159,7 +151,6 @@ export default function EditorPage() {
         cardFont: storeTheme.card_font || 'Poppins',
         announcement: storeTheme.announcement || '',
         announcementOn: storeTheme.announcement_on || false,
-        cardStyle: storeTheme.card_style || 'rounded',
         productLayout: storeTheme.product_layout || 'grid',
       });
     }
@@ -227,7 +218,6 @@ export default function EditorPage() {
   async function saveProductsDesign() {
     await updateTheme({
       card_font: draftTheme.cardFont || 'Poppins',
-      card_style: draftTheme.cardStyle || 'rounded',
       product_layout: draftTheme.productLayout || 'grid',
     });
     flashSaved('products');
@@ -1463,38 +1453,6 @@ export default function EditorPage() {
                           }}
                         >
                           {l.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </ControlGroup>
-
-                {/* Card style */}
-                <ControlGroup label="Card style">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {CARD_STYLES.map((c) => {
-                      const isActive = draftTheme.cardStyle === c.value;
-                      return (
-                        <button
-                          key={c.value}
-                          onClick={() => setDraftTheme((prev) => ({ ...prev, cardStyle: c.value }))}
-                          style={{
-                            padding: '12px 8px',
-                            borderRadius: '10px',
-                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
-                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
-                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
-                            backgroundColor: isActive ? C.amberBtn : C.cream,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.1s',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            color: C.ink,
-                            fontFamily: 'inherit',
-                          }}
-                        >
-                          {c.name}
                         </button>
                       );
                     })}
