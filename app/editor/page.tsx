@@ -947,110 +947,6 @@ export default function EditorPage() {
             {/* ========== PRODUCTS SECTION ========== */}
             {activeSection === 'products' && (
               <div className="space-y-3">
-                {/* Product layout */}
-                <ControlGroup label="Product layout">
-                  <div className="grid grid-cols-3 gap-2">
-                    {LAYOUT_OPTIONS.map((l) => {
-                      const isActive = draftTheme.productLayout === l.value;
-                      return (
-                        <button
-                          key={l.value}
-                          onClick={() => setDraftTheme((prev) => ({ ...prev, productLayout: l.value }))}
-                          style={{
-                            padding: '12px 8px',
-                            borderRadius: '10px',
-                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
-                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
-                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
-                            backgroundColor: isActive ? C.amberBtn : C.cream,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.1s',
-                            fontSize: '13px',
-                            fontWeight: 700,
-                            color: C.ink,
-                            fontFamily: 'inherit',
-                          }}
-                        >
-                          {l.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </ControlGroup>
-
-                {/* Card style */}
-                <ControlGroup label="Card style">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {CARD_STYLES.map((c) => {
-                      const isActive = draftTheme.cardStyle === c.value;
-                      return (
-                        <button
-                          key={c.value}
-                          onClick={() => setDraftTheme((prev) => ({ ...prev, cardStyle: c.value }))}
-                          style={{
-                            padding: '12px 8px',
-                            borderRadius: '10px',
-                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
-                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
-                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
-                            backgroundColor: isActive ? C.amberBtn : C.cream,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.1s',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            color: C.ink,
-                            fontFamily: 'inherit',
-                          }}
-                        >
-                          {c.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </ControlGroup>
-
-                {/* Card font */}
-                <ControlGroup label="Product name font">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {FONT_OPTIONS.map((f) => {
-                      const isActive = draftTheme.cardFont === f.value;
-                      return (
-                        <button
-                          key={f.value}
-                          onClick={() => setDraftTheme((prev) => ({ ...prev, cardFont: f.value }))}
-                          style={{
-                            padding: '10px 8px',
-                            borderRadius: '10px',
-                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
-                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
-                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
-                            backgroundColor: isActive ? C.amberBtn : C.cream,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.1s',
-                          }}
-                        >
-                          <div style={{ fontFamily: f.family, fontSize: '13px', marginBottom: '2px', color: C.ink }}>
-                            Friendship Bracelet
-                          </div>
-                          <div style={{ fontSize: '10px', color: C.inkFaint, fontWeight: 600 }}>
-                            {f.name}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </ControlGroup>
-
-                <SaveBar
-                  sectionLabel="Products design"
-                  isSaved={savedSection === 'products'}
-                  onSave={saveProductsDesign}
-                />
-
-                {/* ===== MY PRODUCTS LIST ===== */}
                 <div
                   style={{
                     backgroundColor: C.cardBg,
@@ -1058,7 +954,6 @@ export default function EditorPage() {
                     borderRadius: '14px',
                     padding: '16px 18px',
                     boxShadow: `2px 2px 0 ${C.ink}12`,
-                    marginTop: '20px',
                   }}
                 >
                   <div className="flex items-center justify-between mb-4">
@@ -1541,6 +1436,110 @@ export default function EditorPage() {
                     )}
                   </div>
                 </div>
+                {/* ===== DESIGN CONTROLS (layout, card style, font) ===== */}
+                {/* Product layout */}
+                <ControlGroup label="Product layout">
+                  <div className="grid grid-cols-3 gap-2">
+                    {LAYOUT_OPTIONS.map((l) => {
+                      const isActive = draftTheme.productLayout === l.value;
+                      return (
+                        <button
+                          key={l.value}
+                          onClick={() => setDraftTheme((prev) => ({ ...prev, productLayout: l.value }))}
+                          style={{
+                            padding: '12px 8px',
+                            borderRadius: '10px',
+                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                            backgroundColor: isActive ? C.amberBtn : C.cream,
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.1s',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            color: C.ink,
+                            fontFamily: 'inherit',
+                          }}
+                        >
+                          {l.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </ControlGroup>
+
+                {/* Card style */}
+                <ControlGroup label="Card style">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {CARD_STYLES.map((c) => {
+                      const isActive = draftTheme.cardStyle === c.value;
+                      return (
+                        <button
+                          key={c.value}
+                          onClick={() => setDraftTheme((prev) => ({ ...prev, cardStyle: c.value }))}
+                          style={{
+                            padding: '12px 8px',
+                            borderRadius: '10px',
+                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                            backgroundColor: isActive ? C.amberBtn : C.cream,
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.1s',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: C.ink,
+                            fontFamily: 'inherit',
+                          }}
+                        >
+                          {c.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </ControlGroup>
+
+                {/* Card font */}
+                <ControlGroup label="Product name font">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {FONT_OPTIONS.map((f) => {
+                      const isActive = draftTheme.cardFont === f.value;
+                      return (
+                        <button
+                          key={f.value}
+                          onClick={() => setDraftTheme((prev) => ({ ...prev, cardFont: f.value }))}
+                          style={{
+                            padding: '10px 8px',
+                            borderRadius: '10px',
+                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                            backgroundColor: isActive ? C.amberBtn : C.cream,
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.1s',
+                          }}
+                        >
+                          <div style={{ fontFamily: f.family, fontSize: '13px', marginBottom: '2px', color: C.ink }}>
+                            Friendship Bracelet
+                          </div>
+                          <div style={{ fontSize: '10px', color: C.inkFaint, fontWeight: 600 }}>
+                            {f.name}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </ControlGroup>
+
+                <SaveBar
+                  sectionLabel="Products design"
+                  isSaved={savedSection === 'products'}
+                  onSave={saveProductsDesign}
+                />
+
               </div>
             )}
           </div>
