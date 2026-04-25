@@ -4,39 +4,81 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Logo, Confetti, stickerSets } from '../components';
+import Link from 'next/link';
+import { NavBar, Logo, Confetti, stickerSets } from '../components';
 import { useApp } from '../../lib/context';
 
-const font = {
-  heading: "'Poppins', sans-serif",
-  accent: "'DynaPuff', cursive",
+// ====================== DESIGN TOKENS ======================
+const C = {
+  cream: '#FEF3C7',
+  creamWarm: '#FEF0B8',
+  creamCool: '#FDF8E1',
+  cardBg: '#FFFBEB',
+  ink: '#1C1917',
+  inkMuted: '#57534E',
+  inkFaint: '#78716C',
+  inkGhost: '#A8A29E',
+  border: '#1C19171F',
+  borderFaint: '#1C191714',
+  borderInput: '#1C19172B',
+  amberAccent: '#D97706',
+  amberBtn: '#FCD34D',
+  amberInputBg: '#FEF3C7',
+  success: '#059669',
+  successBg: '#D1FAE5',
+  tipBg: '#EDE9FE',
+  tipInk: '#4C1D95',
 };
 
-const fontOpts = [
-  { name: 'Poppins', value: 'Poppins', family: "'Poppins', sans-serif" },
-  { name: 'Montserrat', value: 'Montserrat', family: "'Montserrat', sans-serif" },
-  { name: 'Pacifico', value: 'Pacifico', family: "'Pacifico', cursive" },
-  { name: 'Sour Gummy', value: 'Sour Gummy', family: "'Sour Gummy', cursive" },
-  { name: 'DynaPuff', value: 'DynaPuff', family: "'DynaPuff', cursive" },
-  { name: 'Delius', value: 'Delius', family: "'Delius', cursive" },
+const font = {
+  sans: "'Poppins', sans-serif",
+  brand: "'DynaPuff', cursive", // ONLY for "Lemonade Stand" brand moments
+};
+
+// ====================== KID COLOR PALETTE MAP ======================
+// Mirrors the editor + store page so previews render accurately.
+function getKidColors(colorKey) {
+  const palettes = {
+    amber:  { tint: '#FEF3C7', accent: '#F59E0B', deep: '#92400E' },
+    blue:   { tint: '#EFF6FF', accent: '#3B82F6', deep: '#1E3A8A' },
+    green:  { tint: '#ECFDF5', accent: '#10B981', deep: '#065F46' },
+    pink:   { tint: '#FDF2F8', accent: '#EC4899', deep: '#9D174D' },
+    purple: { tint: '#F5F3FF', accent: '#8B5CF6', deep: '#5B21B6' },
+    orange: { tint: '#FFF7ED', accent: '#F97316', deep: '#9A3412' },
+  };
+  return palettes[colorKey] || palettes.amber;
+}
+
+// ====================== OPTION CONSTANTS ======================
+const FONT_OPTS = [
+  { name: 'Poppins',      value: 'Poppins',      family: "'Poppins', sans-serif" },
+  { name: 'Montserrat',   value: 'Montserrat',   family: "'Montserrat', sans-serif" },
+  { name: 'Pacifico',     value: 'Pacifico',     family: "'Pacifico', cursive" },
+  { name: 'Sour Gummy',   value: 'Sour Gummy',   family: "'Sour Gummy', cursive" },
+  { name: 'DynaPuff',     value: 'DynaPuff',     family: "'DynaPuff', cursive" },
+  { name: 'Delius',       value: 'Delius',       family: "'Delius', cursive" },
   { name: 'Emilys Candy', value: 'Emilys Candy', family: "'Emilys Candy', cursive" },
-  { name: 'Unica One', value: 'Unica One', family: "'Unica One', sans-serif" },
-  { name: 'Ultra', value: 'Ultra', family: "'Ultra', serif" },
-  { name: 'Quantico', value: 'Quantico', family: "'Quantico', sans-serif" },
+  { name: 'Unica One',    value: 'Unica One',    family: "'Unica One', sans-serif" },
+  { name: 'Ultra',        value: 'Ultra',        family: "'Ultra', serif" },
+  { name: 'Quantico',     value: 'Quantico',     family: "'Quantico', sans-serif" },
 ];
 
-const colorOptions = [
-  { name: 'Sunshine', value: 'amber', bg: 'bg-amber-400', ring: 'ring-amber-400' },
-  { name: 'Ocean', value: 'blue', bg: 'bg-blue-400', ring: 'ring-blue-400' },
-  { name: 'Forest', value: 'green', bg: 'bg-emerald-400', ring: 'ring-emerald-400' },
-  { name: 'Bubblegum', value: 'pink', bg: 'bg-pink-400', ring: 'ring-pink-400' },
-  { name: 'Grape', value: 'purple', bg: 'bg-purple-400', ring: 'ring-purple-400' },
-  { name: 'Tangerine', value: 'orange', bg: 'bg-orange-400', ring: 'ring-orange-400' },
+const COLOR_OPTIONS = [
+  { name: 'Sunshine',  value: 'amber',  swatch: '#F59E0B' },
+  { name: 'Ocean',     value: 'blue',   swatch: '#3B82F6' },
+  { name: 'Forest',    value: 'green',  swatch: '#10B981' },
+  { name: 'Bubblegum', value: 'pink',   swatch: '#EC4899' },
+  { name: 'Grape',     value: 'purple', swatch: '#8B5CF6' },
+  { name: 'Tangerine', value: 'orange', swatch: '#F97316' },
 ];
 
+const EMOJI_OPTIONS = ['🎁', '🧸', '🎨', '🍪', '💎', '🌸', '⭐', '🦋', '📿', '🧁', '🌱', '🐾'];
+
+// ====================== COMPONENT ======================
 export default function OnboardingPage() {
   const router = useRouter();
   const { store, theme: storeTheme, updateTheme, updateStore, addProduct: addProductToDb, loading } = useApp();
+
   const [step, setStep] = useState(1);
   const [showComplete, setShowComplete] = useState(false);
 
@@ -59,10 +101,8 @@ export default function OnboardingPage() {
   const storeName = store?.store_name || 'My Store';
   const totalSteps = 6;
 
-  const emojiOptions = ['🎁', '🧸', '🎨', '🍪', '💎', '🌸', '⭐', '🦋', '📿', '🧁', '🌱', '🐾'];
-
-  // Save design choices
-  const saveDesign = async () => {
+  // ====================== ACTIONS ======================
+  async function saveDesign() {
     await updateTheme({
       color,
       sticker,
@@ -70,10 +110,9 @@ export default function OnboardingPage() {
       body_font: bodyFont,
     });
     if (bio) await updateStore({ bio });
-  };
+  }
 
-  // Save product
-  const saveProduct = async () => {
+  async function saveProduct() {
     if (!productName || !productPrice) return;
     await addProductToDb({
       name: productName,
@@ -83,389 +122,1075 @@ export default function OnboardingPage() {
       in_stock: true,
       status: 'pending_review',
     });
-  };
+  }
 
-  const handleComplete = async () => {
+  async function handleComplete() {
     await saveDesign();
     if (productName && productPrice) await saveProduct();
     setShowComplete(true);
-  };
+  }
 
-  if (loading) return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center">
-      <Logo size="lg" /><p className="text-gray-400 mt-3 text-sm">Loading...</p>
-    </div>
-  );
-
-  if (!store) { router.push('/setup'); return null; }
-
-  // Completion screen
-  if (showComplete) {
+  // ====================== EARLY STATES ======================
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-100 via-amber-50 to-white flex items-center justify-center px-4">
-        <Confetti />
-        <div className="text-center max-w-sm">
-          <Logo size="xl" />
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-6" style={{ fontFamily: font.accent }}>
-            Your store is ready!
-          </h1>
-          <p className="text-gray-500 mt-3" style={{ fontFamily: font.heading }}>
-            {storeName} is looking great, {kidName}. Time to show the world.
-          </p>
-
-          {/* Mini preview */}
-          <div className={`mt-6 rounded-2xl p-5 text-center ${
-            color === 'blue' ? 'bg-blue-50' : color === 'green' ? 'bg-emerald-50' : color === 'pink' ? 'bg-pink-50' :
-            color === 'purple' ? 'bg-purple-50' : color === 'orange' ? 'bg-orange-50' : 'bg-amber-50'
-          }`}>
-            <div className="text-4xl mb-2">{sticker}</div>
-            <h2 className="text-xl font-bold" style={{
-              fontFamily: fontOpts.find(f => f.value === headerFont)?.family || "'Poppins', sans-serif",
-              color: color === 'blue' ? '#1E40AF' : color === 'green' ? '#065F46' : color === 'pink' ? '#BE185D' :
-                color === 'purple' ? '#5B21B6' : color === 'orange' ? '#C2410C' : '#92400E'
-            }}>{storeName}</h2>
-            {bio && <p className="text-sm text-gray-500 mt-1 italic">"{bio}"</p>}
-            <p className="text-xs text-gray-400 mt-1">by {kidName}</p>
-          </div>
-
-          <div className="flex flex-col gap-3 mt-8">
-            <button onClick={() => router.push(`/store/${store.id}`)}
-              className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-full text-lg transition-all shadow-lg shadow-amber-200 active:scale-[0.97]"
-              style={{ fontFamily: font.accent }}>
-              Visit My Store
-            </button>
-            <button onClick={() => router.push('/editor')}
-              className="w-full py-3 bg-white border-2 border-amber-200 text-amber-600 font-bold rounded-full text-sm transition-all hover:bg-amber-50"
-              style={{ fontFamily: font.accent }}>
-              Keep Customizing
-            </button>
-          </div>
-        </div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans }}
+      >
+        <p style={{ color: C.inkFaint, fontSize: '14px' }}>Loading…</p>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white" style={{ fontFamily: font.heading }}>
+  if (!store) {
+    router.push('/setup');
+    return null;
+  }
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 sm:px-8 py-4">
-        <div className="flex items-center gap-2">
-          <Logo size="sm" />
-          <span className="font-bold text-gray-900" style={{ fontFamily: font.accent }}>Build Your Store</span>
+  // Color palette for current selection (used in completion preview)
+  const kidColors = getKidColors(color);
+
+  // ====================== COMPLETION SCREEN ======================
+  if (showComplete) {
+    return (
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+      >
+        <Confetti />
+        <NavBar active="biz" />
+
+        <main className="max-w-md mx-auto px-4 sm:px-8 pt-12 sm:pt-16 pb-16 text-center">
+          <p
+            className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
+            style={{ color: C.amberAccent }}
+          >
+            Your store is ready
+          </p>
+          <h1
+            className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02]"
+            style={{ fontWeight: 800, color: C.ink }}
+          >
+            Let's <span style={{ color: C.amberAccent }}>show the world.</span>
+          </h1>
+          <p
+            className="mt-4 leading-relaxed"
+            style={{ fontSize: '15px', color: C.inkMuted }}
+          >
+            {storeName} is looking great, {kidName}.
+          </p>
+
+          {/* Mini store preview — uses kid's chosen color/font/sticker/bio */}
+          <div
+            className="mt-8 mx-auto relative overflow-hidden"
+            style={{
+              backgroundColor: kidColors.tint,
+              border: `1.5px solid ${C.ink}`,
+              borderRadius: '20px',
+              boxShadow: `3px 3px 0 ${C.ink}`,
+              padding: '28px 22px',
+              maxWidth: '380px',
+            }}
+          >
+            <div style={{ fontSize: '52px', lineHeight: 1, marginBottom: '8px' }}>
+              {sticker}
+            </div>
+            <h2
+              style={{
+                fontFamily: FONT_OPTS.find((f) => f.value === headerFont)?.family || font.sans,
+                fontSize: '28px',
+                fontWeight: 700,
+                color: kidColors.deep,
+                lineHeight: 1.05,
+                letterSpacing: '-0.01em',
+                margin: 0,
+              }}
+            >
+              {storeName}
+            </h2>
+            <p
+              style={{
+                fontSize: '12px',
+                color: C.inkMuted,
+                marginTop: '4px',
+                fontFamily: FONT_OPTS.find((f) => f.value === bodyFont)?.family || font.sans,
+              }}
+            >
+              by {kidName}
+            </p>
+            {bio && (
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: C.inkMuted,
+                  fontStyle: 'italic',
+                  marginTop: '10px',
+                  lineHeight: 1.45,
+                  fontFamily: FONT_OPTS.find((f) => f.value === bodyFont)?.family || font.sans,
+                }}
+              >
+                "{bio}"
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3 mt-8">
+            <button
+              onClick={() => router.push(`/store/${store.id}`)}
+              className="w-full transition-all hover:-translate-y-0.5"
+              style={{
+                backgroundColor: C.amberBtn,
+                color: C.ink,
+                border: `1.5px solid ${C.ink}`,
+                boxShadow: `3px 3px 0 ${C.ink}`,
+                borderRadius: '14px',
+                padding: '15px',
+                fontWeight: 800,
+                fontSize: '16px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                letterSpacing: '-0.005em',
+              }}
+            >
+              Visit my store →
+            </button>
+            <button
+              onClick={() => router.push('/editor')}
+              className="w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                color: C.inkMuted,
+                border: `1.5px solid ${C.borderInput}`,
+                borderRadius: '14px',
+                padding: '13px',
+                fontWeight: 700,
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Keep customizing
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ====================== WIZARD CHROME ======================
+  return (
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+    >
+      <NavBar active="" />
+
+      {/* Wizard sub-header — small chunky pill showing whose turn it is */}
+      <div className="max-w-xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between gap-3">
+        <p
+          className="text-xs uppercase tracking-[0.25em] font-bold"
+          style={{ color: C.amberAccent }}
+        >
+          Build your store
+        </p>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            backgroundColor: C.cardBg,
+            border: `1px solid ${C.border}`,
+            borderRadius: '999px',
+            padding: '4px 12px',
+            fontSize: '12px',
+            fontWeight: 700,
+            color: C.ink,
+            boxShadow: `1px 1px 0 ${C.ink}14`,
+          }}
+        >
+          {kidName}'s turn
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs bg-amber-400 text-white px-3 py-1 rounded-full font-bold" style={{ fontFamily: font.accent }}>{kidName}'s Turn</span>
-        </div>
-      </header>
+      </div>
 
       {/* Progress dots */}
-      <div className="max-w-xl mx-auto px-4 mb-6">
+      <div className="max-w-xl mx-auto px-4 mb-8">
         <div className="flex items-center justify-center gap-2">
           {Array.from({ length: totalSteps }).map((_, i) => (
-            <div key={i} className={`h-2 rounded-full transition-all duration-300 ${
-              i < step - 1 ? 'w-8 bg-amber-400' :
-              i === step - 1 ? 'w-10 bg-amber-500' :
-              'w-6 bg-amber-200'
-            }`} />
+            <div
+              key={i}
+              style={{
+                height: '6px',
+                borderRadius: '999px',
+                transition: 'all 0.3s',
+                width: i === step - 1 ? '32px' : i < step - 1 ? '24px' : '16px',
+                backgroundColor: i === step - 1 ? C.ink : i < step - 1 ? C.amberAccent : C.borderInput,
+              }}
+            />
           ))}
         </div>
+        <p
+          className="text-center mt-3"
+          style={{
+            fontSize: '11px',
+            color: C.inkFaint,
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+          }}
+        >
+          Step {step} of {totalSteps}
+        </p>
       </div>
 
       <main className="max-w-xl mx-auto px-4 pb-20">
 
-        {/* ===== STEP 1: Pick your color ===== */}
+        {/* ===================== STEP 1: COLOR ===================== */}
         {step === 1 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Pick your store color!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Pick your <span style={{ color: C.amberAccent }}>store color.</span>
             </h1>
-            <p className="text-gray-500 mt-2">This sets the vibe for your whole store.</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              This sets the vibe for your whole store.
+            </p>
 
-            <div className="grid grid-cols-3 gap-4 mt-8 max-w-sm mx-auto">
-              {colorOptions.map((c) => (
-                <button key={c.value} onClick={() => setColor(c.value)}
-                  className={`p-4 rounded-2xl border-3 transition-all active:scale-95 ${
-                    color === c.value ? 'border-gray-800 scale-[1.05] shadow-lg' : 'border-transparent hover:scale-[1.02]'
-                  }`}>
-                  <div className={`w-full h-14 rounded-xl ${c.bg} mb-2`} />
-                  <div className="text-sm font-bold text-gray-600">{c.name}</div>
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-3 mt-8 max-w-sm mx-auto">
+              {COLOR_OPTIONS.map((c) => {
+                const isActive = color === c.value;
+                return (
+                  <button
+                    key={c.value}
+                    onClick={() => setColor(c.value)}
+                    className="transition-all"
+                    style={{
+                      padding: '14px 12px',
+                      borderRadius: '16px',
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `3px 3px 0 ${C.ink}` : 'none',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      backgroundColor: C.cardBg,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '52px',
+                        borderRadius: '10px',
+                        backgroundColor: c.swatch,
+                        border: `1.5px solid ${C.ink}`,
+                        marginBottom: '8px',
+                      }}
+                    />
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: C.ink }}>
+                      {c.name}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex gap-3 mt-10">
-              <button onClick={() => { setStep(2); }}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-4 rounded-full text-lg transition-all active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>
-                Love it! →
-              </button>
-            </div>
-            <button onClick={() => setStep(2)} className="text-sm text-gray-400 mt-3 hover:text-gray-500">Skip for now</button>
+            <NavButtons step={step} setStep={setStep} totalSteps={totalSteps} />
           </div>
         )}
 
-        {/* ===== STEP 2: Choose your sticker ===== */}
+        {/* ===================== STEP 2: STICKER ===================== */}
         {step === 2 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Choose your sticker!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Choose your <span style={{ color: C.amberAccent }}>sticker.</span>
             </h1>
-            <p className="text-gray-500 mt-2">This shows up at the top of your store.</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              This shows up at the top of your store.
+            </p>
 
-            <div className="mt-6 flex gap-1.5 justify-center flex-wrap">
-              {['popular','faces','animals','food','nature','sports'].map((cat) => (
-                <button key={cat} onClick={() => setStickerTab(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    stickerTab === cat ? 'bg-amber-400 text-white' : 'bg-white text-gray-500 border border-gray-200'
-                  }`}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</button>
-              ))}
+            {/* Category tabs */}
+            <div className="flex gap-1.5 justify-center flex-wrap mt-6 mb-4">
+              {['popular', 'faces', 'animals', 'food', 'nature', 'sports'].map((cat) => {
+                const isActive = stickerTab === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setStickerTab(cat)}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '999px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: isActive ? C.amberBtn : C.inkFaint,
+                      backgroundColor: isActive ? C.ink : C.cardBg,
+                      border: `1px solid ${isActive ? C.ink : C.border}`,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex flex-wrap gap-2 justify-center mt-4 max-w-sm mx-auto">
-              {(stickerSets[stickerTab] || stickerSets.popular).map((s) => (
-                <button key={s} onClick={() => setSticker(s)}
-                  className={`w-14 h-14 text-3xl rounded-xl border-2 flex items-center justify-center transition-all active:scale-90 ${
-                    sticker === s ? 'border-amber-400 bg-amber-50 scale-110 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
-                  }`}>{s}</button>
-              ))}
+            {/* Sticker grid */}
+            <div className="flex flex-wrap gap-2 justify-center max-w-sm mx-auto">
+              {(stickerSets[stickerTab] || stickerSets.popular).map((s) => {
+                const isActive = sticker === s;
+                return (
+                  <button
+                    key={s}
+                    onClick={() => setSticker(s)}
+                    className="transition-all"
+                    style={{
+                      width: '52px',
+                      height: '52px',
+                      fontSize: '26px',
+                      borderRadius: '12px',
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
             </div>
 
+            {/* Live confirmation */}
             {sticker && (
-              <div className="mt-6 animate-fadeIn">
-                <div className="text-5xl">{sticker}</div>
-                <p className="text-amber-600 text-sm font-semibold mt-1" style={{ fontFamily: font.accent }}>Great pick!</p>
+              <div className="mt-8 animate-fadeIn">
+                <div style={{ fontSize: '60px', lineHeight: 1 }}>{sticker}</div>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    marginTop: '8px',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Great pick!
+                </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(1)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(3)}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-4 rounded-full text-lg transition-all active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>Next →</button>
-            </div>
-            <button onClick={() => setStep(3)} className="text-sm text-gray-400 mt-3 hover:text-gray-500">Skip for now</button>
+            <NavButtons step={step} setStep={setStep} totalSteps={totalSteps} />
           </div>
         )}
 
-        {/* ===== STEP 3: Pick your fonts ===== */}
+        {/* ===================== STEP 3: FONTS ===================== */}
         {step === 3 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Pick your fonts!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Pick your <span style={{ color: C.amberAccent }}>fonts.</span>
             </h1>
-            <p className="text-gray-500 mt-2">Two fonts. One for personality, one for reading.</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              Two fonts. One for personality, one for reading.
+            </p>
 
             {/* Headline font */}
             <div className="mt-8 text-left">
-              <h3 className="font-bold text-amber-700 text-sm mb-1" style={{ fontFamily: font.accent }}>Headline font</h3>
-              <p className="text-xs text-gray-400 mb-3">This is where you show off your personality. Go bold, go fun!</p>
+              <div
+                className="mb-2"
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: C.amberAccent,
+                  fontWeight: 800,
+                  paddingLeft: '4px',
+                }}
+              >
+                Headline font
+              </div>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: C.inkFaint,
+                  marginBottom: '12px',
+                  paddingLeft: '4px',
+                  lineHeight: 1.5,
+                }}
+              >
+                Where you show off your personality. Go bold, go fun.
+              </p>
               <div className="grid grid-cols-2 gap-2">
-                {fontOpts.map((f) => (
-                  <button key={f.value} onClick={() => setHeaderFont(f.value)}
-                    className={`p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
-                      headerFont === f.value ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
-                    }`}>
-                    <div className="text-lg mb-0.5" style={{ fontFamily: f.family }}>{storeName}</div>
-                    <div className="text-xs text-gray-400">{f.name}</div>
-                  </button>
-                ))}
+                {FONT_OPTS.map((f) => {
+                  const isActive = headerFont === f.value;
+                  return (
+                    <button
+                      key={f.value}
+                      onClick={() => setHeaderFont(f.value)}
+                      className="transition-all"
+                      style={{
+                        padding: '12px 8px',
+                        borderRadius: '12px',
+                        border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                        boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                        transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                        backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: f.family,
+                          fontSize: '17px',
+                          marginBottom: '2px',
+                          color: C.ink,
+                        }}
+                      >
+                        {storeName}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '10px',
+                          color: C.inkFaint,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {f.name}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Description font */}
             <div className="mt-6 text-left">
-              <h3 className="font-bold text-amber-700 text-sm mb-1" style={{ fontFamily: font.accent }}>Description font</h3>
-              <p className="text-xs text-gray-400 mb-3">This is where all the info about what you sell will appear. Pick something easy to read!</p>
+              <div
+                className="mb-2"
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: C.amberAccent,
+                  fontWeight: 800,
+                  paddingLeft: '4px',
+                }}
+              >
+                Description font
+              </div>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: C.inkFaint,
+                  marginBottom: '12px',
+                  paddingLeft: '4px',
+                  lineHeight: 1.5,
+                }}
+              >
+                For descriptions and details. Pick something easy to read.
+              </p>
               <div className="grid grid-cols-2 gap-2">
-                {fontOpts.map((f) => (
-                  <button key={f.value} onClick={() => setBodyFont(f.value)}
-                    className={`p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
-                      bodyFont === f.value ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
-                    }`}>
-                    <div className="text-sm mb-0.5" style={{ fontFamily: f.family }}>Handmade with love by {kidName}</div>
-                    <div className="text-xs text-gray-400">{f.name}</div>
-                  </button>
-                ))}
+                {FONT_OPTS.map((f) => {
+                  const isActive = bodyFont === f.value;
+                  return (
+                    <button
+                      key={f.value}
+                      onClick={() => setBodyFont(f.value)}
+                      className="transition-all"
+                      style={{
+                        padding: '12px 8px',
+                        borderRadius: '12px',
+                        border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                        boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                        transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                        backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: f.family,
+                          fontSize: '13px',
+                          marginBottom: '2px',
+                          color: C.ink,
+                        }}
+                      >
+                        Handmade with love by {kidName}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '10px',
+                          color: C.inkFaint,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {f.name}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(2)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(4)}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-4 rounded-full text-lg transition-all active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>Looks great! →</button>
-            </div>
-            <button onClick={() => setStep(4)} className="text-sm text-gray-400 mt-3 hover:text-gray-500">Skip for now</button>
+            <NavButtons step={step} setStep={setStep} totalSteps={totalSteps} />
           </div>
         )}
 
-        {/* ===== STEP 4: Store bio ===== */}
+        {/* ===================== STEP 4: BIO ===================== */}
         {step === 4 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Tell people about your store!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Tell people <span style={{ color: C.amberAccent }}>about your store.</span>
             </h1>
-            <p className="text-gray-500 mt-2">A few words about what you make and why it's awesome.</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              A few words about what you make and why it's awesome.
+            </p>
 
-            <div className="mt-8 text-left">
-              <textarea value={bio} onChange={(e) => setBio(e.target.value.slice(0, 150))}
+            <div
+              className="mt-8 text-left"
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1px solid ${C.border}`,
+                borderRadius: '16px',
+                padding: '16px 18px',
+                boxShadow: `2px 2px 0 ${C.ink}12`,
+              }}
+            >
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value.slice(0, 150))}
                 placeholder={`Hi! I'm ${kidName} and I love making things by hand...`}
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-base resize-none" />
-              <div className="text-right text-xs text-gray-400 mt-1">{bio.length}/150</div>
+                className="focus:outline-none"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: C.cream,
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  color: C.ink,
+                  fontFamily: 'inherit',
+                  resize: 'none',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+              />
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontSize: '11px',
+                  color: C.inkFaint,
+                  marginTop: '6px',
+                  fontWeight: 600,
+                }}
+              >
+                {bio.length}/150
+              </div>
             </div>
 
             {bio && (
-              <div className="mt-4 bg-amber-50 rounded-xl p-4 animate-fadeIn">
-                <p className="text-xs text-amber-600/60 mb-1">Preview</p>
-                <p className="text-gray-700 italic">"{bio}"</p>
+              <div
+                className="mt-4 animate-fadeIn"
+                style={{
+                  backgroundColor: kidColors.tint,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '14px',
+                  padding: '16px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    marginBottom: '6px',
+                  }}
+                >
+                  Preview
+                </p>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: C.ink,
+                    fontStyle: 'italic',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  "{bio}"
+                </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(3)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(5)}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-4 rounded-full text-lg transition-all active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>{bio ? "Nice! →" : "Next →"}</button>
-            </div>
-            <button onClick={() => setStep(5)} className="text-sm text-gray-400 mt-3 hover:text-gray-500">Skip for now</button>
+            <NavButtons step={step} setStep={setStep} totalSteps={totalSteps} />
           </div>
         )}
 
-        {/* ===== STEP 5: First product ===== */}
+        {/* ===================== STEP 5: FIRST PRODUCT ===================== */}
         {step === 5 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Add your first product!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Add your <span style={{ color: C.amberAccent }}>first product.</span>
             </h1>
-            <p className="text-gray-500 mt-2">This is the exciting part. What do you want to sell?</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              The exciting part. What do you want to sell?
+            </p>
 
-            <div className="mt-8 text-left space-y-4">
+            <div
+              className="mt-8 text-left space-y-4"
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1px solid ${C.border}`,
+                borderRadius: '16px',
+                padding: '20px',
+                boxShadow: `2px 2px 0 ${C.ink}12`,
+              }}
+            >
+              {/* Name */}
               <div>
-                <label className="block text-sm font-bold text-amber-700 mb-1" style={{ fontFamily: font.accent }}>What's it called?</label>
-                <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)}
+                <label style={fieldLabelStyle}>What's it called?</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
                   placeholder="e.g. Friendship Bracelet"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-lg" />
+                  className="focus:outline-none"
+                  style={fieldInputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                />
               </div>
 
+              {/* Price */}
               <div>
-                <label className="block text-sm font-bold text-amber-700 mb-1" style={{ fontFamily: font.accent }}>How much does it cost?</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-lg text-gray-400">$</span>
-                  <input type="number" inputMode="decimal" value={productPrice} onChange={(e) => setProductPrice(e.target.value)}
+                <label style={fieldLabelStyle}>How much does it cost?</label>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '14px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: C.inkGhost,
+                      fontSize: '15px',
+                      pointerEvents: 'none',
+                      fontWeight: 700,
+                    }}
+                  >
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={productPrice}
+                    onChange={(e) => setProductPrice(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-9 pr-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-lg" />
+                    className="focus:outline-none"
+                    style={{ ...fieldInputStyle, paddingLeft: '28px' }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                  />
                 </div>
               </div>
 
+              {/* Description */}
               <div>
-                <label className="block text-sm font-bold text-amber-700 mb-1" style={{ fontFamily: font.accent }}>Tell customers about it</label>
-                <textarea value={productDesc} onChange={(e) => setProductDesc(e.target.value)}
-                  placeholder="Handmade with love..." rows={2}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-sm resize-none" />
+                <label style={fieldLabelStyle}>Tell customers about it</label>
+                <textarea
+                  value={productDesc}
+                  onChange={(e) => setProductDesc(e.target.value)}
+                  placeholder="Handmade with love..."
+                  rows={2}
+                  className="focus:outline-none"
+                  style={{ ...fieldInputStyle, resize: 'none' }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                />
               </div>
 
+              {/* Emoji picker */}
               <div>
-                <label className="block text-sm font-bold text-amber-700 mb-2" style={{ fontFamily: font.accent }}>Pick an emoji</label>
+                <label style={fieldLabelStyle}>Pick an emoji</label>
                 <div className="flex gap-2 flex-wrap">
-                  {emojiOptions.map((e) => (
-                    <button key={e} onClick={() => setProductEmoji(e)}
-                      className={`w-12 h-12 text-2xl rounded-xl border-2 flex items-center justify-center transition-all active:scale-90 ${
-                        productEmoji === e ? 'border-amber-400 bg-amber-50 scale-110 shadow-md shadow-amber-100' : 'border-gray-100 hover:border-amber-200 bg-white'
-                      }`}>{e}</button>
-                  ))}
+                  {EMOJI_OPTIONS.map((e) => {
+                    const isActive = productEmoji === e;
+                    return (
+                      <button
+                        key={e}
+                        onClick={() => setProductEmoji(e)}
+                        className="transition-all"
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          fontSize: '20px',
+                          borderRadius: '10px',
+                          border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                          boxShadow: isActive ? `1px 1px 0 ${C.ink}` : 'none',
+                          transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                          backgroundColor: isActive ? C.amberBtn : C.cream,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {e}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
+            {/* Live preview */}
             {productName && productPrice && (
-              <div className="mt-6 bg-white rounded-2xl p-4 border border-amber-100 shadow-sm animate-fadeIn">
-                <p className="text-xs text-amber-600/60 mb-2">Product preview</p>
+              <div
+                className="mt-4 animate-fadeIn"
+                style={{
+                  backgroundColor: C.cardBg,
+                  border: `1.5px solid ${C.ink}`,
+                  borderRadius: '14px',
+                  padding: '14px 16px',
+                  boxShadow: `2px 2px 0 ${C.ink}`,
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    marginBottom: '10px',
+                    textAlign: 'left',
+                  }}
+                >
+                  Product preview
+                </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center text-2xl">{productEmoji}</div>
-                  <div className="text-left flex-1">
-                    <p className="font-bold text-gray-800">{productName}</p>
-                    {productDesc && <p className="text-xs text-gray-400">{productDesc}</p>}
+                  <div
+                    style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '12px',
+                      backgroundColor: kidColors.tint,
+                      border: `1px solid ${C.border}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '24px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {productEmoji}
                   </div>
-                  <div className="font-bold text-amber-600 text-lg" style={{ fontFamily: font.accent }}>${productPrice}</div>
+                  <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 800,
+                        color: C.ink,
+                        marginBottom: '2px',
+                      }}
+                    >
+                      {productName}
+                    </p>
+                    {productDesc && (
+                      <p
+                        style={{
+                          fontSize: '12px',
+                          color: C.inkFaint,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {productDesc}
+                      </p>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '17px',
+                      fontWeight: 800,
+                      color: kidColors.deep,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ${productPrice}
+                  </div>
                 </div>
               </div>
             )}
 
-            <p className="text-xs text-gray-400 mt-4">Your parent will review it before it goes live.</p>
+            <p
+              className="mt-4"
+              style={{ fontSize: '12px', color: C.inkFaint, fontWeight: 500 }}
+            >
+              Your parent will review it before it goes live.
+            </p>
 
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep(4)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(6)}
-                disabled={!productName || !productPrice}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-all active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>Add to My Store! →</button>
-            </div>
-            <button onClick={() => setStep(6)} className="text-sm text-gray-400 mt-3 hover:text-gray-500">Skip for now</button>
+            <NavButtons
+              step={step}
+              setStep={setStep}
+              totalSteps={totalSteps}
+              nextDisabled={!productName || !productPrice}
+            />
           </div>
         )}
 
-        {/* ===== STEP 6: Review & Launch ===== */}
+        {/* ===================== STEP 6: REVIEW & LAUNCH ===================== */}
         {step === 6 && (
-          <div className="animate-fadeIn text-center">
-            <Logo size="lg" />
-            <h1 className="text-3xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-              Your store is looking amazing!
+          <div className="text-center animate-fadeIn">
+            <h1
+              className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Your store is <span style={{ color: C.amberAccent }}>looking amazing.</span>
             </h1>
-            <p className="text-gray-500 mt-2">Here's what you built.</p>
+            <p
+              className="mt-3"
+              style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              Here's what you built.
+            </p>
 
-            {/* Store preview */}
-            <div className={`mt-8 rounded-2xl p-6 text-center ${
-              color === 'blue' ? 'bg-blue-50' : color === 'green' ? 'bg-emerald-50' : color === 'pink' ? 'bg-pink-50' :
-              color === 'purple' ? 'bg-purple-50' : color === 'orange' ? 'bg-orange-50' : 'bg-amber-50'
-            }`}>
-              <div className="text-5xl mb-2">{sticker}</div>
-              <h2 className="text-2xl font-bold" style={{
-                fontFamily: fontOpts.find(f => f.value === headerFont)?.family || "'Poppins', sans-serif",
-                color: color === 'blue' ? '#1E40AF' : color === 'green' ? '#065F46' : color === 'pink' ? '#BE185D' :
-                  color === 'purple' ? '#5B21B6' : color === 'orange' ? '#C2410C' : '#92400E'
-              }}>{storeName}</h2>
-              {bio && <p className="text-sm text-gray-500 mt-1 italic">"{bio}"</p>}
-              <p className="text-xs text-gray-400 mt-1">by {kidName}</p>
+            {/* Store preview — kid's chosen everything */}
+            <div
+              className="mt-8 mx-auto"
+              style={{
+                backgroundColor: kidColors.tint,
+                border: `1.5px solid ${C.ink}`,
+                borderRadius: '20px',
+                boxShadow: `3px 3px 0 ${C.ink}`,
+                padding: '32px 22px',
+                maxWidth: '420px',
+              }}
+            >
+              <div style={{ fontSize: '56px', lineHeight: 1, marginBottom: '8px' }}>
+                {sticker}
+              </div>
+              <h2
+                style={{
+                  fontFamily: FONT_OPTS.find((f) => f.value === headerFont)?.family || font.sans,
+                  fontSize: '30px',
+                  fontWeight: 700,
+                  color: kidColors.deep,
+                  lineHeight: 1.05,
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}
+              >
+                {storeName}
+              </h2>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: C.inkMuted,
+                  marginTop: '4px',
+                  fontFamily: FONT_OPTS.find((f) => f.value === bodyFont)?.family || font.sans,
+                }}
+              >
+                by {kidName}
+              </p>
+              {bio && (
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: C.inkMuted,
+                    fontStyle: 'italic',
+                    marginTop: '10px',
+                    lineHeight: 1.45,
+                    fontFamily: FONT_OPTS.find((f) => f.value === bodyFont)?.family || font.sans,
+                  }}
+                >
+                  "{bio}"
+                </p>
+              )}
             </div>
 
             {/* Product preview */}
             {productName && productPrice && (
-              <div className="mt-4 bg-white rounded-2xl p-4 border border-amber-100 shadow-sm">
+              <div
+                className="mt-3 mx-auto"
+                style={{
+                  backgroundColor: C.cardBg,
+                  border: `1.5px solid ${C.ink}`,
+                  borderRadius: '14px',
+                  padding: '14px 16px',
+                  boxShadow: `2px 2px 0 ${C.ink}`,
+                  maxWidth: '420px',
+                }}
+              >
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center text-2xl">{productEmoji}</div>
-                  <div className="text-left flex-1">
-                    <p className="font-bold text-gray-800">{productName}</p>
-                    {productDesc && <p className="text-xs text-gray-400">{productDesc}</p>}
+                  <div
+                    style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '12px',
+                      backgroundColor: kidColors.tint,
+                      border: `1px solid ${C.border}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '24px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {productEmoji}
                   </div>
-                  <div className="font-bold text-amber-600 text-lg" style={{ fontFamily: font.accent }}>${productPrice}</div>
+                  <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 800,
+                        color: C.ink,
+                        marginBottom: '2px',
+                      }}
+                    >
+                      {productName}
+                    </p>
+                    {productDesc && (
+                      <p
+                        style={{
+                          fontSize: '12px',
+                          color: C.inkFaint,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {productDesc}
+                      </p>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '17px',
+                      fontWeight: 800,
+                      color: kidColors.deep,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ${productPrice}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Parent approval reminder */}
+            {/* Parent approval reminder — text-only, no emoji */}
             {productName && productPrice && (
-              <div className="mt-4 bg-purple-50 rounded-xl p-4 border border-purple-100 flex items-start gap-3 text-left animate-fadeIn">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center shrink-0 text-sm">🔒</div>
-                <div>
-                  <p className="text-sm font-bold text-purple-800" style={{ fontFamily: font.accent }}>One more step!</p>
-                  <p className="text-xs text-purple-600 mt-0.5">Ask your parent to approve your product on the Parent Dashboard. It won't show up in your store until they say it's good to go.</p>
-                </div>
+              <div
+                className="mt-4 animate-fadeIn"
+                style={{
+                  backgroundColor: C.tipBg,
+                  border: `1px solid #C4B5FD`,
+                  borderRadius: '14px',
+                  padding: '14px 16px',
+                  textAlign: 'left',
+                  maxWidth: '420px',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '11px',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.tipInk,
+                    fontWeight: 800,
+                    marginBottom: '4px',
+                  }}
+                >
+                  One more step
+                </p>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: C.tipInk,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Ask your parent to approve your product on the parent dashboard. It won't show up in your store until they say it's good to go.
+                </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(5)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={handleComplete}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-5 rounded-full text-xl transition-all shadow-lg shadow-amber-200 active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>
-                I'm Done — Show Me My Store!
+            {/* Final actions */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-8 max-w-md mx-auto">
+              <button
+                onClick={() => setStep(5)}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '14px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: 'transparent',
+                  color: C.inkMuted,
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  flexShrink: 0,
+                }}
+              >
+                ← Back
+              </button>
+              <button
+                onClick={handleComplete}
+                className="transition-all hover:-translate-y-0.5"
+                style={{
+                  flex: 1,
+                  backgroundColor: C.amberBtn,
+                  color: C.ink,
+                  border: `1.5px solid ${C.ink}`,
+                  boxShadow: `3px 3px 0 ${C.ink}`,
+                  borderRadius: '14px',
+                  padding: '15px',
+                  fontWeight: 800,
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                Show me my store →
               </button>
             </div>
           </div>
@@ -474,3 +1199,96 @@ export default function OnboardingPage() {
     </div>
   );
 }
+
+// =====================================================================
+// NAV BUTTONS — back / next / skip-for-now (used on every step except 6)
+// =====================================================================
+function NavButtons({ step, setStep, totalSteps, nextDisabled = false }) {
+  return (
+    <>
+      <div className="flex gap-3 mt-10 max-w-md mx-auto">
+        {step > 1 && (
+          <button
+            onClick={() => setStep(step - 1)}
+            style={{
+              padding: '14px 20px',
+              borderRadius: '14px',
+              border: `1.5px solid ${C.borderInput}`,
+              backgroundColor: 'transparent',
+              color: C.inkMuted,
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              flexShrink: 0,
+            }}
+          >
+            ← Back
+          </button>
+        )}
+        <button
+          onClick={() => setStep(step + 1)}
+          disabled={nextDisabled}
+          className="transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          style={{
+            flex: 1,
+            backgroundColor: C.amberBtn,
+            color: C.ink,
+            border: `1.5px solid ${C.ink}`,
+            boxShadow: `3px 3px 0 ${C.ink}`,
+            borderRadius: '14px',
+            padding: '15px',
+            fontWeight: 800,
+            fontSize: '15px',
+            cursor: nextDisabled ? 'not-allowed' : 'pointer',
+            fontFamily: 'inherit',
+            letterSpacing: '-0.005em',
+          }}
+        >
+          Next →
+        </button>
+      </div>
+      <button
+        onClick={() => setStep(step + 1)}
+        style={{
+          fontSize: '12px',
+          color: C.inkFaint,
+          marginTop: '14px',
+          background: 'transparent',
+          border: 'none',
+          fontWeight: 600,
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          textDecoration: 'underline',
+          textUnderlineOffset: '2px',
+        }}
+      >
+        Skip for now
+      </button>
+    </>
+  );
+}
+
+// ====================== SHARED FIELD STYLES ======================
+const fieldLabelStyle = {
+  display: 'block',
+  fontSize: '11px',
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: C.amberAccent,
+  fontWeight: 800,
+  marginBottom: '8px',
+  paddingLeft: '4px',
+};
+
+const fieldInputStyle = {
+  width: '100%',
+  padding: '12px 14px',
+  borderRadius: '12px',
+  border: `1.5px solid ${C.borderInput}`,
+  backgroundColor: C.cream,
+  fontSize: '15px',
+  fontWeight: 500,
+  color: C.ink,
+  fontFamily: 'inherit',
+};
