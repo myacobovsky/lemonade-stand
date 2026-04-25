@@ -1,16 +1,121 @@
 // @ts-nocheck
+// FILE: app/setup/page.tsx
+
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  Gem,
+  Palette,
+  Cookie,
+  Scissors,
+  Sprout,
+  CupSoda,
+  PawPrint,
+  Sparkles,
+  Gamepad2,
+  Smartphone,
+  GraduationCap,
+  Bike,
+  Gift,
+  PiggyBank,
+  Pencil,
+} from 'lucide-react';
 import { Logo, Confetti } from '../components';
 import { useApp } from '../../lib/context';
 import { supabase } from '../../lib/supabase';
 
-const font = {
-  heading: "'Poppins', sans-serif",
-  accent: "'DynaPuff', cursive",
+// ====================== DESIGN TOKENS ======================
+// We use the same palette across the whole flow, but lean on different
+// shades to create a parent/kid temperature distinction (Option C).
+// Parent zone: amberDeep accents, tighter density, serious tone.
+// Kid zone: amberAccent (brighter) accents, larger type, warmer tone.
+const C = {
+  cream: '#FEF3C7',
+  creamWarm: '#FEF0B8',
+  creamCool: '#FDF8E1',
+  cardBg: '#FFFBEB',
+  ink: '#1C1917',
+  inkMuted: '#57534E',
+  inkFaint: '#78716C',
+  inkGhost: '#A8A29E',
+  border: '#1C19171F',
+  borderFaint: '#1C191714',
+  borderInput: '#1C19172B',
+  amberAccent: '#D97706',  // kid zone (warmer/brighter)
+  amberDeep: '#92400E',    // parent zone (deeper, more serious)
+  amberBtn: '#FCD34D',
+  success: '#059669',
+  successBg: '#D1FAE5',
+  successBorder: '#10B98140',
+  danger: '#DC2626',
+  tipBg: '#EDE9FE',
+  tipInk: '#4C1D95',
 };
 
+const font = {
+  sans: "'Poppins', sans-serif",
+};
+
+// ====================== ICON MAP ======================
+// Maps each option label to a Lucide icon component. Lucide icons accept
+// `size`, `strokeWidth`, and inherit `color` via currentColor — perfect for
+// our active-state color flip (amber → ink) without re-render gymnastics.
+const CATEGORY_ICONS = {
+  'Jewelry & Bracelets': Gem,
+  'Art & Drawings':      Palette,
+  'Baked Goods':         Cookie,
+  'Handmade Crafts':     Scissors,
+  'Plants & Garden':     Sprout,
+  'Lemonade & Treats':   CupSoda,
+  'Pet Products':        PawPrint,
+  'Other':               Sparkles,
+};
+
+const SAVINGS_ICONS = {
+  'Toy or Game':        Gamepad2,
+  'Art Supplies':       Palette,
+  'Tech / Electronics': Smartphone,
+  'College Fund':       GraduationCap,
+  'Bike or Scooter':    Bike,
+  'Gift for Someone':   Gift,
+  'Just Save It!':      PiggyBank,
+  'Other':              Pencil,
+};
+
+// ====================== OPTION DATA ======================
+const AGE_TIERS = [
+  { id: '6-8',  label: 'Ages 6-8',  desc: 'Young entrepreneur' },
+  { id: '9-12', label: 'Ages 9-12', desc: 'Growing entrepreneur' },
+  { id: '13+',  label: 'Ages 13+',  desc: 'Teen entrepreneur' },
+];
+
+const CATEGORY_OPTIONS = [
+  { label: 'Jewelry & Bracelets' },
+  { label: 'Art & Drawings' },
+  { label: 'Baked Goods' },
+  { label: 'Handmade Crafts' },
+  { label: 'Plants & Garden' },
+  { label: 'Lemonade & Treats' },
+  { label: 'Pet Products' },
+  { label: 'Other' },
+];
+
+const SAVINGS_GOAL_OPTIONS = [
+  { label: 'Toy or Game' },
+  { label: 'Art Supplies' },
+  { label: 'Tech / Electronics' },
+  { label: 'College Fund' },
+  { label: 'Bike or Scooter' },
+  { label: 'Gift for Someone' },
+  { label: 'Just Save It!' },
+  { label: 'Other' },
+];
+
+const SAVINGS_AMOUNT_OPTIONS = ['25', '50', '100', '250', '500', '1000'];
+
+// ====================== COMPONENT ======================
 export default function SetupPage() {
   const router = useRouter();
   const { user, createStore } = useApp();
@@ -35,8 +140,8 @@ export default function SetupPage() {
   const [schoolLookupError, setSchoolLookupError] = useState('');
   const [schoolLookupLoading, setSchoolLookupLoading] = useState(false);
 
-  const totalSteps = 8;
-  const updateField = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
+  const updateField = (field, value) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
   const handleKidNameChange = (name) => {
     updateField('kidName', name);
@@ -54,499 +159,1391 @@ export default function SetupPage() {
     const trimmed = code.trim().toLowerCase();
     updateField('schoolCode', code);
     setSchoolLookupError('');
-    if (!trimmed) { updateField('schoolId', null); updateField('schoolName', ''); return; }
+    if (!trimmed) {
+      updateField('schoolId', null);
+      updateField('schoolName', '');
+      return;
+    }
     setSchoolLookupLoading(true);
-    const { data } = await supabase.from('schools').select('id, name, slug').eq('slug', trimmed).eq('is_active', true).single();
+    const { data } = await supabase
+      .from('schools')
+      .select('id, name, slug')
+      .eq('slug', trimmed)
+      .eq('is_active', true)
+      .single();
     setSchoolLookupLoading(false);
-    if (data) { updateField('schoolId', data.id); updateField('schoolName', data.name); setSchoolLookupError(''); }
-    else { updateField('schoolId', null); updateField('schoolName', ''); setSchoolLookupError('No club found with that code. Check with your club leader.'); }
+    if (data) {
+      updateField('schoolId', data.id);
+      updateField('schoolName', data.name);
+      setSchoolLookupError('');
+    } else {
+      updateField('schoolId', null);
+      updateField('schoolName', '');
+      setSchoolLookupError("No club found with that code. Check with your club leader.");
+    }
   };
 
   const handleComplete = async () => {
     const savingsGoal = formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal;
-    if (!user) { router.push('/login'); return; }
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     await createStore({
-      parent_name: formData.parentName, kid_name: formData.kidName, kid_age_tier: formData.kidAge,
-      store_name: formData.storeName, category: formData.category, savings_goal: savingsGoal,
-      savings_amount: parseFloat(formData.savingsAmount) || 100, savings_percent: 50,
-      school_id: formData.schoolId || null, public_listing: formData.schoolId ? false : true,
+      parent_name: formData.parentName,
+      kid_name: formData.kidName,
+      kid_age_tier: formData.kidAge,
+      store_name: formData.storeName,
+      category: formData.category,
+      savings_goal: savingsGoal,
+      savings_amount: parseFloat(formData.savingsAmount) || 100,
+      savings_percent: 50,
+      school_id: formData.schoolId || null,
+      public_listing: formData.schoolId ? false : true,
     });
     setShowConfetti(true);
     setTimeout(() => router.push('/onboarding'), 3500);
   };
 
-  const ageTiers = [
-    { id: '6-8', label: 'Ages 6-8', desc: 'Young Entrepreneur' },
-    { id: '9-12', label: 'Ages 9-12', desc: 'Growing Entrepreneur' },
-    { id: '13+', label: 'Ages 13+', desc: 'Teen Entrepreneur' },
-  ];
-
-  const categoryOptions = [
-    { emoji: '📿', label: 'Jewelry & Bracelets' },
-    { emoji: '🎨', label: 'Art & Drawings' },
-    { emoji: '🍪', label: 'Baked Goods' },
-    { emoji: '🧶', label: 'Handmade Crafts' },
-    { emoji: '🌱', label: 'Plants & Garden' },
-    { emoji: '🧁', label: 'Lemonade & Treats' },
-    { emoji: '🐾', label: 'Pet Products' },
-    { emoji: '✨', label: 'Other' },
-  ];
-
-  const savingsGoalOptions = [
-    { emoji: '🎮', label: 'Toy or Game' },
-    { emoji: '🎨', label: 'Art Supplies' },
-    { emoji: '📱', label: 'Tech / Electronics' },
-    { emoji: '🎓', label: 'College Fund' },
-    { emoji: '🚲', label: 'Bike or Scooter' },
-    { emoji: '🎁', label: 'Gift for Someone' },
-    { emoji: '💰', label: 'Just Save It!' },
-    { emoji: '✏️', label: 'Other' },
-  ];
-
-  const savingsAmountOptions = ['25', '50', '100', '250', '500', '1000'];
-
+  // Zone classification — drives styling decisions
   const isParentStep = step === 1;
   const isHandoff = step === 2;
   const isKidStep = step >= 3;
 
-  // Celebration screen
+  // Active accent color — deeper for parent, brighter for kid
+  const accent = isParentStep ? C.amberDeep : C.amberAccent;
+
+  // ====================== CELEBRATION SCREEN ======================
   if (showConfetti) {
+    const kidColors = { tint: '#FEF3C7', deep: '#92400E' };
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-100 via-amber-50 to-white flex items-center justify-center px-4">
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+      >
         <Confetti />
-        <div className="text-center">
-          <Logo size="xl" />
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mt-6" style={{ fontFamily: font.accent }}>
-            You did it, {formData.kidName}!
-          </h1>
-          <p className="text-xl text-amber-600 mt-3 font-semibold" style={{ fontFamily: font.accent }}>
-            {formData.storeName} is open for business!
+        <div className="text-center max-w-md">
+          <p
+            className="text-xs uppercase tracking-[0.25em] font-bold mb-3"
+            style={{ color: C.amberAccent }}
+          >
+            Congratulations
           </p>
-          <p className="text-gray-400 text-sm mt-8">Taking you to your store now...</p>
+          <h1
+            className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02]"
+            style={{ fontWeight: 800, color: C.ink }}
+          >
+            You did it,{' '}
+            <span style={{ color: C.amberAccent }}>{formData.kidName}!</span>
+          </h1>
+          <p
+            className="mt-4 text-lg"
+            style={{ color: C.inkMuted, fontWeight: 600 }}
+          >
+            {formData.storeName} is open for business.
+          </p>
+          <p
+            className="mt-8 text-sm"
+            style={{ color: C.inkFaint }}
+          >
+            Taking you to your store now…
+          </p>
         </div>
       </div>
     );
   }
 
-  // Progress dots for kid steps (steps 3-8 = 6 kid steps)
+  // Progress dots — kid steps only (steps 3-8 = 6 kid steps)
   const kidStepIndex = step - 3;
   const totalKidSteps = 6;
 
   return (
-    <div className={`min-h-screen ${isParentStep ? 'bg-gray-900' : isHandoff ? 'bg-gradient-to-b from-amber-200 via-amber-100 to-amber-50' : 'bg-gradient-to-b from-amber-50 to-white'}`}>
-
-      {/* Header */}
-      <header className={`flex items-center justify-between px-4 sm:px-8 py-4 ${isParentStep ? '' : ''}`}>
-        <button onClick={() => router.push('/')} className="flex items-center gap-2">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+    >
+      {/* ===== HEADER (custom for setup wizard) ===== */}
+      <header
+        className="px-4 sm:px-8 py-4 flex items-center justify-between"
+        style={{ borderBottom: `1px solid ${C.borderFaint}` }}
+      >
+        <Link href="/" className="flex items-center gap-2.5" style={{ textDecoration: 'none' }}>
           <Logo size="sm" />
-          <span className={`font-bold text-lg ${isParentStep ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: font.accent }}>Lemonade Stand</span>
-        </button>
-        <div className="flex items-center gap-3">
-          {isParentStep && (
-            <span className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full font-medium border border-white/10">Parent Setup</span>
-          )}
-          {isKidStep && (
-            <span className="text-xs bg-amber-400 text-white px-3 py-1 rounded-full font-bold" style={{ fontFamily: font.accent }}>{formData.kidName}'s Turn</span>
-          )}
-        </div>
+          <span
+            style={{
+              fontFamily: "'DynaPuff', cursive",
+              fontSize: '17px',
+              fontWeight: 700,
+              color: C.ink,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Lemonade Stand
+          </span>
+        </Link>
+
+        {/* Status pill — different label per zone */}
+        {isParentStep && (
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              color: C.amberDeep,
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              padding: '4px 12px',
+              borderRadius: '999px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              boxShadow: `1px 1px 0 ${C.ink}14`,
+            }}
+          >
+            Parent setup
+          </span>
+        )}
+        {isKidStep && formData.kidName && (
+          <span
+            style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              color: C.ink,
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              padding: '4px 12px',
+              borderRadius: '999px',
+              boxShadow: `1px 1px 0 ${C.ink}14`,
+            }}
+          >
+            {formData.kidName}'s turn
+          </span>
+        )}
       </header>
 
-      {/* Progress */}
+      {/* ===== PROGRESS ===== */}
       {isParentStep && (
-        <div className="max-w-xl mx-auto px-4 mb-6">
-          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full bg-white/40 rounded-full transition-all duration-500" style={{ width: '100%' }} />
+        <div className="max-w-xl mx-auto px-4 pt-6 pb-2">
+          <div
+            style={{
+              height: '6px',
+              borderRadius: '999px',
+              backgroundColor: C.borderInput,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: '20%',
+                backgroundColor: C.amberDeep,
+                borderRadius: '999px',
+                transition: 'width 0.5s',
+              }}
+            />
           </div>
-          <p className="text-white/30 text-xs mt-2 text-center">One step for you, then the fun begins</p>
+          <p
+            className="text-center mt-3"
+            style={{
+              fontSize: '11px',
+              color: C.inkFaint,
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+            }}
+          >
+            One step for you, then the fun begins
+          </p>
         </div>
       )}
+
       {isKidStep && (
-        <div className="max-w-xl mx-auto px-4 mb-6">
+        <div className="max-w-xl mx-auto px-4 pt-6 pb-2">
           <div className="flex items-center justify-center gap-2">
             {Array.from({ length: totalKidSteps }).map((_, i) => (
-              <div key={i} className={`h-2 rounded-full transition-all duration-300 ${
-                i < kidStepIndex ? 'w-8 bg-amber-400' :
-                i === kidStepIndex ? 'w-10 bg-amber-500' :
-                'w-6 bg-amber-200'
-              }`} />
+              <div
+                key={i}
+                style={{
+                  height: '6px',
+                  borderRadius: '999px',
+                  transition: 'all 0.3s',
+                  width: i === kidStepIndex ? '32px' : i < kidStepIndex ? '24px' : '16px',
+                  backgroundColor: i === kidStepIndex ? C.ink : i < kidStepIndex ? C.amberAccent : C.borderInput,
+                }}
+              />
             ))}
           </div>
+          <p
+            className="text-center mt-3"
+            style={{
+              fontSize: '11px',
+              color: C.inkFaint,
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+            }}
+          >
+            Step {kidStepIndex + 1} of {totalKidSteps}
+          </p>
         </div>
       )}
 
-      <main className="max-w-xl mx-auto px-4 pb-20">
 
-        {/* ===== STEP 1: PARENT ZONE ===== */}
+      <main className="max-w-xl mx-auto px-4 pb-20 pt-4">
+
+        {/* =========================================================
+            STEP 1 — PARENT SETUP
+            Tighter density, deeper amber accents, "serious" tone.
+            ========================================================= */}
         {step === 1 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7">
-                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1" style={{ fontFamily: font.heading }}>Quick Parent Setup</h1>
-              <p className="text-white/50 text-sm">Takes about 2 minutes. Then your kid takes the wheel.</p>
+            <div className="text-center mb-7">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberDeep }}
+              >
+                For parents
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                Set up your kid's{' '}
+                <span style={{ color: C.amberDeep }}>store.</span>
+              </h1>
+              <p
+                className="mt-3"
+                style={{ fontSize: '14px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                Takes about 2 minutes. Then your kid takes the wheel.
+              </p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-white/60 mb-1">Your first name</label>
-                <input type="text" value={formData.parentName} onChange={(e) => updateField('parentName', e.target.value)}
-                  placeholder="e.g. Sarah" className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 focus:border-amber-400 focus:outline-none text-lg text-white placeholder-white/20" autoComplete="given-name" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/60 mb-1">Your child&apos;s first name</label>
-                <input type="text" value={formData.kidName} onChange={(e) => handleKidNameChange(e.target.value)}
-                  placeholder="e.g. Emma" className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 focus:border-amber-400 focus:outline-none text-lg text-white placeholder-white/20" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/60 mb-2">Age group</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {ageTiers.map((tier) => (
-                    <button key={tier.id} onClick={() => updateField('kidAge', tier.id)}
-                      className={`p-3 rounded-xl border-2 text-center transition-all ${
-                        formData.kidAge === tier.id
-                          ? 'border-amber-400 bg-amber-400/10 text-amber-300 scale-[1.02]'
-                          : 'border-white/10 hover:border-white/20 text-white/50'
-                      }`}>
-                      <div className="font-semibold text-sm">{tier.label}</div>
-                      <div className="text-xs mt-0.5 opacity-60">{tier.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="space-y-3">
+              {/* Parent name */}
+              <ParentField label="Your first name">
+                <input
+                  type="text"
+                  value={formData.parentName}
+                  onChange={(e) => updateField('parentName', e.target.value)}
+                  placeholder="e.g. Sarah"
+                  autoComplete="given-name"
+                  className="focus:outline-none"
+                  style={parentInputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                />
+              </ParentField>
 
-              {/* School Club */}
-              <div className="pt-1">
-                <button onClick={() => {
+              {/* Kid name */}
+              <ParentField label="Your kid's first name">
+                <input
+                  type="text"
+                  value={formData.kidName}
+                  onChange={(e) => handleKidNameChange(e.target.value)}
+                  placeholder="e.g. Emma"
+                  className="focus:outline-none"
+                  style={parentInputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                />
+              </ParentField>
+
+              {/* Age tier */}
+              <ParentField label="Age group">
+                <div className="grid grid-cols-3 gap-2">
+                  {AGE_TIERS.map((tier) => {
+                    const isActive = formData.kidAge === tier.id;
+                    return (
+                      <button
+                        key={tier.id}
+                        onClick={() => updateField('kidAge', tier.id)}
+                        className="transition-all"
+                        style={{
+                          padding: '10px 6px',
+                          borderRadius: '12px',
+                          border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                          boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                          transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                          backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 800,
+                            color: C.ink,
+                            marginBottom: '1px',
+                          }}
+                        >
+                          {tier.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            color: C.inkFaint,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {tier.desc}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </ParentField>
+
+              {/* School club toggle */}
+              <div
+                style={{
+                  backgroundColor: C.cardBg,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '14px',
+                  padding: '14px 16px',
+                  boxShadow: `2px 2px 0 ${C.ink}12`,
+                }}
+              >
+                <button
+                  onClick={() => {
                     const next = !formData.joiningClub;
                     updateField('joiningClub', next);
-                    if (!next) { updateField('schoolCode', ''); updateField('schoolId', null); updateField('schoolName', ''); setSchoolLookupError(''); }
+                    if (!next) {
+                      updateField('schoolCode', '');
+                      updateField('schoolId', null);
+                      updateField('schoolName', '');
+                      setSchoolLookupError('');
+                    }
                   }}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
-                    formData.joiningClub ? 'border-emerald-400/50 bg-emerald-400/10' : 'border-white/10 hover:border-white/20'
-                  }`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🏫</span>
-                    <div className="text-left">
-                      <div className={`font-medium text-sm ${formData.joiningClub ? 'text-emerald-300' : 'text-white/60'}`}>Joining a school club?</div>
-                      <div className="text-xs text-white/30">Enter your club code if you have one</div>
+                  className="w-full flex items-center justify-between"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <div style={{ textAlign: 'left' }}>
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 800,
+                        color: C.ink,
+                        marginBottom: '2px',
+                      }}
+                    >
+                      Joining a school club?
+                    </div>
+                    <div style={{ fontSize: '12px', color: C.inkFaint }}>
+                      Enter your club code if you have one.
                     </div>
                   </div>
-                  <div className={`w-10 h-6 rounded-full transition-colors flex items-center ${formData.joiningClub ? 'bg-emerald-400 justify-end' : 'bg-white/10 justify-start'}`}>
-                    <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5" />
+                  {/* Chunky toggle */}
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '44px',
+                      height: '24px',
+                      borderRadius: '999px',
+                      backgroundColor: formData.joiningClub ? C.amberBtn : '#D6D3D1',
+                      border: `1.5px solid ${C.ink}`,
+                      flexShrink: 0,
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '1px',
+                        left: formData.joiningClub ? '21px' : '1px',
+                        width: '19px',
+                        height: '19px',
+                        borderRadius: '50%',
+                        backgroundColor: 'white',
+                        border: `1px solid ${C.ink}`,
+                        transition: 'all 0.2s',
+                      }}
+                    />
                   </div>
                 </button>
+
                 {formData.joiningClub && (
                   <div className="mt-3 animate-fadeIn">
-                    <input type="text" value={formData.schoolCode} onChange={(e) => handleSchoolCodeCheck(e.target.value)}
-                      placeholder="e.g. ps150" className="w-full px-4 py-3 rounded-xl border-2 border-white/10 bg-white/5 focus:border-emerald-400 focus:outline-none text-lg text-white placeholder-white/20" />
-                    {schoolLookupLoading && <p className="text-xs text-white/30 mt-1">Looking up club...</p>}
+                    <input
+                      type="text"
+                      value={formData.schoolCode}
+                      onChange={(e) => handleSchoolCodeCheck(e.target.value)}
+                      placeholder="e.g. ps150"
+                      className="focus:outline-none"
+                      style={{
+                        ...parentInputStyle,
+                        marginTop: '8px',
+                      }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                    />
+                    {schoolLookupLoading && (
+                      <p style={{ fontSize: '11px', color: C.inkFaint, marginTop: '6px' }}>
+                        Looking up club…
+                      </p>
+                    )}
                     {formData.schoolName && (
-                      <div className="mt-2 p-3 bg-emerald-400/10 rounded-xl flex items-center gap-2 border border-emerald-400/20">
-                        <span className="text-emerald-400">✓</span>
-                        <span className="text-sm text-emerald-300 font-medium">{formData.schoolName}</span>
+                      <div
+                        className="mt-2"
+                        style={{
+                          padding: '10px 14px',
+                          backgroundColor: C.successBg,
+                          border: `1px solid ${C.successBorder}`,
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <span style={{ color: C.success, fontWeight: 800 }}>✓</span>
+                        <span style={{ fontSize: '13px', color: C.success, fontWeight: 700 }}>
+                          {formData.schoolName}
+                        </span>
                       </div>
                     )}
-                    {schoolLookupError && <p className="text-xs text-red-400 mt-1">{schoolLookupError}</p>}
+                    {schoolLookupError && (
+                      <p style={{ fontSize: '12px', color: C.danger, marginTop: '6px' }}>
+                        {schoolLookupError}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
 
               {/* Community Standards */}
-              <div className="bg-white/5 rounded-2xl p-5 mt-3 border border-white/10">
-                <h3 className="font-bold text-white/70 mb-3 text-sm">Community Standards</h3>
-                <div className="text-xs text-white/40 space-y-2 mb-4 max-h-32 overflow-y-auto pr-2">
-                  <p>By creating a store, you agree to the following:</p>
-                  <p><strong className="text-white/50">Parent Responsibility:</strong> You are responsible for supervising your child's activity, reviewing and approving all products, and overseeing orders and interactions.</p>
-                  <p><strong className="text-white/50">Safe Content:</strong> All content must be family-appropriate. No offensive language, imagery, or harmful content.</p>
-                  <p><strong className="text-white/50">Privacy:</strong> No personal information in listings. No photos of children. All communications handled by a parent.</p>
-                  <p><strong className="text-white/50">Respect & Moderation:</strong> Treat everyone with kindness. Lemonade Stand may remove content that violates these standards.</p>
+              <div
+                style={{
+                  backgroundColor: C.creamWarm,
+                  border: `1px solid ${C.borderFaint}`,
+                  borderRadius: '14px',
+                  padding: '16px 18px',
+                  marginTop: '8px',
+                }}
+              >
+                <p
+                  className="text-xs uppercase tracking-[0.14em] font-bold mb-2"
+                  style={{ color: C.amberDeep }}
+                >
+                  Community standards
+                </p>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: C.inkMuted,
+                    lineHeight: 1.55,
+                    maxHeight: '128px',
+                    overflowY: 'auto',
+                    paddingRight: '4px',
+                  }}
+                >
+                  <p style={{ marginBottom: '8px' }}>By creating a store, you agree to the following:</p>
+                  <p style={{ marginBottom: '6px' }}>
+                    <strong style={{ color: C.ink, fontWeight: 700 }}>Parent responsibility:</strong>{' '}
+                    You are responsible for supervising your kid's activity, reviewing and approving all products, and overseeing orders and interactions.
+                  </p>
+                  <p style={{ marginBottom: '6px' }}>
+                    <strong style={{ color: C.ink, fontWeight: 700 }}>Safe content:</strong>{' '}
+                    All content must be family-appropriate. No offensive language, imagery, or harmful content.
+                  </p>
+                  <p style={{ marginBottom: '6px' }}>
+                    <strong style={{ color: C.ink, fontWeight: 700 }}>Privacy:</strong>{' '}
+                    No personal information in listings. No photos of children. All communications handled by a parent.
+                  </p>
+                  <p>
+                    <strong style={{ color: C.ink, fontWeight: 700 }}>Respect & moderation:</strong>{' '}
+                    Treat everyone with kindness. Lemonade Stand may remove content that violates these standards.
+                  </p>
                 </div>
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="w-5 h-5 rounded border-white/20 text-amber-400 mt-0.5 shrink-0" />
-                  <span className="text-xs text-white/50">I agree to the Community Standards and will supervise my child's store. <a href="/privacy" target="_blank" className="text-amber-400/70 underline">Privacy Policy</a></span>
+                <label
+                  className="flex items-start gap-3 cursor-pointer mt-3"
+                  style={{ paddingTop: '10px', borderTop: `1px solid ${C.borderFaint}` }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      marginTop: '2px',
+                      flexShrink: 0,
+                      accentColor: C.amberDeep,
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <span style={{ fontSize: '12px', color: C.inkMuted, lineHeight: 1.5 }}>
+                    I agree to the community standards and will supervise my kid's store.{' '}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      style={{
+                        color: C.amberDeep,
+                        fontWeight: 700,
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '2px',
+                      }}
+                    >
+                      Privacy policy
+                    </Link>
+                  </span>
                 </label>
               </div>
             </div>
 
-            <button onClick={() => setStep(2)}
-              disabled={!formData.parentName || !formData.kidName || !formData.kidAge || !agreedToTerms || (formData.joiningClub && !formData.schoolId)}
-              className="w-full mt-8 bg-amber-400 hover:bg-amber-500 disabled:bg-white/10 disabled:text-white/20 text-white font-bold py-4 rounded-full text-lg transition-colors">
-              All done — hand it to {formData.kidName || 'your kid'} →
+            {/* Continue button */}
+            <button
+              onClick={() => setStep(2)}
+              disabled={
+                !formData.parentName ||
+                !formData.kidName ||
+                !formData.kidAge ||
+                !agreedToTerms ||
+                (formData.joiningClub && !formData.schoolId)
+              }
+              className="w-full transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mt-6"
+              style={{
+                backgroundColor: C.amberBtn,
+                color: C.ink,
+                border: `1.5px solid ${C.ink}`,
+                boxShadow: `3px 3px 0 ${C.ink}`,
+                borderRadius: '14px',
+                padding: '15px',
+                fontWeight: 800,
+                fontSize: '15px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                letterSpacing: '-0.005em',
+              }}
+            >
+              All set — pass it to {formData.kidName || 'your kid'} →
             </button>
           </div>
         )}
 
-        {/* ===== STEP 2: HANDOFF ===== */}
+        {/* =========================================================
+            STEP 2 — HANDOFF
+            The transition moment. Bigger spread, single focus.
+            ========================================================= */}
         {step === 2 && (
-          <div className="animate-fadeIn flex flex-col items-center justify-center py-8 sm:py-16">
+          <div className="animate-fadeIn flex flex-col items-center justify-center py-8 sm:py-14 text-center">
             <Logo size="xl" />
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mt-8 text-center leading-tight" style={{ fontFamily: font.accent }}>
-              Ok {formData.parentName},<br />hand it over!
-            </h1>
-            <div className="w-16 h-1 bg-amber-400 rounded-full mt-4" />
-            <p className="text-gray-600 mt-6 text-center text-lg" style={{ fontFamily: font.heading }}>
-              It's <span className="font-bold text-amber-600" style={{ fontFamily: font.accent }}>{formData.kidName}'s</span> turn now.
+            <p
+              className="text-xs uppercase tracking-[0.25em] font-bold mt-6 mb-2"
+              style={{ color: C.amberAccent }}
+            >
+              Handoff time
             </p>
-            <div className="mt-4 bg-white rounded-2xl px-6 py-4 shadow-sm border border-amber-100 max-w-sm">
-              <p className="text-gray-500 text-sm text-center leading-relaxed">
-                {formData.kidName} will name their store, pick what they sell, and set a savings goal. It only takes a few minutes.
+            <h1
+              className="text-4xl sm:text-5xl tracking-[-0.025em] leading-[1.02] max-w-md"
+              style={{ fontWeight: 800, color: C.ink }}
+            >
+              Ok {formData.parentName},<br />
+              <span style={{ color: C.amberAccent }}>hand it over.</span>
+            </h1>
+
+            <div
+              className="mt-4"
+              style={{
+                width: '60px',
+                height: '4px',
+                borderRadius: '999px',
+                backgroundColor: C.amberBtn,
+                border: `1px solid ${C.ink}`,
+              }}
+            />
+
+            <p
+              className="mt-6 max-w-md"
+              style={{ fontSize: '17px', color: C.inkMuted, lineHeight: 1.5 }}
+            >
+              It's{' '}
+              <span style={{ color: C.amberAccent, fontWeight: 800 }}>
+                {formData.kidName}'s
+              </span>{' '}
+              turn now.
+            </p>
+
+            <div
+              className="mt-6 max-w-sm"
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1px solid ${C.border}`,
+                borderRadius: '14px',
+                padding: '14px 18px',
+                boxShadow: `2px 2px 0 ${C.ink}12`,
+              }}
+            >
+              <p style={{ fontSize: '13px', color: C.inkMuted, lineHeight: 1.55 }}>
+                {formData.kidName} will name their store, pick what they sell, and set a savings goal. Only takes a few minutes.
               </p>
             </div>
-            <button onClick={() => setStep(3)}
-              className="mt-10 px-12 py-5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-full text-2xl transition-all hover:shadow-xl hover:shadow-amber-200 active:scale-[0.97]"
-              style={{ fontFamily: font.accent }}>
-              I'm ready!
+
+            <button
+              onClick={() => setStep(3)}
+              className="transition-all hover:-translate-y-0.5 mt-10"
+              style={{
+                backgroundColor: C.amberBtn,
+                color: C.ink,
+                border: `1.5px solid ${C.ink}`,
+                boxShadow: `4px 4px 0 ${C.ink}`,
+                borderRadius: '16px',
+                padding: '18px 36px',
+                fontWeight: 800,
+                fontSize: '18px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                letterSpacing: '-0.005em',
+              }}
+            >
+              I'm ready! →
             </button>
           </div>
         )}
 
-        {/* ===== STEP 3: KID — What's your name? ===== */}
+        {/* =========================================================
+            STEP 3 — KID: WHAT'S YOUR NAME?
+            Brighter amber, larger headline, warmer copy.
+            ========================================================= */}
         {step === 3 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                Welcome
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
                 Hey there!
               </h1>
-              <p className="text-gray-500 mt-2 text-lg" style={{ fontFamily: font.heading }}>First things first. What should we call you?</p>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                First things first.{' '}
+                <span style={{ color: C.amberAccent, fontWeight: 700 }}>
+                  What should we call you?
+                </span>
+              </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
-              <label className="block text-sm font-bold text-amber-700 mb-2" style={{ fontFamily: font.accent }}>Your name</label>
-              <input type="text" value={formData.kidName} onChange={(e) => handleKidNameChange(e.target.value)}
-                className="w-full px-4 py-4 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-2xl text-center font-bold text-gray-900"
-                style={{ fontFamily: font.accent }} />
+            <div
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1.5px solid ${C.ink}`,
+                borderRadius: '18px',
+                padding: '20px',
+                boxShadow: `3px 3px 0 ${C.ink}`,
+              }}
+            >
+              <label style={kidLabelStyle}>Your name</label>
+              <input
+                type="text"
+                value={formData.kidName}
+                onChange={(e) => handleKidNameChange(e.target.value)}
+                placeholder="Type your name"
+                className="focus:outline-none"
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: C.cream,
+                  fontSize: '24px',
+                  fontWeight: 800,
+                  color: C.ink,
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                autoFocus
+              />
             </div>
 
             {formData.kidName && (
-              <div className="mt-6 text-center animate-fadeIn">
-                <p className="text-amber-600 text-lg font-semibold" style={{ fontFamily: font.accent }}>
+              <div className="mt-5 text-center animate-fadeIn">
+                <p
+                  style={{
+                    fontSize: '15px',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    letterSpacing: '-0.005em',
+                  }}
+                >
                   Nice to meet you, {formData.kidName}!
                 </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(2)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(4)} disabled={!formData.kidName}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
-                style={{ fontFamily: font.accent }}>
-                That's me! →
-              </button>
-            </div>
+            <KidNavButtons
+              onBack={() => setStep(2)}
+              onNext={() => setStep(4)}
+              nextDisabled={!formData.kidName}
+              nextLabel="That's me! →"
+            />
           </div>
         )}
 
-        {/* ===== STEP 4: KID — Name your store ===== */}
+        {/* =========================================================
+            STEP 4 — KID: NAME YOUR STORE
+            ========================================================= */}
         {step === 4 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-                Name your store!
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                Your store
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                Name your <span style={{ color: C.amberAccent }}>store.</span>
               </h1>
-              <p className="text-gray-500 mt-2" style={{ fontFamily: font.heading }}>This is what your customers will see.</p>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                This is what your customers will see.
+              </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
-              <label className="block text-sm font-bold text-amber-700 mb-2" style={{ fontFamily: font.accent }}>Store name</label>
-              <input type="text" value={formData.storeName} onChange={(e) => handleStoreNameChange(e.target.value)}
-                className="w-full px-4 py-4 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-xl text-center font-bold text-gray-900"
-                style={{ fontFamily: font.accent }} />
+            <div
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1.5px solid ${C.ink}`,
+                borderRadius: '18px',
+                padding: '20px',
+                boxShadow: `3px 3px 0 ${C.ink}`,
+              }}
+            >
+              <label style={kidLabelStyle}>Store name</label>
+              <input
+                type="text"
+                value={formData.storeName}
+                onChange={(e) => handleStoreNameChange(e.target.value)}
+                placeholder="Your store name"
+                className="focus:outline-none"
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: C.cream,
+                  fontSize: '20px',
+                  fontWeight: 800,
+                  color: C.ink,
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+              />
               {!formData.storeNameEdited && formData.storeName && (
-                <p className="text-xs text-amber-400 mt-2 text-center">We picked this for you. Tap to change it!</p>
+                <p
+                  style={{
+                    fontSize: '11px',
+                    color: C.inkFaint,
+                    marginTop: '8px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                  }}
+                >
+                  We picked this for you. Tap to change it.
+                </p>
               )}
             </div>
 
+            {/* Live preview */}
             {formData.storeName && (
-              <div className="mt-6 bg-amber-50 rounded-2xl p-5 border border-amber-100 text-center">
-                <p className="text-xs text-amber-600/60 mb-1">Preview</p>
-                <p className="text-2xl font-bold text-gray-900" style={{ fontFamily: font.accent }}>{formData.storeName}</p>
-                <p className="text-sm text-gray-400 mt-1">by {formData.kidName}</p>
+              <div
+                className="mt-4 animate-fadeIn"
+                style={{
+                  backgroundColor: C.creamWarm,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '14px',
+                  padding: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    marginBottom: '8px',
+                  }}
+                >
+                  Preview
+                </p>
+                <p
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 800,
+                    color: C.ink,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {formData.storeName}
+                </p>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: C.inkMuted,
+                    marginTop: '4px',
+                  }}
+                >
+                  by {formData.kidName}
+                </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(3)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(5)} disabled={!formData.storeName}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
-                style={{ fontFamily: font.accent }}>
-                Love it! →
-              </button>
-            </div>
+            <KidNavButtons
+              onBack={() => setStep(3)}
+              onNext={() => setStep(5)}
+              nextDisabled={!formData.storeName}
+              nextLabel="Love it! →"
+            />
           </div>
         )}
 
-        {/* ===== STEP 5: KID — What do you make? ===== */}
+        {/* =========================================================
+            STEP 5 — KID: WHAT DO YOU MAKE? (Category)
+            Uses inline SVG icons instead of emojis.
+            ========================================================= */}
         {step === 5 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-                What do you make?
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                Your products
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                What do you <span style={{ color: C.amberAccent }}>make?</span>
               </h1>
-              <p className="text-gray-500 mt-2" style={{ fontFamily: font.heading }}>Pick what you sell. You can always add more later.</p>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                Pick what you sell. You can always add more later.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {categoryOptions.map((cat) => (
-                <button key={cat.label} onClick={() => updateField('category', cat.label)}
-                  className={`flex items-center gap-3 p-4 rounded-2xl border-2 text-sm font-semibold transition-all text-left ${
-                    formData.category === cat.label
-                      ? 'border-amber-400 bg-amber-50 text-amber-700 scale-[1.03] shadow-md shadow-amber-100'
-                      : 'border-gray-200 hover:border-amber-200 text-gray-600 bg-white'
-                  }`}>
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <span>{cat.label}</span>
-                </button>
-              ))}
+              {CATEGORY_OPTIONS.map((cat) => {
+                const isActive = formData.category === cat.label;
+                const IconCmp = CATEGORY_ICONS[cat.label] || Sparkles;
+                return (
+                  <button
+                    key={cat.label}
+                    onClick={() => updateField('category', cat.label)}
+                    className="flex items-center gap-3 transition-all"
+                    style={{
+                      padding: '14px 14px',
+                      borderRadius: '14px',
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `3px 3px 0 ${C.ink}` : 'none',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      color: C.ink,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        backgroundColor: isActive ? '#FFFBEB' : C.cream,
+                        border: `1px solid ${isActive ? C.ink : C.border}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        color: isActive ? C.ink : C.amberAccent,
+                      }}
+                    >
+                      <IconCmp size={22} strokeWidth={2} />
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {cat.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(4)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(6)} disabled={!formData.category}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
-                style={{ fontFamily: font.accent }}>
-                That's what I make! →
-              </button>
-            </div>
+            <KidNavButtons
+              onBack={() => setStep(4)}
+              onNext={() => setStep(6)}
+              nextDisabled={!formData.category}
+              nextLabel="That's what I make! →"
+            />
           </div>
         )}
 
-        {/* ===== STEP 6: KID — What are you saving for? ===== */}
+        {/* =========================================================
+            STEP 6 — KID: WHAT ARE YOU SAVING FOR?
+            ========================================================= */}
         {step === 6 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-                What are you saving for?
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                Your goal
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                What are you <span style={{ color: C.amberAccent }}>saving for?</span>
               </h1>
-              <p className="text-gray-500 mt-2" style={{ fontFamily: font.heading }}>Every sale gets you closer.</p>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                Every sale gets you closer.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {savingsGoalOptions.map((goal) => (
-                <button key={goal.label} onClick={() => updateField('savingsGoal', goal.label)}
-                  className={`flex items-center gap-3 p-4 rounded-2xl border-2 text-sm font-semibold transition-all text-left ${
-                    formData.savingsGoal === goal.label
-                      ? 'border-amber-400 bg-amber-50 text-amber-700 scale-[1.03] shadow-md shadow-amber-100'
-                      : 'border-gray-200 hover:border-amber-200 text-gray-600 bg-white'
-                  }`}>
-                  <span className="text-2xl">{goal.emoji}</span>
-                  <span>{goal.label}</span>
-                </button>
-              ))}
+              {SAVINGS_GOAL_OPTIONS.map((goal) => {
+                const isActive = formData.savingsGoal === goal.label;
+                const IconCmp = SAVINGS_ICONS[goal.label] || Pencil;
+                return (
+                  <button
+                    key={goal.label}
+                    onClick={() => updateField('savingsGoal', goal.label)}
+                    className="flex items-center gap-3 transition-all"
+                    style={{
+                      padding: '14px 14px',
+                      borderRadius: '14px',
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `3px 3px 0 ${C.ink}` : 'none',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      color: C.ink,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        backgroundColor: isActive ? '#FFFBEB' : C.cream,
+                        border: `1px solid ${isActive ? C.ink : C.border}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        color: isActive ? C.ink : C.amberAccent,
+                      }}
+                    >
+                      <IconCmp size={22} strokeWidth={2} />
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {goal.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
+            {/* Custom "Other" input */}
             {formData.savingsGoal === 'Other' && (
-              <input type="text" value={formData.savingsGoalCustom} onChange={(e) => updateField('savingsGoalCustom', e.target.value)}
-                placeholder="What are you saving for?" autoFocus
-                className="w-full mt-4 px-4 py-4 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none text-lg bg-white text-center animate-fadeIn" />
+              <input
+                type="text"
+                value={formData.savingsGoalCustom}
+                onChange={(e) => updateField('savingsGoalCustom', e.target.value)}
+                placeholder="What are you saving for?"
+                autoFocus
+                className="focus:outline-none animate-fadeIn"
+                style={{
+                  width: '100%',
+                  marginTop: '14px',
+                  padding: '14px',
+                  borderRadius: '14px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: C.cream,
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: C.ink,
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+              />
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(5)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(7)}
-                disabled={!formData.savingsGoal || (formData.savingsGoal === 'Other' && !formData.savingsGoalCustom)}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
-                style={{ fontFamily: font.accent }}>
-                Great pick! →
-              </button>
-            </div>
+            <KidNavButtons
+              onBack={() => setStep(5)}
+              onNext={() => setStep(7)}
+              nextDisabled={
+                !formData.savingsGoal ||
+                (formData.savingsGoal === 'Other' && !formData.savingsGoalCustom)
+              }
+              nextLabel="Great pick! →"
+            />
           </div>
         )}
 
-        {/* ===== STEP 7: KID — How much do you need? ===== */}
+        {/* =========================================================
+            STEP 7 — KID: HOW MUCH DO YOU NEED?
+            ========================================================= */}
         {step === 7 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-                How much do you need?
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                Set your target
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                How much do you <span style={{ color: C.amberAccent }}>need?</span>
               </h1>
-              <p className="text-gray-500 mt-2" style={{ fontFamily: font.heading }}>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
                 Set your target. You'll see your progress as you sell.
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {savingsAmountOptions.map((amt) => (
-                <button key={amt} onClick={() => updateField('savingsAmount', amt)}
-                  className={`py-5 rounded-2xl border-2 font-bold text-xl transition-all ${
-                    formData.savingsAmount === amt
-                      ? 'border-amber-400 bg-amber-50 text-amber-700 scale-105 shadow-md shadow-amber-100'
-                      : 'border-gray-200 hover:border-amber-200 text-gray-500 bg-white'
-                  }`} style={{ fontFamily: font.accent }}>
-                  ${amt}
-                </button>
-              ))}
+              {SAVINGS_AMOUNT_OPTIONS.map((amt) => {
+                const isActive = formData.savingsAmount === amt;
+                return (
+                  <button
+                    key={amt}
+                    onClick={() => updateField('savingsAmount', amt)}
+                    className="transition-all"
+                    style={{
+                      padding: '20px 8px',
+                      borderRadius: '14px',
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `3px 3px 0 ${C.ink}` : 'none',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      backgroundColor: isActive ? C.amberBtn : C.cardBg,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      color: C.ink,
+                      fontSize: '22px',
+                      fontWeight: 800,
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    ${amt}
+                  </button>
+                );
+              })}
             </div>
 
             {formData.savingsAmount && (
               <div className="mt-6 text-center animate-fadeIn">
-                <p className="text-amber-600 font-semibold" style={{ fontFamily: font.accent }}>
-                  ${formData.savingsAmount} for {formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal.toLowerCase()}. Let's do this!
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: C.amberAccent,
+                    fontWeight: 800,
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  ${formData.savingsAmount} for{' '}
+                  {formData.savingsGoal === 'Other'
+                    ? formData.savingsGoalCustom
+                    : formData.savingsGoal.toLowerCase()}
+                  . Let's do this!
                 </p>
               </div>
             )}
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(6)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={() => setStep(8)} disabled={!formData.savingsAmount}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-full text-lg transition-colors"
-                style={{ fontFamily: font.accent }}>
-                Almost there! →
-              </button>
-            </div>
+            <KidNavButtons
+              onBack={() => setStep(6)}
+              onNext={() => setStep(8)}
+              nextDisabled={!formData.savingsAmount}
+              nextLabel="Almost there! →"
+            />
           </div>
         )}
 
-        {/* ===== STEP 8: LAUNCH ===== */}
+        {/* =========================================================
+            STEP 8 — LAUNCH SUMMARY
+            Clean label/value rows. No decorative emojis.
+            ========================================================= */}
         {step === 8 && (
           <div className="animate-fadeIn">
-            <div className="text-center mb-8">
-              <Logo size="lg" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4" style={{ fontFamily: font.accent }}>
-                Ready to launch?
+            <div className="text-center mb-6">
+              <p
+                className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+                style={{ color: C.amberAccent }}
+              >
+                One last look
+              </p>
+              <h1
+                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                style={{ fontWeight: 800, color: C.ink }}
+              >
+                Ready to <span style={{ color: C.amberAccent }}>launch?</span>
               </h1>
-              <p className="text-gray-500 mt-2" style={{ fontFamily: font.heading }}>Here's your store at a glance.</p>
+              <p
+                className="mt-3"
+                style={{ fontSize: '15px', color: C.inkMuted, lineHeight: 1.5 }}
+              >
+                Here's your store at a glance.
+              </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
+            {/* Summary card — rows of label/value */}
+            <div
+              style={{
+                backgroundColor: C.cardBg,
+                border: `1.5px solid ${C.ink}`,
+                borderRadius: '18px',
+                padding: '8px 18px',
+                boxShadow: `3px 3px 0 ${C.ink}`,
+              }}
+            >
               {[
-                ['🧒', 'Owner', formData.kidName],
-                ['🏪', 'Store', formData.storeName],
-                ['📦', 'Selling', formData.category],
-                ['🎯', 'Saving for', formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal],
-                ['💰', 'Goal', `$${formData.savingsAmount}`],
-                ...(formData.schoolName ? [['🏫', 'Club', formData.schoolName]] : []),
-              ].map(([emoji, label, value], i, arr) => (
-                <div key={i} className={`flex items-center gap-3 py-3 ${i < arr.length - 1 ? 'border-b border-amber-50' : ''}`}>
-                  <span className="text-lg w-8 text-center">{emoji}</span>
-                  <span className="text-gray-400 text-sm w-20">{label}</span>
-                  <span className="font-bold text-gray-900 flex-1 text-right" style={{ fontFamily: font.accent }}>{value}</span>
+                ['Owner',     formData.kidName],
+                ['Store',     formData.storeName],
+                ['Selling',   formData.category],
+                ['Saving for', formData.savingsGoal === 'Other' ? formData.savingsGoalCustom : formData.savingsGoal],
+                ['Goal',      `$${formData.savingsAmount}`],
+                ...(formData.schoolName ? [['Club', formData.schoolName]] : []),
+              ].map(([label, value], i, arr) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between"
+                  style={{
+                    padding: '14px 0',
+                    borderBottom: i < arr.length - 1 ? `1px solid ${C.borderFaint}` : 'none',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: C.inkFaint,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {label}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: C.ink,
+                      letterSpacing: '-0.005em',
+                      textAlign: 'right',
+                      maxWidth: '60%',
+                    }}
+                  >
+                    {value}
+                  </span>
                 </div>
               ))}
             </div>
 
-            <p className="text-xs text-gray-400 text-center mt-3">You can change any of this later in your store editor.</p>
+            <p
+              className="text-center mt-4"
+              style={{ fontSize: '12px', color: C.inkFaint, fontWeight: 500 }}
+            >
+              You can change any of this later in your store editor.
+            </p>
 
-            <div className="flex gap-3 mt-8">
-              <button onClick={() => setStep(7)} className="px-6 py-4 rounded-full border-2 border-amber-200 text-amber-500 font-semibold">←</button>
-              <button onClick={handleComplete}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white font-bold py-5 rounded-full text-xl transition-all shadow-lg shadow-amber-200 hover:shadow-xl active:scale-[0.97]"
-                style={{ fontFamily: font.accent }}>
-                Launch My Store!
+            <div className="flex flex-col sm:flex-row gap-3 mt-8 max-w-md mx-auto">
+              <button
+                onClick={() => setStep(7)}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '14px',
+                  border: `1.5px solid ${C.borderInput}`,
+                  backgroundColor: 'transparent',
+                  color: C.inkMuted,
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  flexShrink: 0,
+                }}
+              >
+                ← Back
+              </button>
+              <button
+                onClick={handleComplete}
+                className="transition-all hover:-translate-y-0.5"
+                style={{
+                  flex: 1,
+                  backgroundColor: C.amberBtn,
+                  color: C.ink,
+                  border: `1.5px solid ${C.ink}`,
+                  boxShadow: `4px 4px 0 ${C.ink}`,
+                  borderRadius: '16px',
+                  padding: '17px',
+                  fontWeight: 800,
+                  fontSize: '17px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  letterSpacing: '-0.005em',
+                }}
+              >
+                Launch my store! →
               </button>
             </div>
           </div>
         )}
+
       </main>
     </div>
   );
 }
+
+// =====================================================================
+// PARENT ZONE — small field wrapper with label
+// =====================================================================
+function ParentField({ label, children }) {
+  return (
+    <div
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: '14px',
+        padding: '14px 16px',
+        boxShadow: `2px 2px 0 ${C.ink}12`,
+      }}
+    >
+      <label
+        style={{
+          display: 'block',
+          fontSize: '11px',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: C.amberDeep,
+          fontWeight: 800,
+          marginBottom: '8px',
+        }}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+// =====================================================================
+// KID ZONE — back/next button row used on steps 3-7
+// =====================================================================
+function KidNavButtons({ onBack, onNext, nextDisabled = false, nextLabel = 'Next →' }) {
+  return (
+    <div className="flex gap-3 mt-8 max-w-md mx-auto">
+      <button
+        onClick={onBack}
+        style={{
+          padding: '14px 20px',
+          borderRadius: '14px',
+          border: `1.5px solid ${C.borderInput}`,
+          backgroundColor: 'transparent',
+          color: C.inkMuted,
+          fontWeight: 700,
+          fontSize: '14px',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          flexShrink: 0,
+        }}
+      >
+        ← Back
+      </button>
+      <button
+        onClick={onNext}
+        disabled={nextDisabled}
+        className="transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        style={{
+          flex: 1,
+          backgroundColor: C.amberBtn,
+          color: C.ink,
+          border: `1.5px solid ${C.ink}`,
+          boxShadow: `3px 3px 0 ${C.ink}`,
+          borderRadius: '14px',
+          padding: '15px',
+          fontWeight: 800,
+          fontSize: '15px',
+          cursor: nextDisabled ? 'not-allowed' : 'pointer',
+          fontFamily: 'inherit',
+          letterSpacing: '-0.005em',
+        }}
+      >
+        {nextLabel}
+      </button>
+    </div>
+  );
+}
+
+// ====================== SHARED INPUT STYLES ======================
+
+const parentInputStyle = {
+  width: '100%',
+  padding: '11px 14px',
+  borderRadius: '10px',
+  border: `1.5px solid ${C.borderInput}`,
+  backgroundColor: C.cream,
+  fontSize: '15px',
+  fontWeight: 600,
+  color: C.ink,
+  fontFamily: 'inherit',
+};
+
+const kidLabelStyle = {
+  display: 'block',
+  fontSize: '11px',
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
+  color: C.amberAccent,
+  fontWeight: 800,
+  marginBottom: '10px',
+  paddingLeft: '4px',
+};
