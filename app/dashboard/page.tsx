@@ -1,34 +1,118 @@
 // @ts-nocheck
+// FILE: app/dashboard/page.tsx
+
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Pencil,
+  Eye,
+  PiggyBank,
+  ShoppingCart,
+  MessageSquare,
+  Copy,
+  Share2,
+  Check,
+} from 'lucide-react';
 import { NavBar, ParentGate } from '../components';
 import { useApp } from '../../lib/context';
 
+// ====================== DESIGN TOKENS ======================
+// Parent zone — same cream palette, deeper amber accent for serious tone.
+const C = {
+  cream: '#FEF3C7',
+  creamWarm: '#FEF0B8',
+  cardBg: '#FFFBEB',
+  ink: '#1C1917',
+  inkMuted: '#57534E',
+  inkFaint: '#78716C',
+  inkGhost: '#A8A29E',
+  border: '#1C19171F',
+  borderFaint: '#1C191714',
+  borderInput: '#1C19172B',
+  amberAccent: '#D97706',
+  amberDeep: '#92400E',
+  amberBtn: '#FCD34D',
+  successBg: '#ECFDF5',
+  successBorder: '#10B98140',
+  successInk: '#047857',
+  successInkSoft: '#057857BB',
+  danger: '#A32D2D',
+  dangerBorder: '#A32D2D40',
+};
+
+const font = { sans: "'Poppins', sans-serif" };
+
+// Avatar generator — first letter of kid name in chunky amber circle
+function StoreAvatar({ name, isActive }) {
+  const letter = (name || '?').charAt(0).toUpperCase();
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '10px',
+        backgroundColor: isActive ? C.amberBtn : C.cardBg,
+        border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 800,
+        fontSize: '14px',
+        color: isActive ? C.ink : C.inkMuted,
+        flexShrink: 0,
+      }}
+    >
+      {letter}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading, store: storeData, stores, products, orders, updateOrderStatus, confirmPayment, updateProduct, deleteStore, switchStore } = useApp();
+  const {
+    loading,
+    store: storeData,
+    stores,
+    products,
+    orders,
+    updateOrderStatus,
+    confirmPayment,
+    updateProduct,
+    deleteStore,
+    switchStore,
+  } = useApp();
+
+  // Derived
   const totalEarnings = storeData?.total_earnings || 0;
   const confirmedSavings = storeData?.confirmed_savings || 0;
   const storeName = storeData?.store_name || 'My Store';
   const kidName = storeData?.kid_name || 'Kid';
+  const parentName = storeData?.parent_name || 'Parent';
   const savingsPercentConfig = storeData?.savings_percent || 50;
   const savingsGoalAmount = storeData?.savings_amount || 100;
+  const savingsGoalLabel = storeData?.savings_goal || 'New goal';
 
+  // UI state
   const [completingOrder, setCompletingOrder] = useState(null);
   const [confirmAmount, setConfirmAmount] = useState('');
+  const [confirmSavings, setConfirmSavings] = useState('');
   const [deletingStore, setDeletingStore] = useState(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
-  const [confirmSavings, setConfirmSavings] = useState('');
+  const [copied, setCopied] = useState(false);
 
+  // Order buckets
   const pendingOrders = orders.filter((o) => o.status === 'pending');
   const acceptedOrders = orders.filter((o) => o.status === 'accepted');
   const completedOrders = orders.filter((o) => o.status === 'completed');
-  const pendingProducts = products.filter(p => p.status === 'pending_review');
-  const totalActionItems = pendingProducts.length + pendingOrders.length;
+  const pendingProducts = products.filter((p) => p.status === 'pending_review');
+  const totalActionItems = pendingProducts.length + pendingOrders.length + acceptedOrders.length;
 
+  // Handlers
   const handleStartComplete = (order) => {
-    const totalAmount = order.items ? order.items.reduce((sum, item) => sum + item.price * item.quantity, 0) : order.price;
+    const totalAmount = order.items
+      ? order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      : order.price;
     setCompletingOrder(order);
     setConfirmAmount(totalAmount.toFixed(2));
     setConfirmSavings((totalAmount * (savingsPercentConfig / 100)).toFixed(2));
@@ -44,388 +128,1292 @@ export default function DashboardPage() {
     }
   };
 
-  if (!loading && !storeData) { router.push('/setup'); return null; }
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center"><div className="text-4xl mb-3">🍋</div><p className="text-gray-500">Loading...</p></div>
-    </div>
-  );
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard?.writeText(`https://getlemonadestand.com/store/${storeData?.id}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Early redirects
+  if (!loading && !storeData) {
+    router.push('/setup');
+    return null;
+  }
+  if (loading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans }}
+      >
+        <p style={{ color: C.inkFaint, fontSize: '14px' }}>Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <ParentGate onCancel={() => router.push('/biz')}>
-    <div className="min-h-screen bg-gray-50">
-      <NavBar active="dashboard" />
+      <div
+        className="min-h-screen"
+        style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
+      >
+        <NavBar active="dashboard" />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Welcome back, {storeData?.parent_name || 'Parent'}!</h1>
-        <p className="text-gray-500 mb-6">Managing {storeName}</p>
+        <main className="max-w-3xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
 
-        {/* ============================================ */}
-        {/* ACTION ITEMS — Always at the top */}
-        {/* ============================================ */}
-        {totalActionItems > 0 && (
-          <div className="mb-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{totalActionItems}</span>
+          {/* ===== HEADER ===== */}
+          <p
+            className="text-xs uppercase tracking-[0.25em] font-bold mb-2"
+            style={{ color: C.amberDeep }}
+          >
+            Parent zone
+          </p>
+          <h1
+            className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+            style={{ fontWeight: 800, color: C.ink }}
+          >
+            Welcome back, <span style={{ color: C.amberDeep }}>{parentName}.</span>
+          </h1>
+          <p style={{ fontSize: '13px', color: C.inkMuted, marginTop: '4px' }}>
+            Managing {storeName}{stores.length > 1 ? ` · ${stores.length} stores` : ''}
+          </p>
+
+          {/* ===== ACTION ITEMS ===== */}
+          {totalActionItems > 0 ? (
+            <>
+              <SectionLabel
+                label="Needs your attention"
+                rightElement={
+                  <span
+                    style={{
+                      backgroundColor: C.ink,
+                      color: C.amberBtn,
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      letterSpacing: '0.05em',
+                      padding: '3px 8px',
+                      borderRadius: '999px',
+                    }}
+                  >
+                    {totalActionItems} {totalActionItems === 1 ? 'item' : 'items'}
+                  </span>
+                }
+              />
+
+              {/* Pending products */}
+              {pendingProducts.length > 0 && (
+                <ActionCard
+                  title={`${pendingProducts.length} product${pendingProducts.length !== 1 ? 's' : ''} to review`}
+                  meta={`${kidName} is waiting`}
+                >
+                  {pendingProducts.map((p, i) => (
+                    <ProductReviewRow
+                      key={p.id}
+                      product={p}
+                      isLast={i === pendingProducts.length - 1}
+                      onApprove={() => updateProduct(p.id, { status: 'approved' })}
+                      onChanges={() => updateProduct(p.id, { status: 'changes_requested' })}
+                    />
+                  ))}
+                </ActionCard>
+              )}
+
+              {/* Pending orders */}
+              {pendingOrders.length > 0 && (
+                <ActionCard
+                  title={`${pendingOrders.length} new order${pendingOrders.length !== 1 ? 's' : ''}`}
+                  meta="Review & respond"
+                >
+                  {pendingOrders.map((order, i) => (
+                    <PendingOrderRow
+                      key={order.id}
+                      order={order}
+                      isLast={i === pendingOrders.length - 1}
+                      onAccept={() => updateOrderStatus(order.id, 'accepted')}
+                      onDecline={() => updateOrderStatus(order.id, 'declined')}
+                    />
+                  ))}
+                </ActionCard>
+              )}
+
+              {/* In-progress orders */}
+              {acceptedOrders.length > 0 && (
+                <ActionCard
+                  title={`${acceptedOrders.length} order${acceptedOrders.length !== 1 ? 's' : ''} in progress`}
+                  meta="Arrange delivery"
+                >
+                  {acceptedOrders.map((order, i) => (
+                    <AcceptedOrderRow
+                      key={order.id}
+                      order={order}
+                      isLast={i === acceptedOrders.length - 1}
+                      onComplete={() => handleStartComplete(order)}
+                    />
+                  ))}
+                </ActionCard>
+              )}
+            </>
+          ) : (
+            /* All caught up */
+            <div
+              className="mt-6 mb-2"
+              style={{
+                backgroundColor: C.successBg,
+                border: `1px solid ${C.successBorder}`,
+                borderRadius: '14px',
+                padding: '18px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+              }}
+            >
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: '#10B98120',
+                  border: `1.5px solid ${C.successBorder}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Check size={20} strokeWidth={3} color={C.successInk} />
               </div>
-              <h2 className="font-bold text-gray-800 text-sm">Needs your attention</h2>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: C.successInk }}>
+                  All caught up.
+                </div>
+                <div style={{ fontSize: '12px', color: C.successInkSoft, marginTop: '2px' }}>
+                  No items need your attention right now. Nice work.
+                </div>
+              </div>
             </div>
+          )}
 
-            {/* Pending Product Approvals */}
-            {pendingProducts.length > 0 && (
-              <div className="bg-white rounded-xl border-2 border-purple-200 overflow-hidden">
-                <div className="bg-purple-50 px-4 py-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">✋</span>
-                    <span className="font-semibold text-purple-800 text-sm">{pendingProducts.length} product{pendingProducts.length !== 1 ? 's' : ''} to review</span>
-                  </div>
-                  <span className="text-xs text-purple-500">{kidName} is waiting</span>
+          {/* ===== OVERVIEW ===== */}
+          <SectionLabel label="Overview" />
+
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            <StatCard
+              label="Total earned"
+              value={`$${totalEarnings.toFixed(2)}`}
+              meta={`${completedOrders.length} ${completedOrders.length === 1 ? 'sale' : 'sales'}`}
+              valueColor={C.amberDeep}
+            />
+            <StatCard
+              label="In savings"
+              value={`$${confirmedSavings.toFixed(2)}`}
+              meta={`${savingsPercentConfig}% of earnings`}
+              valueColor={C.ink}
+            />
+            <StatCard
+              label="Orders"
+              value={String(orders.length)}
+              meta={`${completedOrders.length} completed`}
+              valueColor={C.ink}
+            />
+          </div>
+
+          {/* Savings progress */}
+          <div
+            style={{
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              borderRadius: '14px',
+              padding: '16px 18px',
+              boxShadow: `2px 2px 0 ${C.ink}12`,
+            }}
+          >
+            <div className="flex justify-between items-baseline mb-3">
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: C.ink }}>
+                  Saving for: {savingsGoalLabel}
                 </div>
-                <div className="p-3 space-y-2">
-                  {pendingProducts.map((p) => (
-                    <div key={p.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                      <span className="text-2xl shrink-0">{p.emoji || '🎁'}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-800 text-sm">{p.name}</div>
-                        <div className="text-xs text-gray-400 truncate">{p.description || 'No description'}</div>
-                        <div className="text-xs font-bold text-amber-600 mt-0.5">${p.price}</div>
-                      </div>
-                      <div className="flex gap-1.5 shrink-0">
-                        <button onClick={() => updateProduct(p.id, { status: 'approved' })}
-                          className="px-3 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-colors active:scale-95">
-                          Approve
-                        </button>
-                        <button onClick={() => updateProduct(p.id, { status: 'changes_requested' })}
-                          className="px-3 py-2 rounded-lg border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors active:scale-95">
-                          Changes
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ fontSize: '11px', color: C.inkFaint, marginTop: '2px', fontWeight: 600 }}>
+                  ${confirmedSavings.toFixed(2)} of ${savingsGoalAmount} saved
+                  {confirmedSavings < savingsGoalAmount && ` · $${(savingsGoalAmount - confirmedSavings).toFixed(2)} to go`}
                 </div>
               </div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: C.amberDeep, letterSpacing: '-0.02em' }}>
+                {Math.min(Math.round((confirmedSavings / savingsGoalAmount) * 100), 100)}%
+              </div>
+            </div>
+            <div
+              style={{
+                height: '8px',
+                backgroundColor: C.cream,
+                border: `1px solid ${C.borderFaint}`,
+                borderRadius: '999px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  width: `${Math.min((confirmedSavings / savingsGoalAmount) * 100, 100)}%`,
+                  backgroundColor: C.amberBtn,
+                  borderRadius: '999px',
+                  transition: 'width 0.6s ease',
+                }}
+              />
+            </div>
+            {confirmedSavings >= savingsGoalAmount && (
+              <p style={{ fontSize: '12px', color: C.successInk, fontWeight: 700, marginTop: '8px' }}>
+                Goal reached! Time to set a new one.
+              </p>
             )}
+          </div>
 
-            {/* Pending Orders */}
-            {pendingOrders.length > 0 && (
-              <div className="bg-white rounded-xl border-2 border-amber-200 overflow-hidden">
-                <div className="bg-amber-50 px-4 py-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🔔</span>
-                    <span className="font-semibold text-amber-800 text-sm">{pendingOrders.length} new order{pendingOrders.length !== 1 ? 's' : ''}</span>
-                  </div>
-                  <span className="text-xs text-amber-500">Review & respond</span>
-                </div>
-                <div className="p-3 space-y-2">
-                  {pendingOrders.map((order) => (
-                    <div key={order.id} className="p-3 bg-gray-50 rounded-xl">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="font-semibold text-gray-800 text-sm">{order.buyer_name || 'Customer'}</div>
-                          {order.buyer_contact && <div className="text-xs text-blue-600 mt-0.5">{order.buyer_contact}</div>}
+
+          {/* ===== QUICK ACTIONS ===== */}
+          <SectionLabel label="Quick actions" />
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <QuickActionButton
+              icon={<Pencil size={20} strokeWidth={1.75} />}
+              label="Edit store"
+              onClick={() => router.push('/editor')}
+            />
+            <QuickActionButton
+              icon={<Eye size={20} strokeWidth={1.75} />}
+              label="View store"
+              onClick={() => router.push(`/store/${storeData?.id}`)}
+            />
+            <QuickActionButton
+              icon={<PiggyBank size={20} strokeWidth={1.75} />}
+              label="Savings"
+              onClick={() => router.push('/savings')}
+            />
+            <QuickActionButton
+              icon={<ShoppingCart size={20} strokeWidth={1.75} />}
+              label="Marketplace"
+              onClick={() => router.push('/shop')}
+            />
+          </div>
+
+          {/* ===== SHARE STORE ===== */}
+          <SectionLabel label={`Share ${kidName}'s store`} />
+
+          <div
+            style={{
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              borderRadius: '14px',
+              padding: '16px 18px',
+              boxShadow: `2px 2px 0 ${C.ink}12`,
+            }}
+          >
+            <div className="flex gap-2 items-center mb-3">
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: C.cream,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '11px',
+                  color: C.inkMuted,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                getlemonadestand.com/store/{storeData?.id}
+              </div>
+              <button
+                onClick={handleCopyLink}
+                className="transition-all hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: copied ? C.successBg : C.amberBtn,
+                  color: copied ? C.successInk : C.ink,
+                  border: `1.5px solid ${C.ink}`,
+                  boxShadow: `2px 2px 0 ${C.ink}`,
+                  padding: '9px 16px',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {copied ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <ShareButton
+                icon={<MessageSquare size={16} strokeWidth={2} />}
+                label="Text"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open(`sms:?body=Check out ${kidName}'s store on Lemonade Stand! https://getlemonadestand.com/store/${storeData?.id}`);
+                  }
+                }}
+              />
+              <ShareButton
+                icon={<Copy size={16} strokeWidth={2} />}
+                label="Copy link"
+                onClick={handleCopyLink}
+              />
+              <ShareButton
+                icon={<Share2 size={16} strokeWidth={2} />}
+                label="Share"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && navigator.share) {
+                    navigator.share({
+                      title: `${kidName}'s Store`,
+                      text: `Check out ${kidName}'s store on Lemonade Stand!`,
+                      url: `https://getlemonadestand.com/store/${storeData?.id}`,
+                    });
+                  } else {
+                    handleCopyLink();
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* ===== YOUR STORES ===== */}
+          <SectionLabel label="Your stores" />
+
+          <div
+            style={{
+              backgroundColor: C.cardBg,
+              border: `1px solid ${C.border}`,
+              borderRadius: '14px',
+              padding: '16px 18px',
+              boxShadow: `2px 2px 0 ${C.ink}12`,
+            }}
+          >
+            <div className="flex justify-between items-center mb-3">
+              <span style={{ fontSize: '14px', fontWeight: 800, color: C.ink }}>
+                {stores.length} {stores.length === 1 ? 'store' : 'stores'}
+              </span>
+              <button
+                onClick={() => router.push('/setup')}
+                className="transition-all hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: C.amberBtn,
+                  color: C.ink,
+                  border: `1.5px solid ${C.ink}`,
+                  boxShadow: `1.5px 1.5px 0 ${C.ink}`,
+                  padding: '7px 12px',
+                  borderRadius: '9px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                + Add store
+              </button>
+            </div>
+            <div className="space-y-2">
+              {stores.map((s) => {
+                const isActive = storeData?.id === s.id;
+                return (
+                  <div
+                    key={s.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px',
+                      backgroundColor: C.cream,
+                      border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                      boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                      borderRadius: '12px',
+                      transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <StoreAvatar name={s.kid_name} isActive={isActive} />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5" style={{ flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 800, color: C.ink }}>
+                            {s.store_name}
+                          </span>
+                          {isActive && (
+                            <span
+                              style={{
+                                backgroundColor: C.ink,
+                                color: C.amberBtn,
+                                fontSize: '9px',
+                                fontWeight: 800,
+                                letterSpacing: '0.05em',
+                                padding: '2px 7px',
+                                borderRadius: '999px',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              Active
+                            </span>
+                          )}
                         </div>
-                        <div className="text-sm font-bold text-gray-800">${order.total_amount?.toFixed(2) || (order.items ? order.items.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2) : '0.00')}</div>
-                      </div>
-                      {order.items && (
-                        <div className="text-xs text-gray-500 mb-2">
-                          {order.items.map((item, i) => (
-                            <span key={i}>{item.name} x{item.quantity}{i < order.items.length - 1 ? ', ' : ''}</span>
-                          ))}
+                        <div style={{ fontSize: '11px', color: C.inkFaint, marginTop: '2px', fontWeight: 600 }}>
+                          {s.kid_name}
                         </div>
-                      )}
-                      {order.buyer_note && (
-                        <div className="text-xs text-gray-500 italic mb-2">"{order.buyer_note}"</div>
-                      )}
-                      <div className="flex gap-1.5">
-                        <button onClick={() => updateOrderStatus(order.id, 'accepted')}
-                          className="flex-1 py-2 rounded-lg bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition-colors active:scale-95">
-                          Accept Order
-                        </button>
-                        <button onClick={() => updateOrderStatus(order.id, 'declined')}
-                          className="px-3 py-2 rounded-lg border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors active:scale-95">
-                          Decline
-                        </button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Accepted orders needing completion */}
-            {acceptedOrders.length > 0 && (
-              <div className="bg-white rounded-xl border-2 border-blue-200 overflow-hidden">
-                <div className="bg-blue-50 px-4 py-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">📦</span>
-                    <span className="font-semibold text-blue-800 text-sm">{acceptedOrders.length} order{acceptedOrders.length !== 1 ? 's' : ''} in progress</span>
-                  </div>
-                  <span className="text-xs text-blue-500">Arrange delivery</span>
-                </div>
-                <div className="p-3 space-y-2">
-                  {acceptedOrders.map((order) => (
-                    <div key={order.id} className="p-3 bg-gray-50 rounded-xl">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="font-semibold text-gray-800 text-sm">{order.buyer_name || 'Customer'}</div>
-                          {order.buyer_contact && <div className="text-xs text-blue-600 mt-0.5">{order.buyer_contact}</div>}
-                        </div>
-                        <div className="text-sm font-bold text-gray-800">${order.total_amount?.toFixed(2) || '0.00'}</div>
-                      </div>
-                      <div className="bg-blue-50 rounded-lg p-2 text-xs text-blue-700 mb-2">
-                        Contact {order.buyer_name || 'the customer'} to arrange pickup or delivery.
-                      </div>
-                      <button onClick={() => handleStartComplete(order)}
-                        className="w-full py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-colors active:scale-95">
-                        Mark Complete & Confirm Payment
+                    <div className="flex gap-1.5 flex-shrink-0">
+                      {!isActive && (
+                        <button
+                          onClick={() => switchStore(s.id)}
+                          style={{
+                            backgroundColor: 'white',
+                            color: C.ink,
+                            border: `1px solid ${C.ink}`,
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            fontFamily: 'inherit',
+                          }}
+                        >
+                          Switch
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setDeletingStore(s)}
+                        style={{
+                          backgroundColor: 'white',
+                          color: C.danger,
+                          border: `1px solid ${C.dangerBorder}`,
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        Delete
                       </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ===== COMPLETED ORDERS ===== */}
+          {completedOrders.length > 0 && (
+            <>
+              <SectionLabel label="Completed orders" />
+              <div
+                style={{
+                  backgroundColor: C.cardBg,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  boxShadow: `2px 2px 0 ${C.ink}12`,
+                }}
+              >
+                {completedOrders.map((order, i) => (
+                  <div
+                    key={order.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px 12px',
+                      backgroundColor: C.cream,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: '10px',
+                      marginBottom: i === completedOrders.length - 1 ? 0 : '6px',
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <div style={{ fontSize: '12px', fontWeight: 800, color: C.ink }}>
+                        {order.buyer_name || 'Customer'}
+                      </div>
+                      <div style={{ fontSize: '11px', color: C.inkFaint, marginTop: '1px' }}>
+                        {order.items ? order.items.map((it) => it.name).join(', ') : 'Order'}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '12px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: C.ink }}>
+                        ${(order.confirmed_amount || order.total_amount || 0).toFixed(2)}
+                      </div>
+                      <div style={{ fontSize: '10px', color: C.inkFaint, marginTop: '1px' }}>
+                        Completed
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
+            </>
+          )}
+
+          {/* ===== COMMUNITY STANDARDS ===== */}
+          <div className="mt-6">
+            <div
+              style={{
+                backgroundColor: C.creamWarm,
+                border: `1px solid ${C.border}`,
+                borderRadius: '14px',
+                padding: '18px 20px',
+              }}
+            >
+              <p
+                className="text-xs uppercase tracking-[0.16em] font-bold mb-2"
+                style={{ color: C.amberDeep, letterSpacing: '0.16em' }}
+              >
+                For parents
+              </p>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: C.ink, marginBottom: '12px', letterSpacing: '-0.005em' }}>
+                Community standards
+              </h3>
+              <div style={{ fontSize: '12px', color: C.inkMuted, lineHeight: 1.6 }}>
+                <p style={{ marginBottom: '8px' }}>
+                  <strong style={{ color: C.ink, fontWeight: 700 }}>Parent responsibility:</strong>{' '}
+                  You are responsible for supervising your kid's activity, reviewing and approving all products, and overseeing all orders, payments, and customer interactions.
+                </p>
+                <p style={{ marginBottom: '8px' }}>
+                  <strong style={{ color: C.ink, fontWeight: 700 }}>Safe content:</strong>{' '}
+                  All store names, product listings, descriptions, and images must be appropriate for a family audience.
+                </p>
+                <p style={{ marginBottom: '8px' }}>
+                  <strong style={{ color: C.ink, fontWeight: 700 }}>Privacy & safety:</strong>{' '}
+                  Never share personal information in store listings. No photos of children permitted. All customer communications handled by a parent.
+                </p>
+                <p>
+                  <strong style={{ color: C.ink, fontWeight: 700 }}>Respect & moderation:</strong>{' '}
+                  Treat all community members with kindness. Lemonade Stand reserves the right to review or remove content that violates these standards.
+                </p>
+              </div>
+              <a
+                href="/privacy"
+                style={{
+                  display: 'inline-block',
+                  marginTop: '12px',
+                  fontSize: '12px',
+                  color: C.amberDeep,
+                  fontWeight: 700,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '2px',
+                }}
+              >
+                Read our full privacy & data practices →
+              </a>
+            </div>
           </div>
+
+        </main>
+
+        {/* ===== DELETE STORE MODAL ===== */}
+        {deletingStore && (
+          <DeleteStoreModal
+            store={deletingStore}
+            confirmText={deleteConfirmText}
+            onChangeText={setDeleteConfirmText}
+            onCancel={() => {
+              setDeletingStore(null);
+              setDeleteConfirmText('');
+            }}
+            onConfirm={async () => {
+              if (deleteConfirmText.toLowerCase() === deletingStore.kid_name.toLowerCase()) {
+                await deleteStore(deletingStore.id);
+                setDeletingStore(null);
+                setDeleteConfirmText('');
+              }
+            }}
+          />
         )}
 
-        {/* All clear message */}
-        {totalActionItems === 0 && (
-          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6 flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <div className="font-semibold text-emerald-800 text-sm">You're all caught up!</div>
-              <div className="text-xs text-emerald-600">No items need your attention right now.</div>
-            </div>
-          </div>
+        {/* ===== PAYMENT CONFIRM MODAL ===== */}
+        {completingOrder && (
+          <PaymentConfirmModal
+            kidName={kidName}
+            confirmAmount={confirmAmount}
+            confirmSavings={confirmSavings}
+            savingsPercentConfig={savingsPercentConfig}
+            onChangeAmount={(v) => {
+              setConfirmAmount(v);
+              setConfirmSavings((parseFloat(v || 0) * (savingsPercentConfig / 100)).toFixed(2));
+            }}
+            onChangeSavings={setConfirmSavings}
+            onCancel={() => setCompletingOrder(null)}
+            onConfirm={handleConfirmComplete}
+          />
         )}
 
-        {/* ============================================ */}
-        {/* STATS & OVERVIEW */}
-        {/* ============================================ */}
+      </div>
+    </ParentGate>
+  );
+}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="text-xs text-gray-500 mb-1">Total Earned</div>
-            <div className="text-xl sm:text-2xl font-bold text-amber-600">${totalEarnings.toFixed(2)}</div>
-            <div className="text-xs text-gray-400 mt-1">{completedOrders.length} sale{completedOrders.length !== 1 ? 's' : ''}</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="text-xs text-gray-500 mb-1">In Savings</div>
-            <div className="text-xl sm:text-2xl font-bold text-emerald-600">${confirmedSavings.toFixed(2)}</div>
-            <div className="text-xs text-gray-400 mt-1">{savingsPercentConfig}% of earnings</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="text-xs text-gray-500 mb-1">Orders</div>
-            <div className="text-xl sm:text-2xl font-bold text-blue-600">{orders.length}</div>
-            <div className="text-xs text-gray-400 mt-1">{completedOrders.length} completed</div>
-          </div>
+// =====================================================================
+// SECTION LABEL — uppercase eyebrow with optional right element
+// =====================================================================
+function SectionLabel({ label, rightElement }) {
+  return (
+    <div
+      className="flex items-center justify-between mt-6 mb-2.5"
+      style={{ paddingLeft: '4px' }}
+    >
+      <span
+        style={{
+          fontSize: '10px',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: C.inkFaint,
+          fontWeight: 700,
+        }}
+      >
+        {label}
+      </span>
+      {rightElement}
+    </div>
+  );
+}
+
+// =====================================================================
+// ACTION CARD — wrapper for action item groupings
+// =====================================================================
+function ActionCard({ title, meta, children }) {
+  return (
+    <div
+      className="mb-2.5"
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: '14px',
+        padding: '14px 16px',
+        boxShadow: `2px 2px 0 ${C.ink}12`,
+      }}
+    >
+      <div className="flex justify-between items-center mb-3">
+        <span style={{ fontSize: '14px', fontWeight: 800, color: C.ink, letterSpacing: '-0.005em' }}>
+          {title}
+        </span>
+        <span style={{ fontSize: '11px', color: C.inkFaint, fontWeight: 600 }}>
+          {meta}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// =====================================================================
+// PRODUCT REVIEW ROW
+// =====================================================================
+function ProductReviewRow({ product, isLast, onApprove, onChanges }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '12px',
+        backgroundColor: C.cream,
+        border: `1px solid ${C.border}`,
+        borderRadius: '12px',
+        marginBottom: isLast ? 0 : '8px',
+      }}
+    >
+      <div
+        style={{
+          width: '44px',
+          height: '44px',
+          borderRadius: '10px',
+          backgroundColor: C.cardBg,
+          border: `1px solid ${C.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '22px',
+          flexShrink: 0,
+          overflow: 'hidden',
+        }}
+      >
+        {product.image_url ? (
+          <img src={product.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          product.emoji || '🎁'
+        )}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '13px', fontWeight: 800, color: C.ink, lineHeight: 1.2 }}>
+          {product.name}
         </div>
+        <div
+          style={{
+            fontSize: '11px',
+            color: C.inkFaint,
+            marginTop: '2px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {product.description || 'No description'}
+        </div>
+        <div style={{ fontSize: '13px', fontWeight: 800, color: C.amberDeep, marginTop: '4px' }}>
+          ${Number(product.price).toFixed(2)}
+        </div>
+      </div>
+      <div className="flex gap-1.5 flex-shrink-0">
+        <button
+          onClick={onApprove}
+          className="transition-all hover:-translate-y-0.5"
+          style={{
+            backgroundColor: C.amberBtn,
+            color: C.ink,
+            border: `1.5px solid ${C.ink}`,
+            boxShadow: `1.5px 1.5px 0 ${C.ink}`,
+            padding: '6px 12px',
+            borderRadius: '8px',
+            fontSize: '11px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          Approve
+        </button>
+        <button
+          onClick={onChanges}
+          style={{
+            backgroundColor: 'white',
+            color: C.inkMuted,
+            border: `1px solid ${C.border}`,
+            padding: '6px 12px',
+            borderRadius: '8px',
+            fontSize: '11px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          Changes
+        </button>
+      </div>
+    </div>
+  );
+}
 
-        {/* Savings Progress */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <div className="font-semibold text-gray-800 text-sm">Savings Goal: {storeData?.savings_goal || 'New Art Supplies'}</div>
-              <div className="text-xs text-gray-400">${confirmedSavings.toFixed(2)} of ${savingsGoalAmount} saved</div>
-            </div>
-            <div className="text-sm font-bold text-emerald-600">
-              {Math.min(Math.round((confirmedSavings / savingsGoalAmount) * 100), 100)}%
-            </div>
+// =====================================================================
+// PENDING ORDER ROW
+// =====================================================================
+function PendingOrderRow({ order, isLast, onAccept, onDecline }) {
+  const total = order.total_amount || (order.items ? order.items.reduce((s, i) => s + i.price * i.quantity, 0) : 0);
+  return (
+    <div
+      style={{
+        padding: '12px',
+        backgroundColor: C.cream,
+        border: `1px solid ${C.border}`,
+        borderRadius: '12px',
+        marginBottom: isLast ? 0 : '8px',
+      }}
+    >
+      <div className="flex justify-between items-start mb-1.5">
+        <div className="min-w-0">
+          <div style={{ fontSize: '13px', fontWeight: 800, color: C.ink }}>
+            {order.buyer_name || 'Customer'}
           </div>
-          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000"
-              style={{ width: `${Math.min((confirmedSavings / savingsGoalAmount) * 100, 100)}%` }} />
-          </div>
-          {confirmedSavings >= savingsGoalAmount ? (
-            <div className="text-sm text-emerald-600 font-medium mt-2">Goal reached! Time to set a new one.</div>
-          ) : (
-            <div className="text-xs text-gray-400 mt-2">${(savingsGoalAmount - confirmedSavings).toFixed(2)} to go</div>
+          {order.buyer_contact && (
+            <div style={{ fontSize: '11px', color: C.amberDeep, marginTop: '2px' }}>
+              {order.buyer_contact}
+            </div>
           )}
         </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-          <button onClick={() => router.push('/editor')} className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 text-center hover:bg-gray-50 transition-colors">
-            <svg className="w-5 h-5 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <div className="text-xs font-medium text-gray-700">Edit Store</div>
-          </button>
-          <button onClick={() => router.push('/store')} className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 text-center hover:bg-gray-50 transition-colors">
-            <svg className="w-5 h-5 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <div className="text-xs font-medium text-gray-700">View Store</div>
-          </button>
-          <button onClick={() => router.push('/savings')} className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 text-center hover:bg-gray-50 transition-colors">
-            <svg className="w-5 h-5 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <div className="text-xs font-medium text-gray-700">Savings</div>
-          </button>
-          <button onClick={() => router.push('/shop')} className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 text-center hover:bg-gray-50 transition-colors">
-            <svg className="w-5 h-5 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            <div className="text-xs font-medium text-gray-700">Marketplace</div>
-          </button>
+        <div style={{ fontSize: '14px', fontWeight: 800, color: C.ink, flexShrink: 0, marginLeft: '12px' }}>
+          ${total.toFixed(2)}
         </div>
-
-        {/* Share Store */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-          <h2 className="font-semibold text-gray-800 text-sm mb-3">Share {kidName}&apos;s Store</h2>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500 border border-gray-200 truncate font-mono">
-              getlemonadestand.com/store/{storeData?.id}
-            </div>
-            <button onClick={() => { navigator.clipboard?.writeText(`https://getlemonadestand.com/store/${storeData?.id}`); }}
-              className="px-3 py-2 rounded-lg text-xs font-medium bg-amber-400 hover:bg-amber-500 text-white transition-colors">Copy</button>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button onClick={() => { window.open(`sms:?body=Check out ${kidName}'s store on Lemonade Stand! https://getlemonadestand.com/store/${storeData?.id}`); }}
-              className="bg-gray-50 hover:bg-gray-100 rounded-lg p-2.5 text-center transition-colors">
-              <svg className="w-4 h-4 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <div className="text-[10px] font-medium text-gray-600">Text</div>
-            </button>
-            <button onClick={() => { navigator.clipboard?.writeText(`https://getlemonadestand.com/store/${storeData?.id}`); }}
-              className="bg-gray-50 hover:bg-gray-100 rounded-lg p-2.5 text-center transition-colors">
-              <svg className="w-4 h-4 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <div className="text-[10px] font-medium text-gray-600">Copy Link</div>
-            </button>
-            <button onClick={() => { navigator.clipboard?.writeText(`Check out ${kidName}'s store! https://getlemonadestand.com/store/${storeData?.id}`); }}
-              className="bg-gray-50 hover:bg-gray-100 rounded-lg p-2.5 text-center transition-colors">
-              <svg className="w-4 h-4 mx-auto mb-1 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              <div className="text-[10px] font-medium text-gray-600">Share</div>
-            </button>
-          </div>
+      </div>
+      {order.items && (
+        <div style={{ fontSize: '11px', color: C.inkFaint, margin: '6px 0' }}>
+          {order.items.map((item, i) => (
+            <span key={i}>
+              {item.name} × {item.quantity}
+              {i < order.items.length - 1 ? ', ' : ''}
+            </span>
+          ))}
         </div>
-
-        {/* Completed Orders History */}
-        {completedOrders.length > 0 && (
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-            <h2 className="font-semibold text-gray-800 text-sm mb-3">Completed Orders</h2>
-            <div className="space-y-2">
-              {completedOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div>
-                    <div className="font-medium text-gray-800 text-sm">{order.buyer_name || 'Customer'}</div>
-                    <div className="text-xs text-gray-400">{order.items ? order.items.map(i => i.name).join(', ') : 'Order'}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-emerald-600">${order.confirmed_amount?.toFixed(2) || order.total_amount?.toFixed(2) || '0.00'}</div>
-                    <div className="text-xs text-gray-400">Completed</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Store Management */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-800 text-sm">Your Stores</h2>
-            <button onClick={() => router.push('/setup')} className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-medium rounded-lg transition-colors">
-              + Add Store
-            </button>
-          </div>
-          <div className="space-y-2">
-            {stores.map((s) => (
-              <div key={s.id} className={`flex items-center justify-between p-3 rounded-xl border ${storeData?.id === s.id ? 'border-amber-200 bg-amber-50' : 'border-gray-100'}`}>
-                <div className="flex items-center gap-3">
-                  <div className="text-xl">{storeData?.id === s.id ? '🏪' : '🏬'}</div>
-                  <div>
-                    <div className="font-medium text-gray-800 text-sm">{s.store_name}</div>
-                    <div className="text-xs text-gray-400">{s.kid_name}{storeData?.id === s.id ? ' · Active' : ''}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {storeData?.id !== s.id && (
-                    <button onClick={() => switchStore(s.id)}
-                      className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">Switch</button>
-                  )}
-                  <button onClick={() => setDeletingStore(s)}
-                    className="px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors">Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
+      )}
+      {order.buyer_note && (
+        <div style={{ fontSize: '11px', color: C.inkFaint, fontStyle: 'italic', margin: '4px 0 8px' }}>
+          "{order.buyer_note}"
         </div>
-
-        {/* Delete Store Confirmation */}
-        {deletingStore && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-              <div className="text-3xl text-center mb-3">⚠️</div>
-              <h3 className="font-bold text-lg text-center text-gray-800 mb-2">Delete {deletingStore.store_name}?</h3>
-              <div className="bg-red-50 rounded-xl p-4 mb-4 text-sm text-red-700 space-y-1">
-                <p>This will permanently delete:</p>
-                <p>• All products in this store</p>
-                <p>• All order history</p>
-                <p>• Store design and settings</p>
-                <p>• Savings tracking data</p>
-                <p className="font-semibold mt-2">This cannot be undone.</p>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm text-gray-600 mb-2">Type <strong>{deletingStore.kid_name}</strong> to confirm:</label>
-                <input type="text" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  placeholder={deletingStore.kid_name}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-red-400 focus:outline-none text-base" />
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => { setDeletingStore(null); setDeleteConfirmText(''); }}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium transition-colors hover:bg-gray-50">Cancel</button>
-                <button onClick={async () => {
-                    if (deleteConfirmText.toLowerCase() === deletingStore.kid_name.toLowerCase()) {
-                      await deleteStore(deletingStore.id); setDeletingStore(null); setDeleteConfirmText('');
-                    }
-                  }}
-                  disabled={deleteConfirmText.toLowerCase() !== deletingStore.kid_name.toLowerCase()}
-                  className={`flex-1 py-3 rounded-xl font-semibold transition-colors ${
-                    deleteConfirmText.toLowerCase() === deletingStore.kid_name.toLowerCase()
-                      ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}>Delete Forever</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Confirmation Modal */}
-        {completingOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-              <h3 className="font-bold text-lg mb-4">Confirm Payment Received</h3>
-              <p className="text-gray-600 text-sm mb-4">How much did you receive for this order? {kidName}'s savings will be updated.</p>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount received ($)</label>
-                  <input type="number" value={confirmAmount} onChange={(e) => { setConfirmAmount(e.target.value); setConfirmSavings((parseFloat(e.target.value || 0) * (savingsPercentConfig / 100)).toFixed(2)); }}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-400 focus:outline-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Amount to savings ({savingsPercentConfig}%)</label>
-                  <input type="number" value={confirmSavings} onChange={(e) => setConfirmSavings(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-400 focus:outline-none" />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button onClick={() => setCompletingOrder(null)} className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-medium">Cancel</button>
-                <button onClick={handleConfirmComplete} className="flex-1 py-3 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600">Confirm</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Community Standards */}
-        <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 mt-6">
-          <h2 className="font-semibold text-gray-700 text-sm mb-3">Community Standards</h2>
-          <div className="text-xs text-gray-500 space-y-2">
-            <p><strong>Parent Responsibility:</strong> You are responsible for supervising your child's activity, reviewing and approving all products, and overseeing all orders, payments, and customer interactions.</p>
-            <p><strong>Safe & Appropriate Content:</strong> All store names, product listings, descriptions, and images must be appropriate for a family audience.</p>
-            <p><strong>Privacy & Safety:</strong> Never share personal information in store listings. No photos of children permitted. All customer communications handled by a parent.</p>
-            <p><strong>Respect & Moderation:</strong> Treat all community members with kindness. Lemonade Stand reserves the right to review or remove content that violates these standards.</p>
-          </div>
-          <a href="/privacy" className="inline-block mt-3 text-xs text-amber-600 hover:underline">Read our full Privacy & Data Practices →</a>
-        </div>
-      </main>
+      )}
+      <div className="flex gap-1.5">
+        <button
+          onClick={onAccept}
+          className="transition-all hover:-translate-y-0.5"
+          style={{
+            flex: 1,
+            backgroundColor: C.amberBtn,
+            color: C.ink,
+            border: `1.5px solid ${C.ink}`,
+            boxShadow: `1.5px 1.5px 0 ${C.ink}`,
+            padding: '8px',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          Accept order
+        </button>
+        <button
+          onClick={onDecline}
+          style={{
+            backgroundColor: 'white',
+            color: C.inkMuted,
+            border: `1px solid ${C.border}`,
+            padding: '8px 14px',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          Decline
+        </button>
+      </div>
     </div>
-    </ParentGate>
+  );
+}
+
+// =====================================================================
+// ACCEPTED ORDER ROW (in progress, needs completion)
+// =====================================================================
+function AcceptedOrderRow({ order, isLast, onComplete }) {
+  return (
+    <div
+      style={{
+        padding: '12px',
+        backgroundColor: C.cream,
+        border: `1px solid ${C.border}`,
+        borderRadius: '12px',
+        marginBottom: isLast ? 0 : '8px',
+      }}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div className="min-w-0">
+          <div style={{ fontSize: '13px', fontWeight: 800, color: C.ink }}>
+            {order.buyer_name || 'Customer'}
+          </div>
+          {order.buyer_contact && (
+            <div style={{ fontSize: '11px', color: C.amberDeep, marginTop: '2px' }}>
+              {order.buyer_contact}
+            </div>
+          )}
+        </div>
+        <div style={{ fontSize: '14px', fontWeight: 800, color: C.ink, flexShrink: 0, marginLeft: '12px' }}>
+          ${(order.total_amount || 0).toFixed(2)}
+        </div>
+      </div>
+      <div
+        style={{
+          backgroundColor: C.cardBg,
+          border: `1px solid ${C.border}`,
+          padding: '8px 12px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          color: C.inkMuted,
+          marginBottom: '8px',
+        }}
+      >
+        Contact {order.buyer_name || 'the customer'} to arrange pickup or delivery.
+      </div>
+      <button
+        onClick={onComplete}
+        className="transition-all hover:-translate-y-0.5"
+        style={{
+          width: '100%',
+          backgroundColor: C.amberBtn,
+          color: C.ink,
+          border: `1.5px solid ${C.ink}`,
+          boxShadow: `1.5px 1.5px 0 ${C.ink}`,
+          padding: '8px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontWeight: 800,
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}
+      >
+        Mark complete & confirm payment
+      </button>
+    </div>
+  );
+}
+
+// =====================================================================
+// STAT CARD
+// =====================================================================
+function StatCard({ label, value, meta, valueColor }) {
+  return (
+    <div
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: '14px',
+        padding: '14px 16px',
+        boxShadow: `2px 2px 0 ${C.ink}12`,
+      }}
+    >
+      <div
+        style={{
+          fontSize: '10px',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: C.inkFaint,
+          fontWeight: 700,
+          marginBottom: '4px',
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 'clamp(20px, 5vw, 26px)',
+          fontWeight: 800,
+          letterSpacing: '-0.025em',
+          color: valueColor || C.ink,
+          lineHeight: 1.1,
+        }}
+      >
+        {value}
+      </div>
+      <div style={{ fontSize: '11px', color: C.inkFaint, marginTop: '2px', fontWeight: 600 }}>
+        {meta}
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+// QUICK ACTION BUTTON
+// =====================================================================
+function QuickActionButton({ icon, label, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="transition-all hover:-translate-y-0.5"
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: '12px',
+        padding: '14px 10px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        boxShadow: `2px 2px 0 ${C.ink}12`,
+        fontFamily: 'inherit',
+      }}
+    >
+      <div style={{ width: '24px', height: '24px', margin: '0 auto 6px', color: C.amberDeep }}>
+        {icon}
+      </div>
+      <div style={{ fontSize: '12px', fontWeight: 800, color: C.ink }}>
+        {label}
+      </div>
+    </button>
+  );
+}
+
+// =====================================================================
+// SHARE BUTTON
+// =====================================================================
+function ShareButton({ icon, label, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        backgroundColor: C.cream,
+        border: `1px solid ${C.border}`,
+        borderRadius: '10px',
+        padding: '10px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+      }}
+    >
+      <div style={{ width: '16px', height: '16px', margin: '0 auto 4px', color: C.inkMuted }}>
+        {icon}
+      </div>
+      <div style={{ fontSize: '11px', fontWeight: 700, color: C.inkMuted }}>
+        {label}
+      </div>
+    </button>
+  );
+}
+
+// =====================================================================
+// DELETE STORE MODAL
+// =====================================================================
+function DeleteStoreModal({ store, confirmText, onChangeText, onCancel, onConfirm }) {
+  const canDelete = confirmText.toLowerCase() === store.kid_name.toLowerCase();
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 60,
+        padding: '16px',
+      }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: C.cardBg,
+          border: `1.5px solid ${C.ink}`,
+          borderRadius: '18px',
+          boxShadow: `4px 4px 0 ${C.ink}`,
+          padding: '24px',
+          maxWidth: '420px',
+          width: '100%',
+          fontFamily: font.sans,
+          color: C.ink,
+        }}
+      >
+        <p
+          className="text-xs uppercase tracking-[0.2em] font-bold"
+          style={{ color: C.danger, marginBottom: '6px' }}
+        >
+          Permanent action
+        </p>
+        <h3 style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.01em', marginBottom: '12px' }}>
+          Delete {store.store_name}?
+        </h3>
+        <div
+          style={{
+            backgroundColor: '#FEE2E2',
+            border: `1px solid ${C.dangerBorder}`,
+            borderRadius: '12px',
+            padding: '14px 16px',
+            fontSize: '12px',
+            color: C.danger,
+            marginBottom: '16px',
+            lineHeight: 1.6,
+          }}
+        >
+          <p style={{ marginBottom: '4px' }}>This will permanently delete:</p>
+          <p style={{ margin: 0 }}>• All products in this store</p>
+          <p style={{ margin: 0 }}>• All order history</p>
+          <p style={{ margin: 0 }}>• Store design and settings</p>
+          <p style={{ margin: 0 }}>• Savings tracking data</p>
+          <p style={{ marginTop: '8px', fontWeight: 800 }}>This cannot be undone.</p>
+        </div>
+        <label style={{ display: 'block', fontSize: '12px', color: C.inkMuted, marginBottom: '8px' }}>
+          Type <strong style={{ color: C.ink }}>{store.kid_name}</strong> to confirm:
+        </label>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={(e) => onChangeText(e.target.value)}
+          placeholder={store.kid_name}
+          className="focus:outline-none"
+          style={{
+            width: '100%',
+            padding: '12px 14px',
+            borderRadius: '10px',
+            border: `1.5px solid ${C.borderInput}`,
+            backgroundColor: C.cream,
+            fontSize: '14px',
+            fontWeight: 600,
+            color: C.ink,
+            fontFamily: 'inherit',
+            marginBottom: '16px',
+          }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={onCancel}
+            style={{
+              flex: 1,
+              backgroundColor: 'white',
+              color: C.inkMuted,
+              border: `1px solid ${C.border}`,
+              padding: '12px',
+              borderRadius: '10px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={!canDelete}
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              flex: 1,
+              backgroundColor: canDelete ? '#DC2626' : '#E7E5E4',
+              color: canDelete ? 'white' : C.inkGhost,
+              border: `1.5px solid ${canDelete ? '#7F1D1D' : C.border}`,
+              boxShadow: canDelete ? `2px 2px 0 #7F1D1D` : 'none',
+              padding: '12px',
+              borderRadius: '10px',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: canDelete ? 'pointer' : 'not-allowed',
+              fontFamily: 'inherit',
+            }}
+          >
+            Delete forever
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+// PAYMENT CONFIRM MODAL
+// =====================================================================
+function PaymentConfirmModal({ kidName, confirmAmount, confirmSavings, savingsPercentConfig, onChangeAmount, onChangeSavings, onCancel, onConfirm }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 60,
+        padding: '16px',
+      }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: C.cardBg,
+          border: `1.5px solid ${C.ink}`,
+          borderRadius: '18px',
+          boxShadow: `4px 4px 0 ${C.ink}`,
+          padding: '24px',
+          maxWidth: '420px',
+          width: '100%',
+          fontFamily: font.sans,
+          color: C.ink,
+        }}
+      >
+        <p
+          className="text-xs uppercase tracking-[0.2em] font-bold"
+          style={{ color: C.amberDeep, marginBottom: '6px' }}
+        >
+          Confirm payment
+        </p>
+        <h3 style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.01em', marginBottom: '8px' }}>
+          Payment received?
+        </h3>
+        <p style={{ fontSize: '13px', color: C.inkMuted, marginBottom: '16px', lineHeight: 1.5 }}>
+          How much did you receive for this order? {kidName}'s savings will be updated.
+        </p>
+        <div className="space-y-3 mb-5">
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.amberDeep, fontWeight: 800, marginBottom: '6px' }}>
+              Amount received ($)
+            </label>
+            <input
+              type="number"
+              value={confirmAmount}
+              onChange={(e) => onChangeAmount(e.target.value)}
+              className="focus:outline-none"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: `1.5px solid ${C.borderInput}`,
+                backgroundColor: C.cream,
+                fontSize: '15px',
+                fontWeight: 700,
+                color: C.ink,
+                fontFamily: 'inherit',
+              }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.amberDeep, fontWeight: 800, marginBottom: '6px' }}>
+              To savings ({savingsPercentConfig}%)
+            </label>
+            <input
+              type="number"
+              value={confirmSavings}
+              onChange={(e) => onChangeSavings(e.target.value)}
+              className="focus:outline-none"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                border: `1.5px solid ${C.borderInput}`,
+                backgroundColor: C.cream,
+                fontSize: '15px',
+                fontWeight: 700,
+                color: C.ink,
+                fontFamily: 'inherit',
+              }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+            />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onCancel}
+            style={{
+              flex: 1,
+              backgroundColor: 'white',
+              color: C.inkMuted,
+              border: `1px solid ${C.border}`,
+              padding: '12px',
+              borderRadius: '10px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="transition-all hover:-translate-y-0.5"
+            style={{
+              flex: 1,
+              backgroundColor: C.amberBtn,
+              color: C.ink,
+              border: `1.5px solid ${C.ink}`,
+              boxShadow: `2px 2px 0 ${C.ink}`,
+              padding: '12px',
+              borderRadius: '10px',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
