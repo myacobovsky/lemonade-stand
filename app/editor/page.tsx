@@ -122,11 +122,13 @@ export default function EditorPage() {
   // ---- DRAFT STATE — what the kid is editing before saving ----
   const [draftTheme, setDraftTheme] = useState(() => ({
     color: storeTheme?.color || 'amber',
+    secondaryColor: storeTheme?.secondary_color || '',
     sticker: storeTheme?.sticker || '🌈',
     accentStickers: storeTheme?.accent_stickers || [],
     stickerPattern: storeTheme?.sticker_pattern || false,
     pattern: storeTheme?.pattern || 'none',
     bannerImage: storeTheme?.banner_image_url || null,
+    heroLayout: storeTheme?.hero_layout || 'classic',
     headerFont: storeTheme?.header_font || 'Poppins',
     bodyFont: storeTheme?.body_font || 'Poppins',
     cardFont: storeTheme?.card_font || 'Poppins',
@@ -135,17 +137,20 @@ export default function EditorPage() {
     productLayout: storeTheme?.product_layout || 'grid',
   }));
   const [draftBio, setDraftBio] = useState(storeData?.bio || '');
+  const [draftAboutStory, setDraftAboutStory] = useState(storeData?.about_story || '');
 
   // When storeTheme/storeData loads, sync into draft
   useEffect(() => {
     if (storeTheme) {
       setDraftTheme({
         color: storeTheme.color || 'amber',
+        secondaryColor: storeTheme.secondary_color || '',
         sticker: storeTheme.sticker || '🌈',
         accentStickers: storeTheme.accent_stickers || [],
         stickerPattern: storeTheme.sticker_pattern || false,
         pattern: storeTheme.pattern || 'none',
         bannerImage: storeTheme.banner_image_url || null,
+        heroLayout: storeTheme.hero_layout || 'classic',
         headerFont: storeTheme.header_font || 'Poppins',
         bodyFont: storeTheme.body_font || 'Poppins',
         cardFont: storeTheme.card_font || 'Poppins',
@@ -155,6 +160,7 @@ export default function EditorPage() {
       });
     }
     if (storeData?.bio !== undefined) setDraftBio(storeData.bio || '');
+    if (storeData?.about_story !== undefined) setDraftAboutStory(storeData.about_story || '');
   }, [storeTheme, storeData]);
 
   // ---- UI STATE ----
@@ -193,11 +199,13 @@ export default function EditorPage() {
   async function saveVibe() {
     await updateTheme({
       color: draftTheme.color,
+      secondary_color: draftTheme.secondaryColor || '',
       sticker: draftTheme.sticker,
       accent_stickers: draftTheme.accentStickers || [],
       sticker_pattern: draftTheme.stickerPattern || false,
       pattern: draftTheme.pattern || 'none',
       banner_image_url: draftTheme.bannerImage || null,
+      hero_layout: draftTheme.heroLayout || 'classic',
     });
     flashSaved('vibe');
   }
@@ -209,9 +217,10 @@ export default function EditorPage() {
       announcement: draftTheme.announcement || '',
       announcement_on: draftTheme.announcementOn || false,
     });
-    if (draftBio !== (storeData?.bio || '')) {
-      await updateStore({ bio: draftBio });
-    }
+    const updates = {};
+    if (draftBio !== (storeData?.bio || '')) updates.bio = draftBio;
+    if (draftAboutStory !== (storeData?.about_story || '')) updates.about_story = draftAboutStory;
+    if (Object.keys(updates).length > 0) await updateStore(updates);
     flashSaved('voice');
   }
 
@@ -745,6 +754,98 @@ export default function EditorPage() {
                   )}
                 </ControlGroup>
 
+                {/* Hero layout */}
+                <ControlGroup label="Hero layout">
+                  <p style={{ fontSize: '11px', color: C.inkFaint, marginBottom: '10px' }}>
+                    How your store name shows up at the top
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'classic',    label: 'Classic',    desc: 'Sticker on top' },
+                      { value: 'horizontal', label: 'Side by side', desc: 'Sticker left' },
+                      { value: 'banner',     label: 'Banner',      desc: 'Photo focused' },
+                    ].map((opt) => {
+                      const isActive = (draftTheme.heroLayout || 'classic') === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => setDraftTheme((prev) => ({ ...prev, heroLayout: opt.value }))}
+                          style={{
+                            padding: '10px 6px',
+                            borderRadius: '10px',
+                            border: isActive ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                            backgroundColor: isActive ? C.amberBtn : C.cream,
+                            cursor: 'pointer',
+                            transition: 'all 0.1s',
+                            fontFamily: 'inherit',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <div style={{ fontSize: '12px', fontWeight: 800, color: C.ink, marginBottom: '2px' }}>
+                            {opt.label}
+                          </div>
+                          <div style={{ fontSize: '10px', color: C.inkFaint, fontWeight: 600 }}>
+                            {opt.desc}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </ControlGroup>
+
+                {/* Secondary accent color */}
+                <ControlGroup label="Button color (optional)">
+                  <p style={{ fontSize: '11px', color: C.inkFaint, marginBottom: '10px' }}>
+                    Pick a different color for your "Add to cart" buttons
+                  </p>
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* "None" option keeps button using main color */}
+                    <button
+                      onClick={() => setDraftTheme((prev) => ({ ...prev, secondaryColor: '' }))}
+                      title="Same as main color"
+                      style={{
+                        aspectRatio: '1',
+                        backgroundColor: C.cream,
+                        borderRadius: '10px',
+                        border: !draftTheme.secondaryColor ? `1.5px solid ${C.ink}` : `1px solid ${C.border}`,
+                        boxShadow: !draftTheme.secondaryColor ? `2px 2px 0 ${C.ink}` : 'none',
+                        transform: !draftTheme.secondaryColor ? 'translate(-1px, -1px)' : 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: 800,
+                        color: C.inkFaint,
+                      }}
+                    >
+                      ✕
+                    </button>
+                    {COLOR_OPTIONS.map((c) => {
+                      const isActive = draftTheme.secondaryColor === c.value;
+                      return (
+                        <button
+                          key={c.value}
+                          onClick={() => setDraftTheme((prev) => ({ ...prev, secondaryColor: c.value }))}
+                          title={c.name}
+                          className="transition-all"
+                          style={{
+                            aspectRatio: '1',
+                            backgroundColor: c.swatch,
+                            borderRadius: '10px',
+                            border: isActive ? `1.5px solid ${C.ink}` : '1.5px solid transparent',
+                            boxShadow: isActive ? `2px 2px 0 ${C.ink}` : 'none',
+                            transform: isActive ? 'translate(-1px, -1px)' : 'none',
+                            cursor: 'pointer',
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </ControlGroup>
+
                 <SaveBar
                   sectionLabel="Vibe"
                   isSaved={savedSection === 'vibe'}
@@ -821,6 +922,38 @@ export default function EditorPage() {
                   />
                   <div style={{ textAlign: 'right', fontSize: '11px', color: C.inkFaint, marginTop: '4px' }}>
                     {draftBio.length}/150
+                  </div>
+                </ControlGroup>
+
+                {/* About / story — longer narrative shown in Store > About tab */}
+                <ControlGroup label="Your story (About tab)">
+                  <p style={{ fontSize: '11px', color: C.inkFaint, marginBottom: '10px' }}>
+                    A longer story about your business. Shows up on the About tab in your store.
+                  </p>
+                  <textarea
+                    value={draftAboutStory}
+                    onChange={(e) => setDraftAboutStory(e.target.value.slice(0, 1000))}
+                    placeholder={`Tell people the story behind your store. How did you start? What do you love about what you make? What makes your products special?`}
+                    rows={6}
+                    className="focus:outline-none"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: `1.5px solid ${C.borderInput}`,
+                      backgroundColor: C.cream,
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: C.ink,
+                      fontFamily: 'inherit',
+                      resize: 'none',
+                      lineHeight: 1.5,
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = C.ink; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = C.borderInput; }}
+                  />
+                  <div style={{ textAlign: 'right', fontSize: '11px', color: C.inkFaint, marginTop: '4px' }}>
+                    {draftAboutStory.length}/1000
                   </div>
                 </ControlGroup>
 
