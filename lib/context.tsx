@@ -28,8 +28,14 @@ export function AppProvider({ children }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
-      if (session?.user) loadUserStores(session.user.id);
-      else {
+      if (session?.user) {
+        // FIX: re-enter loading state when a new auth session begins
+        // (e.g. user just logged in). Without this, components can briefly
+        // see `user=set, loading=false, stores=[]` and redirect to /setup
+        // before the store fetch completes — the "always to /setup" bug.
+        setLoading(true);
+        loadUserStores(session.user.id);
+      } else {
         setStores([]); setActiveStoreId(null); setTheme(null); setProducts([]); setOrders([]);
         setLoading(false);
       }
