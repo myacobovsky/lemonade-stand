@@ -6,7 +6,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Confetti, getPatternStyle, getCardClasses } from '../../components';
+import { Confetti, getPatternStyle, getCardClasses, Logo } from '../../components';
 import { supabase } from '../../../lib/supabase';
 
 // ====================== DESIGN TOKENS ======================
@@ -70,6 +70,9 @@ export default function PublicStorePage({ params }) {
   const [buyerInfo, setBuyerInfo] = useState({ name: '', contact: '', note: '' });
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Tab state — Products vs About (only shown when there's a story)
+  const [activeTab, setActiveTab] = useState('products');
+
   // ====================== DATA LOADING ======================
   // Preserves the 3-path slug lookup from the original: UUID first, then
   // kid_name with hyphens converted to spaces, then raw slug as kid_name.
@@ -131,7 +134,14 @@ export default function PublicStorePage({ params }) {
   const storeName = storeData?.store_name || 'Store';
   const kidName = storeData?.kid_name || '';
   const storeBio = storeData?.bio || '';
+  const aboutStory = storeData?.about_story || '';
+  const heroLayout = storeTheme?.hero_layout || 'classic';
   const kidColors = getKidColors(storeTheme?.color);
+  const secondaryColors = storeTheme?.secondary_color
+    ? getKidColors(storeTheme.secondary_color)
+    : null;
+  // Color for "Add to cart" button — secondary if kid set one, otherwise main
+  const buttonColors = secondaryColors || kidColors;
 
   // Font families (fall back to Poppins if kid picked something unusual)
   const headerFontFamily = storeTheme?.header_font
@@ -307,151 +317,34 @@ export default function PublicStorePage({ params }) {
           </div>
         )}
 
-        {/* ========== HERO (kid's theme) ========== */}
-        <section
-          className="mb-8 relative overflow-hidden"
-          style={{
-            backgroundColor: kidColors.tint,
-            border: `1.5px solid ${C.ink}`,
-            borderRadius: '20px',
-            boxShadow: `3px 3px 0 ${C.ink}`,
-            padding: '40px 24px 36px',
-            textAlign: 'center',
-          }}
-        >
-          {/* Subtle sticker pattern backdrop if enabled */}
-          {storeTheme?.sticker_pattern && storeTheme?.sticker && (
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
-                  `<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50'><text x='12' y='35' font-size='24' opacity='0.08'>${storeTheme.sticker}</text></svg>`
-                )}")`,
-                backgroundSize: '50px 50px',
-              }}
-            />
-          )}
+        {/* ========== HERO (kid's theme — 3 layouts) ========== */}
+        <HeroBlock
+          heroLayout={heroLayout}
+          storeTheme={storeTheme}
+          kidColors={kidColors}
+          storeName={storeName}
+          kidName={kidName}
+          storeBio={storeBio}
+          headerFontFamily={headerFontFamily}
+          bodyFontFamily={bodyFontFamily}
+        />
 
-          {/* Or: explicit background pattern */}
-          {!storeTheme?.sticker_pattern && storeTheme?.pattern && storeTheme.pattern !== 'none' && (
-            <div aria-hidden="true" style={{ position: 'absolute', inset: 0, ...getPatternStyle(storeTheme.pattern) }} />
-          )}
+        {/* ========== TABS (Products + About) ========== */}
+        <StoreTabs
+          activeTab={activeTab}
+          onChange={setActiveTab}
+          hasAbout={!!aboutStory}
+        />
 
-          <div style={{ position: 'relative' }}>
-            {/* Main sticker */}
-            <div style={{ fontSize: '60px', lineHeight: 1, marginBottom: '12px' }}>
-              {storeTheme?.sticker || '🍋'}
-            </div>
-
-            {/* Accent stickers */}
-            {(storeTheme?.accent_stickers || []).length > 0 && (
-              <div className="flex justify-center gap-2 mb-3" style={{ flexWrap: 'wrap' }}>
-                {storeTheme.accent_stickers.map((s, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      fontSize: '22px',
-                      transform: `rotate(${(i - Math.floor(storeTheme.accent_stickers.length / 2)) * 14}deg)`,
-                      display: 'inline-block',
-                    }}
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Store name in kid's header font and deep-tone color */}
-            <h1
-              style={{
-                fontFamily: headerFontFamily,
-                fontSize: 'clamp(32px, 6vw, 44px)',
-                fontWeight: 700,
-                color: kidColors.deep,
-                lineHeight: 1.05,
-                letterSpacing: '-0.01em',
-                margin: '0 0 6px',
-              }}
-            >
-              {storeName}
-            </h1>
-
-            {/* by Kid */}
-            <div
-              style={{
-                fontSize: '14px',
-                color: C.inkMuted,
-                fontWeight: 500,
-                marginBottom: storeBio ? '12px' : '14px',
-                fontFamily: bodyFontFamily,
-              }}
-            >
-              by {kidName}
-            </div>
-
-            {/* Bio */}
-            {storeBio && (
-              <p
-                style={{
-                  fontSize: '14px',
-                  color: C.inkMuted,
-                  fontStyle: 'italic',
-                  maxWidth: '380px',
-                  margin: '0 auto 16px',
-                  lineHeight: 1.5,
-                  fontFamily: bodyFontFamily,
-                }}
-              >
-                "{storeBio}"
-              </p>
-            )}
-
-            {/* Trust pill */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: 'white',
-                border: `1px solid ${C.border}`,
-                borderRadius: '999px',
-                padding: '5px 12px 5px 10px',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: C.inkMuted,
-                letterSpacing: '0.02em',
-              }}
-            >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  backgroundColor: C.success,
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                }}
-              />
-              Parent-supervised shop
-            </div>
-          </div>
-        </section>
-
-        {/* ========== PRODUCTS SECTION ========== */}
-        <div
-          style={{
-            fontSize: '11px',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: C.inkFaint,
-            fontWeight: 700,
-            paddingLeft: '4px',
-            marginBottom: '14px',
-          }}
-        >
-          Products
-        </div>
+        {activeTab === 'about' && aboutStory ? (
+          <AboutContent
+            aboutStory={aboutStory}
+            kidName={kidName}
+            kidColors={kidColors}
+            bodyFontFamily={bodyFontFamily}
+          />
+        ) : (
+        <>
 
         {products.length === 0 ? (
           /* Empty state */
@@ -496,6 +389,7 @@ export default function PublicStorePage({ params }) {
                   key={p.id}
                   product={p}
                   kidColors={kidColors}
+                  buttonColors={buttonColors}
                   cardFontFamily={cardFontFamily}
                   bodyFontFamily={bodyFontFamily}
                   inCart={inCart}
@@ -506,6 +400,8 @@ export default function PublicStorePage({ params }) {
               );
             })}
           </div>
+        )}
+        </>
         )}
       </main>
 
@@ -559,6 +455,399 @@ export default function PublicStorePage({ params }) {
 }
 
 // =====================================================================
+// HERO BLOCK — switches between 3 layouts: classic, horizontal, banner
+// =====================================================================
+function HeroBlock({ heroLayout, storeTheme, kidColors, storeName, kidName, storeBio, headerFontFamily, bodyFontFamily }) {
+  // Shared backdrop pattern (sticker pattern OR explicit pattern)
+  const Backdrop = () => (
+    <>
+      {storeTheme?.sticker_pattern && storeTheme?.sticker && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+              `<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50'><text x='12' y='35' font-size='24' opacity='0.08'>${storeTheme.sticker}</text></svg>`
+            )}")`,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      )}
+      {!storeTheme?.sticker_pattern && storeTheme?.pattern && storeTheme.pattern !== 'none' && (
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, ...getPatternStyle(storeTheme.pattern) }} />
+      )}
+    </>
+  );
+
+  // Shared trust pill
+  const TrustPill = () => (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        backgroundColor: 'white',
+        border: `1px solid ${C.border}`,
+        borderRadius: '999px',
+        padding: '5px 12px 5px 10px',
+        fontSize: '11px',
+        fontWeight: 700,
+        color: C.inkMuted,
+        letterSpacing: '0.02em',
+      }}
+    >
+      <span
+        style={{
+          width: '6px',
+          height: '6px',
+          backgroundColor: C.success,
+          borderRadius: '50%',
+          display: 'inline-block',
+        }}
+      />
+      Parent-supervised shop
+    </div>
+  );
+
+  // Shared store name + by + bio block
+  const HeroText = ({ centered = true, large = true }) => (
+    <>
+      <h1
+        style={{
+          fontFamily: headerFontFamily,
+          fontSize: large ? 'clamp(32px, 6vw, 44px)' : 'clamp(24px, 5vw, 34px)',
+          fontWeight: 700,
+          color: kidColors.deep,
+          lineHeight: 1.05,
+          letterSpacing: '-0.01em',
+          margin: '0 0 6px',
+          textAlign: centered ? 'center' : 'left',
+        }}
+      >
+        {storeName}
+      </h1>
+      <div
+        style={{
+          fontSize: '14px',
+          color: C.inkMuted,
+          fontWeight: 500,
+          marginBottom: storeBio ? '12px' : '14px',
+          fontFamily: bodyFontFamily,
+          textAlign: centered ? 'center' : 'left',
+        }}
+      >
+        by {kidName}
+      </div>
+      {storeBio && (
+        <p
+          style={{
+            fontSize: '14px',
+            color: C.inkMuted,
+            fontStyle: 'italic',
+            maxWidth: '380px',
+            margin: centered ? '0 auto 16px' : '0 0 16px',
+            lineHeight: 1.5,
+            fontFamily: bodyFontFamily,
+            textAlign: centered ? 'center' : 'left',
+          }}
+        >
+          "{storeBio}"
+        </p>
+      )}
+    </>
+  );
+
+  // ====== LAYOUT: BANNER ======
+  // If banner photo set, photo dominates; name overlaid on bottom-left.
+  // Falls back to classic if no banner.
+  if (heroLayout === 'banner' && storeTheme?.banner_image_url) {
+    return (
+      <section
+        className="mb-8 relative overflow-hidden"
+        style={{
+          border: `1.5px solid ${C.ink}`,
+          borderRadius: '20px',
+          boxShadow: `3px 3px 0 ${C.ink}`,
+          minHeight: '280px',
+          backgroundImage: `url(${storeTheme.banner_image_url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Dark gradient overlay for text readability */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0) 100%)',
+          }}
+        />
+        {/* Content overlay — bottom-left */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '20px 24px',
+            color: 'white',
+          }}
+        >
+          {/* Sticker (small, top of overlay) */}
+          {storeTheme?.sticker && (
+            <div style={{ fontSize: '36px', lineHeight: 1, marginBottom: '8px' }}>
+              {storeTheme.sticker}
+            </div>
+          )}
+          <h1
+            style={{
+              fontFamily: headerFontFamily,
+              fontSize: 'clamp(28px, 5vw, 38px)',
+              fontWeight: 700,
+              color: 'white',
+              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
+              margin: '0 0 4px',
+              textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            }}
+          >
+            {storeName}
+          </h1>
+          <div
+            style={{
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.85)',
+              fontWeight: 500,
+              marginBottom: storeBio ? '8px' : '10px',
+              fontFamily: bodyFontFamily,
+            }}
+          >
+            by {kidName}
+          </div>
+          {storeBio && (
+            <p
+              style={{
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.92)',
+                fontStyle: 'italic',
+                maxWidth: '380px',
+                margin: '0 0 12px',
+                lineHeight: 1.5,
+                fontFamily: bodyFontFamily,
+              }}
+            >
+              "{storeBio}"
+            </p>
+          )}
+          <TrustPill />
+        </div>
+      </section>
+    );
+  }
+
+  // ====== LAYOUT: HORIZONTAL ======
+  // Sticker on left, name/bio on right.
+  if (heroLayout === 'horizontal') {
+    return (
+      <section
+        className="mb-8 relative overflow-hidden"
+        style={{
+          backgroundColor: kidColors.tint,
+          border: `1.5px solid ${C.ink}`,
+          borderRadius: '20px',
+          boxShadow: `3px 3px 0 ${C.ink}`,
+          padding: '32px 28px',
+        }}
+      >
+        <Backdrop />
+        <div
+          className="flex items-center gap-6 sm:gap-8"
+          style={{ position: 'relative', flexDirection: 'row', flexWrap: 'wrap' }}
+        >
+          {/* Sticker side */}
+          <div style={{ flexShrink: 0, textAlign: 'center' }}>
+            <div style={{ fontSize: '72px', lineHeight: 1, marginBottom: '8px' }}>
+              {storeTheme?.sticker || '🍋'}
+            </div>
+            {(storeTheme?.accent_stickers || []).length > 0 && (
+              <div className="flex justify-center gap-1.5" style={{ flexWrap: 'wrap' }}>
+                {storeTheme.accent_stickers.map((s, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: '18px',
+                      transform: `rotate(${(i - Math.floor(storeTheme.accent_stickers.length / 2)) * 12}deg)`,
+                      display: 'inline-block',
+                    }}
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Text side */}
+          <div style={{ flex: '1 1 200px', minWidth: '200px' }}>
+            <HeroText centered={false} large={true} />
+            <TrustPill />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // ====== LAYOUT: CLASSIC (default) ======
+  return (
+    <section
+      className="mb-8 relative overflow-hidden"
+      style={{
+        backgroundColor: kidColors.tint,
+        border: `1.5px solid ${C.ink}`,
+        borderRadius: '20px',
+        boxShadow: `3px 3px 0 ${C.ink}`,
+        padding: '40px 24px 36px',
+        textAlign: 'center',
+      }}
+    >
+      <Backdrop />
+      <div style={{ position: 'relative' }}>
+        <div style={{ fontSize: '60px', lineHeight: 1, marginBottom: '12px' }}>
+          {storeTheme?.sticker || '🍋'}
+        </div>
+        {(storeTheme?.accent_stickers || []).length > 0 && (
+          <div className="flex justify-center gap-2 mb-3" style={{ flexWrap: 'wrap' }}>
+            {storeTheme.accent_stickers.map((s, i) => (
+              <span
+                key={i}
+                style={{
+                  fontSize: '22px',
+                  transform: `rotate(${(i - Math.floor(storeTheme.accent_stickers.length / 2)) * 14}deg)`,
+                  display: 'inline-block',
+                }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
+        <HeroText centered={true} large={true} />
+        <TrustPill />
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// STORE TABS — Products / About switcher (only shows About when story exists)
+// =====================================================================
+function StoreTabs({ activeTab, onChange, hasAbout }) {
+  // If no about story, just render the "Products" label like before
+  if (!hasAbout) {
+    return (
+      <div
+        style={{
+          fontSize: '11px',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: C.inkFaint,
+          fontWeight: 700,
+          paddingLeft: '4px',
+          marginBottom: '14px',
+        }}
+      >
+        Products
+      </div>
+    );
+  }
+
+  // Two-tab pill switcher
+  return (
+    <div
+      className="flex gap-1 mb-5"
+      style={{
+        padding: '4px',
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: '12px',
+        boxShadow: `1px 1px 0 ${C.ink}14`,
+        width: 'fit-content',
+      }}
+    >
+      {[
+        { id: 'products', label: 'Products' },
+        { id: 'about',    label: 'About' },
+      ].map((t) => {
+        const isActive = activeTab === t.id;
+        return (
+          <button
+            key={t.id}
+            onClick={() => onChange(t.id)}
+            className="transition-all"
+            style={{
+              padding: isActive ? '7px 14px' : '8px 15px',
+              fontSize: '13px',
+              fontWeight: isActive ? 800 : 700,
+              color: isActive ? C.ink : C.inkFaint,
+              backgroundColor: isActive ? '#FCD34D' : 'transparent',
+              border: isActive ? `1px solid ${C.ink}` : '1px solid transparent',
+              borderRadius: '8px',
+              boxShadow: isActive ? `1px 1px 0 ${C.ink}` : 'none',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// =====================================================================
+// ABOUT CONTENT — story panel shown when About tab is active
+// =====================================================================
+function AboutContent({ aboutStory, kidName, kidColors, bodyFontFamily }) {
+  return (
+    <div
+      style={{
+        backgroundColor: kidColors.tint,
+        border: `1.5px solid ${C.ink}`,
+        borderRadius: '18px',
+        padding: '28px 28px 32px',
+        boxShadow: `3px 3px 0 ${C.ink}`,
+      }}
+    >
+      <p
+        style={{
+          fontSize: '11px',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: kidColors.deep,
+          fontWeight: 800,
+          marginBottom: '12px',
+        }}
+      >
+        {kidName}'s story
+      </p>
+      <div
+        style={{
+          fontSize: '15px',
+          color: C.ink,
+          lineHeight: 1.6,
+          fontFamily: bodyFontFamily,
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        {aboutStory}
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
 // BOLD PLAYFUL NAV — the platform chrome, never changes per store
 // =====================================================================
 function BoldPlayfulNav({ cartCount, cartTotal, onCartClick }) {
@@ -576,27 +865,7 @@ function BoldPlayfulNav({ cartCount, cartTotal, onCartClick }) {
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5 shrink-0" style={{ textDecoration: 'none' }}>
-          <div
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '50%',
-              backgroundColor: C.amberBtn,
-              border: `1.5px solid ${C.ink}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '16px',
-            }}
-          >
-            <svg viewBox="0 0 32 32" fill="none" style={{ width: '20px', height: '20px' }}>
-              <ellipse cx="16" cy="17" rx="11" ry="9" fill="#FCD34D" stroke="#1C1917" strokeWidth="2"/>
-              <circle cx="12" cy="16" r="2" fill="#1C1917"/>
-              <circle cx="20" cy="16" r="2" fill="#1C1917"/>
-              <path d="M12 20 Q16 24 20 20" stroke="#1C1917" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              <path d="M16 8 Q20 4 22 8 Q20 10 16 8" fill="#10B981" stroke="#1C1917" strokeWidth="1.5"/>
-            </svg>
-          </div>
+          <Logo size="sm" />
           <span
             style={{
               fontFamily: "'DynaPuff', cursive",
@@ -669,7 +938,9 @@ function BoldPlayfulNav({ cartCount, cartTotal, onCartClick }) {
 // =====================================================================
 // PRODUCT CARD — chunky Bold Playful frame with kid's color inside
 // =====================================================================
-function ProductCard({ product, kidColors, cardFontFamily, bodyFontFamily, inCart, isOutOfStock, isList, onAdd }) {
+function ProductCard({ product, kidColors, buttonColors, cardFontFamily, bodyFontFamily, inCart, isOutOfStock, isList, onAdd }) {
+  // Default buttonColors to kidColors if not supplied (backwards compatibility)
+  const btnColors = buttonColors || kidColors;
   return (
     <div
       className={`transition-all ${isList ? 'flex' : ''} ${isOutOfStock ? 'opacity-75' : ''}`}
@@ -820,8 +1091,8 @@ function ProductCard({ product, kidColors, cardFontFamily, bodyFontFamily, inCar
               onClick={onAdd}
               className="transition-all hover:-translate-y-0.5"
               style={{
-                backgroundColor: kidColors.accent,
-                color: kidColors.accentContrast,
+                backgroundColor: btnColors.accent,
+                color: btnColors.accentContrast,
                 border: `1.5px solid ${C.ink}`,
                 boxShadow: `2px 2px 0 ${C.ink}`,
                 padding: '6px 12px',
