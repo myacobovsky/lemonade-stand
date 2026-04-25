@@ -2,7 +2,7 @@
 // FILE: app/setup/page.tsx
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -122,6 +122,8 @@ export default function SetupPage() {
   const [step, setStep] = useState(1);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [miniConfetti, setMiniConfetti] = useState(false); // celebrates kid milestones inline
+  const [pulseKey, setPulseKey] = useState(0); // bumps to retrigger headline animation
   const [formData, setFormData] = useState({
     parentName: '',
     kidName: '',
@@ -139,6 +141,15 @@ export default function SetupPage() {
   });
   const [schoolLookupError, setSchoolLookupError] = useState('');
   const [schoolLookupLoading, setSchoolLookupLoading] = useState(false);
+
+  // Celebrate a milestone — used when kid advances on key kid steps (3, 4, 5, 6, 7).
+  // Fires mini confetti for ~1.5s and bumps a pulse key so the next screen's
+  // headline can replay its bounce animation.
+  const celebrateMilestone = () => {
+    setMiniConfetti(true);
+    setPulseKey((k) => k + 1);
+    setTimeout(() => setMiniConfetti(false), 1500);
+  };
 
   const updateField = (field, value) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -262,6 +273,32 @@ export default function SetupPage() {
       className="min-h-screen"
       style={{ backgroundColor: C.cream, fontFamily: font.sans, color: C.ink }}
     >
+      {/* Mini confetti fires when kid hits a milestone (Steps 3-7 advance) */}
+      {miniConfetti && <Confetti />}
+
+      {/* Inline animation styles for bouncy active states + headline pop */}
+      <style>{`
+        @keyframes setup-pop {
+          0% { transform: scale(1); }
+          40% { transform: scale(1.1); }
+          70% { transform: scale(0.96); }
+          100% { transform: scale(1); }
+        }
+        @keyframes setup-bounce-in {
+          0% { transform: translateY(8px) scale(0.95); opacity: 0; }
+          60% { transform: translateY(-3px) scale(1.04); opacity: 1; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes setup-wiggle {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-3deg); }
+          75% { transform: rotate(3deg); }
+        }
+        .setup-pop-on-active { animation: setup-pop 0.4s ease-out; }
+        .setup-bounce-headline { animation: setup-bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .setup-wiggle-icon { animation: setup-wiggle 0.5s ease-in-out; }
+      `}</style>
+
       {/* ===== HEADER (custom for setup wizard) ===== */}
       <header
         className="px-4 sm:px-8 py-4 flex items-center justify-between"
@@ -818,7 +855,7 @@ export default function SetupPage() {
                 Welcome
               </p>
               <h1
-                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                key={pulseKey} className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05] setup-bounce-headline"
                 style={{ fontWeight: 800, color: C.ink }}
               >
                 Hey there!
@@ -869,23 +906,23 @@ export default function SetupPage() {
             </div>
 
             {formData.kidName && (
-              <div className="mt-5 text-center animate-fadeIn">
+              <div className="mt-6 text-center setup-bounce-headline" key={`s3-${formData.kidName.length}`}>
                 <p
                   style={{
-                    fontSize: '15px',
+                    fontSize: '20px',
                     color: C.amberAccent,
                     fontWeight: 800,
-                    letterSpacing: '-0.005em',
+                    letterSpacing: '-0.01em',
                   }}
                 >
-                  Nice to meet you, {formData.kidName}!
+                  Nice to meet you, {formData.kidName}! 👋
                 </p>
               </div>
             )}
 
             <KidNavButtons
               onBack={() => setStep(2)}
-              onNext={() => setStep(4)}
+              onNext={() => { celebrateMilestone(); setStep(4); }}
               nextDisabled={!formData.kidName}
               nextLabel="That's me! →"
             />
@@ -905,7 +942,7 @@ export default function SetupPage() {
                 Your store
               </p>
               <h1
-                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                key={pulseKey} className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05] setup-bounce-headline"
                 style={{ fontWeight: 800, color: C.ink }}
               >
                 Name your <span style={{ color: C.amberAccent }}>store.</span>
@@ -967,7 +1004,8 @@ export default function SetupPage() {
             {/* Live preview */}
             {formData.storeName && (
               <div
-                className="mt-4 animate-fadeIn"
+                className="mt-4 setup-bounce-headline"
+                key={`s4-${formData.storeName}`}
                 style={{
                   backgroundColor: C.creamWarm,
                   border: `1px solid ${C.border}`,
@@ -1013,7 +1051,7 @@ export default function SetupPage() {
 
             <KidNavButtons
               onBack={() => setStep(3)}
-              onNext={() => setStep(5)}
+              onNext={() => { celebrateMilestone(); setStep(5); }}
               nextDisabled={!formData.storeName}
               nextLabel="Love it! →"
             />
@@ -1034,7 +1072,7 @@ export default function SetupPage() {
                 Your products
               </p>
               <h1
-                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                key={pulseKey} className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05] setup-bounce-headline"
                 style={{ fontWeight: 800, color: C.ink }}
               >
                 What do you <span style={{ color: C.amberAccent }}>make?</span>
@@ -1055,7 +1093,7 @@ export default function SetupPage() {
                   <button
                     key={cat.label}
                     onClick={() => updateField('category', cat.label)}
-                    className="flex items-center gap-3 transition-all"
+                    className={`flex items-center gap-3 transition-all ${isActive ? "setup-pop-on-active" : ""}`}
                     style={{
                       padding: '14px 14px',
                       borderRadius: '14px',
@@ -1101,7 +1139,7 @@ export default function SetupPage() {
 
             <KidNavButtons
               onBack={() => setStep(4)}
-              onNext={() => setStep(6)}
+              onNext={() => { celebrateMilestone(); setStep(6); }}
               nextDisabled={!formData.category}
               nextLabel="That's what I make! →"
             />
@@ -1121,7 +1159,7 @@ export default function SetupPage() {
                 Your goal
               </p>
               <h1
-                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                key={pulseKey} className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05] setup-bounce-headline"
                 style={{ fontWeight: 800, color: C.ink }}
               >
                 What are you <span style={{ color: C.amberAccent }}>saving for?</span>
@@ -1142,7 +1180,7 @@ export default function SetupPage() {
                   <button
                     key={goal.label}
                     onClick={() => updateField('savingsGoal', goal.label)}
-                    className="flex items-center gap-3 transition-all"
+                    className={`flex items-center gap-3 transition-all ${isActive ? "setup-pop-on-active" : ""}`}
                     style={{
                       padding: '14px 14px',
                       borderRadius: '14px',
@@ -1215,7 +1253,7 @@ export default function SetupPage() {
 
             <KidNavButtons
               onBack={() => setStep(5)}
-              onNext={() => setStep(7)}
+              onNext={() => { celebrateMilestone(); setStep(7); }}
               nextDisabled={
                 !formData.savingsGoal ||
                 (formData.savingsGoal === 'Other' && !formData.savingsGoalCustom)
@@ -1238,7 +1276,7 @@ export default function SetupPage() {
                 Set your target
               </p>
               <h1
-                className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05]"
+                key={pulseKey} className="text-3xl sm:text-4xl tracking-[-0.025em] leading-[1.05] setup-bounce-headline"
                 style={{ fontWeight: 800, color: C.ink }}
               >
                 How much do you <span style={{ color: C.amberAccent }}>need?</span>
@@ -1258,7 +1296,7 @@ export default function SetupPage() {
                   <button
                     key={amt}
                     onClick={() => updateField('savingsAmount', amt)}
-                    className="transition-all"
+                    className={`transition-all ${isActive ? "setup-pop-on-active" : ""}`}
                     style={{
                       padding: '20px 8px',
                       borderRadius: '14px',
@@ -1282,27 +1320,28 @@ export default function SetupPage() {
             </div>
 
             {formData.savingsAmount && (
-              <div className="mt-6 text-center animate-fadeIn">
+              <div className="mt-6 text-center setup-bounce-headline" key={`s7-${formData.savingsAmount}`}>
                 <p
                   style={{
-                    fontSize: '14px',
+                    fontSize: '18px',
                     color: C.amberAccent,
                     fontWeight: 800,
-                    letterSpacing: '-0.005em',
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.4,
                   }}
                 >
                   ${formData.savingsAmount} for{' '}
                   {formData.savingsGoal === 'Other'
                     ? formData.savingsGoalCustom
                     : formData.savingsGoal.toLowerCase()}
-                  . Let's do this!
+                  . Let's do this! 🚀
                 </p>
               </div>
             )}
 
             <KidNavButtons
               onBack={() => setStep(6)}
-              onNext={() => setStep(8)}
+              onNext={() => { celebrateMilestone(); setStep(8); }}
               nextDisabled={!formData.savingsAmount}
               nextLabel="Almost there! →"
             />
